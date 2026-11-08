@@ -129,6 +129,7 @@ function showView(viewId, pushHistory = true) {
     state.qrScanner.stop();
   }
 }
+window.showView = showView;
 
 // Global Back Navigation: Steps back within the app instead of closing or exiting
 function navigateBack() {
@@ -149,6 +150,7 @@ function navigateBack() {
     showView('view-landing', false);
   }
 }
+window.navigateBack = navigateBack;
 
 // Listen to Android hardware / browser popstate back button
 window.addEventListener('popstate', (event) => {
@@ -209,24 +211,30 @@ function setupSyncUI() {
 // ==========================================================================
 // 2. Student Flow (Form & QR Code Generation)
 // ==========================================================================
-async function initStudentFlow() {
-  const localData = localStorage.getItem('student_profile');
-  if (localData) {
-    try {
-      state.currentStudent = JSON.parse(localData);
-      renderStudentQrCard(state.currentStudent);
-      initStudentInboxListener(state.currentStudent);
-      showView('view-student-card');
-      return;
-    } catch (e) {
-      console.warn('Error reading saved student profile:', e);
+function initStudentFlow() {
+  try {
+    const localData = localStorage.getItem('student_profile');
+    if (localData) {
+      try {
+        state.currentStudent = JSON.parse(localData);
+        renderStudentQrCard(state.currentStudent);
+        initStudentInboxListener(state.currentStudent);
+        showView('view-student-card');
+        return;
+      } catch (e) {
+        console.warn('Error reading saved student profile:', e);
+      }
     }
-  }
 
-  // Not registered yet, show registration form
-  resetStudentForm();
-  showView('view-student-form');
+    // Not registered yet, show registration form
+    resetStudentForm();
+    showView('view-student-form');
+  } catch (err) {
+    console.error('initStudentFlow error:', err);
+    showView('view-student-form');
+  }
 }
+window.initStudentFlow = initStudentFlow;
 
 function resetStudentForm() {
   const nameInput = document.getElementById('student-name-input');
@@ -236,6 +244,30 @@ function resetStudentForm() {
   const firstRadio = document.querySelector('input[name="student_dept"][value="آلات"]');
   if (firstRadio) firstRadio.checked = true;
 }
+
+// Force Update and Clear Cache
+async function forceUpdateApp() {
+  if ('caches' in window) {
+    try {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    } catch (e) {}
+  }
+  if ('serviceWorker' in navigator) {
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const reg of regs) {
+        await reg.unregister();
+      }
+    } catch (e) {}
+  }
+  localStorage.removeItem('smart_attendance_build');
+  showToast('جاري تحديث التطبيق ومسح الكاش...', 'info');
+  setTimeout(() => {
+    window.location.reload(true);
+  }, 400);
+}
+window.forceUpdateApp = forceUpdateApp;
 
 function setupStudentFormEvents() {
   const nidInput = document.getElementById('student-nid-input');
@@ -349,27 +381,7 @@ function setupStudentFormEvents() {
   // Quick App Cache Refresh & Force Update Button
   const forceUpdateBtn = document.getElementById('btn-force-update-app');
   if (forceUpdateBtn) {
-    forceUpdateBtn.addEventListener('click', async () => {
-      if ('caches' in window) {
-        try {
-          const keys = await caches.keys();
-          await Promise.all(keys.map(k => caches.delete(k)));
-        } catch (e) {}
-      }
-      if ('serviceWorker' in navigator) {
-        try {
-          const regs = await navigator.serviceWorker.getRegistrations();
-          for (const reg of regs) {
-            await reg.unregister();
-          }
-        } catch (e) {}
-      }
-      localStorage.removeItem('smart_attendance_build');
-      showToast('جاري تحديث التطبيق ومسح الكاش...', 'info');
-      setTimeout(() => {
-        window.location.reload(true);
-      }, 400);
-    });
+    forceUpdateBtn.addEventListener('click', forceUpdateApp);
   }
 
   // Edit Profile Button
@@ -660,30 +672,28 @@ function setupInstructorFlow() {
   }
 }
 
-// Populate Instructors list and show Instructor PIN screen
-async function initInstructorFlow() {
-  await loadInstructorsList();
+// Populate Instructors list and show Instructor PIN screen (Instant 0ms switch)
+function initInstructorFlow() {
   showView('view-instructor-pin');
+  loadInstructorsList();
   const pinInput = document.getElementById('instructor-pin-input');
   if (pinInput) {
     pinInput.value = '';
-    pinInput.focus();
+    setTimeout(() => pinInput.focus(), 150);
   }
 }
+window.initInstructorFlow = initInstructorFlow;
 
 async function loadInstructorsList() {
-  if (window.CloudDB && window.CloudDB.getAllInstructors) {
-    state.instructors = await window.CloudDB.getAllInstructors();
-  } else {
-    try {
-      const local = localStorage.getItem('app_instructors');
-      state.instructors = local ? JSON.parse(local) : [];
-    } catch (e) {
-      state.instructors = [];
-    }
-  }
+  let cached = null;
+  try {
+    const local = localStorage.getItem('app_instructors');
+    if (local) cached = JSON.parse(local);
+  } catch (e) {}
 
-  if (!state.instructors || state.instructors.length === 0) {
+  if (cached && Array.isArray(cached) && cached.length > 0) {
+    state.instructors = cached;
+  } else if (!state.instructors || state.instructors.length === 0) {
     state.instructors = [{
       id: 'inst_default',
       name: 'د. جورج سليمان رشدي',
@@ -692,9 +702,25 @@ async function loadInstructorsList() {
       pin: '1234'
     }];
   }
+  renderInstructorsDropdown();
 
+  // Fresh background sync from Cloud DB
+  if (window.CloudDB && window.CloudDB.getAllInstructors) {
+    try {
+      const cloudList = await window.CloudDB.getAllInstructors();
+      if (cloudList && cloudList.length > 0) {
+        state.instructors = cloudList;
+        renderInstructorsDropdown();
+      }
+    } catch (err) {
+      console.warn('Could not refresh cloud instructors list:', err);
+    }
+  }
+}
+
+function renderInstructorsDropdown() {
   const sel = document.getElementById('instructor-select');
-  if (sel) {
+  if (sel && state.instructors) {
     sel.innerHTML = '';
     state.instructors.forEach(doc => {
       const opt = document.createElement('option');
@@ -768,6 +794,7 @@ function openDevPinModal() {
   modal?.classList.add('open');
   setTimeout(() => input?.focus(), 200);
 }
+window.openDevPinModal = openDevPinModal;
 
 async function handleDevPinSubmit() {
   const input = document.getElementById('dev-pin-input');
@@ -1085,6 +1112,7 @@ function openNewLectureModal() {
 function closeModals() {
   document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open'));
 }
+window.closeModals = closeModals;
 
 async function handleCreateLecture() {
   const titleInput = document.getElementById('new-lec-title');
@@ -1454,12 +1482,19 @@ async function handleManualAttendanceSubmit() {
 // ==========================================================================
 function setupGlobalEvents() {
   // 1. Simple Clean Role Action Buttons (Direct & Instant)
-  document.getElementById('btn-main-student')?.addEventListener('click', () => {
+  document.getElementById('btn-main-student')?.addEventListener('click', (e) => {
+    e.preventDefault();
     initStudentFlow();
   });
 
-  document.getElementById('btn-main-instructor')?.addEventListener('click', async () => {
-    await initInstructorFlow();
+  document.getElementById('btn-main-instructor')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    initInstructorFlow();
+  });
+
+  document.getElementById('btn-landing-dev-portal')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openDevPinModal();
   });
 
   // Password visibility eye toggle button
@@ -1570,18 +1605,28 @@ function registerServiceWorker() {
   });
 }
 
-// Initialization on DOM Ready
-document.addEventListener('DOMContentLoaded', () => {
-  setupSyncUI();
-  setupStudentFormEvents();
-  setupInstructorFlow();
-  setupStudentProfileFeatures();
-  setupInstructorPortalTabs();
-  setupGlobalEvents();
-  registerServiceWorker();
+// Robust Initialization (handles loading or already-interactive DOM)
+function initApp() {
+  try {
+    setupSyncUI();
+    setupStudentFormEvents();
+    setupInstructorFlow();
+    setupStudentProfileFeatures();
+    setupInstructorPortalTabs();
+    setupGlobalEvents();
+    registerServiceWorker();
+    console.log('Smart Attendance PWA v5.6 initialized successfully.');
+  } catch (e) {
+    console.error('Error during initApp:', e);
+  }
+}
 
-  console.log('Smart Attendance PWA initialized successfully.');
-});
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  // DOM is already ready
+  initApp();
+}
 
 
 

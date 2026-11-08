@@ -10,16 +10,16 @@
 
   <!-- PWA Manifest & Favicon -->
   <link rel="manifest" href="./manifest.json">
-  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="icon" type="image/png" href="./icons/icon-192.png">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=5.5">
+  <link rel="stylesheet" href="./css/style.css?v=5.6">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation (v5.5) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation (v5.6) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v5.5-simple-agri';
+      const CURRENT_VERSION = 'v5.6-instant-action';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
         if ('caches' in window) {
@@ -52,18 +52,10 @@
     <header class="app-header">
       <div class="brand-container btn-back-landing">
         <div class="brand-logo" title="مهندس زراعي">
-          <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-            <!-- Engineer Helmet -->
-            <path d="M 8 18 C 8 11 11 9 16 9 C 21 9 24 11 24 18 Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>
-            <ellipse cx="16" cy="18" rx="10" ry="2.5" fill="#eab308"/>
-            <rect x="15" y="9" width="2" height="9" fill="#fef08a"/>
-            <!-- Green Sprout -->
-            <path d="M 16 9 C 14 5 10 4 9 2 C 12 3 15 5 16 9 Z" fill="#10b981"/>
-            <path d="M 16 9 C 18 5 22 4 23 2 C 20 3 17 5 16 9 Z" fill="#34d399"/>
-          </svg>
+          <img src="./icons/icon-192.png?v=5.6" alt="مهندس زراعي" style="width: 24px; height: 24px; object-fit: cover; border-radius: 6px; display: block;">
         </div>
         <div>
-          <h1 class="brand-title">حضور وغياب <span style="font-size:0.65rem; background:rgba(16,185,129,0.2); color:var(--emerald-light); border:1px solid rgba(16,185,129,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.5</span></h1>
+          <h1 class="brand-title">حضور وغياب <span style="font-size:0.65rem; background:rgba(16,185,129,0.2); color:var(--emerald-light); border:1px solid rgba(16,185,129,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.6</span></h1>
         </div>
       </div>
 
@@ -91,16 +83,8 @@
 
           <!-- Clean App Header with Agricultural Engineer Emblem -->
           <div class="simple-brand-header">
-            <div class="agri-eng-badge" title="مهندس زراعي">
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                <!-- Golden Helmet -->
-                <path d="M 12 26 C 12 16 17 13 24 13 C 31 13 36 16 36 26 Z" fill="#eab308" stroke="#ca8a04" stroke-width="2"/>
-                <ellipse cx="24" cy="26" rx="14" ry="3.5" fill="#ca8a04"/>
-                <rect x="22.5" y="13" width="3" height="13" fill="#fef08a"/>
-                <!-- Green Sprout -->
-                <path d="M 24 13 C 21 8 16 7 15 3 C 19 4 23 8 24 13 Z" fill="#10b981"/>
-                <path d="M 24 13 C 27 8 32 7 33 3 C 29 4 25 8 24 13 Z" fill="#34d399"/>
-              </svg>
+            <div class="agri-eng-badge" title="مهندس زراعي" style="overflow: hidden; padding: 0;">
+              <img src="./icons/icon-192.png?v=5.6" alt="مهندس زراعي" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
             </div>
             <h2 class="simple-app-title">نظام الحضور والغياب</h2>
             <p class="simple-app-sub">منظومة الحضور الذكي بالـ QR Code</p>
@@ -108,7 +92,7 @@
 
           <!-- The Two Direct Clean Buttons -->
           <div class="simple-role-actions">
-            <button type="button" id="btn-main-student" class="simple-role-btn student-glow">
+            <button type="button" id="btn-main-student" class="simple-role-btn student-glow" onclick="window.initStudentFlow && window.initStudentFlow()">
               <div class="btn-icon-circle">🎓</div>
               <div class="btn-text-content">
                 <strong class="btn-main-text">دخول الطالب</strong>
@@ -117,7 +101,7 @@
               <span class="btn-arrow-icon">◀</span>
             </button>
 
-            <button type="button" id="btn-main-instructor" class="simple-role-btn instructor-glow">
+            <button type="button" id="btn-main-instructor" class="simple-role-btn instructor-glow" onclick="window.initInstructorFlow && window.initInstructorFlow()">
               <div class="btn-icon-circle instructor">👨‍🏫</div>
               <div class="btn-text-content">
                 <strong class="btn-main-text">دخول المحاضر</strong>
@@ -129,7 +113,7 @@
 
           <!-- Discrete Developer Link at the bottom -->
           <div class="simple-dev-link-wrap">
-            <button type="button" id="btn-landing-dev-portal" class="simple-dev-link">
+            <button type="button" id="btn-landing-dev-portal" class="simple-dev-link" onclick="window.openDevPinModal && window.openDevPinModal()">
               <span>🔐</span>
               <span>دخول مسؤول النظام والمطور</span>
             </button>
@@ -137,8 +121,8 @@
 
           <!-- Subtle App Refresh Trigger -->
           <div style="margin-top: 14px; text-align: center;">
-            <button id="btn-force-update-app" class="tool-btn" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
-              <span>🔄 تحديث التطبيق ومسح الكاش (v5.5)</span>
+            <button id="btn-force-update-app" class="tool-btn" onclick="window.forceUpdateApp && window.forceUpdateApp()" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
+              <span>🔄 تحديث التطبيق ومسح الكاش (v5.6)</span>
             </button>
           </div>
 
@@ -1010,19 +994,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=5.4"></script>
+  <script src="./js/firebase-app.js?v=5.6"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=5.4"></script>
-  <script src="./libs/html5-qrcode.min.js?v=5.4"></script>
-  <script src="./libs/xlsx.full.min.js?v=5.4"></script>
+  <script src="./libs/qrcode.js?v=5.6"></script>
+  <script src="./libs/html5-qrcode.min.js?v=5.6"></script>
+  <script src="./libs/xlsx.full.min.js?v=5.6"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=5.4"></script>
-  <script src="./js/sync.js?v=5.4"></script>
-  <script src="./js/qr-scanner.js?v=5.4"></script>
-  <script src="./js/excel.js?v=5.4"></script>
-  <script src="./js/app.js?v=5.4"></script>
+  <script src="./js/db.js?v=5.6"></script>
+  <script src="./js/sync.js?v=5.6"></script>
+  <script src="./js/qr-scanner.js?v=5.6"></script>
+  <script src="./js/excel.js?v=5.6"></script>
+  <script src="./js/app.js?v=5.6"></script>
 
 </body>
 </html>
