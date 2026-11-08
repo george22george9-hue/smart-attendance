@@ -1,17 +1,17 @@
-const CACHE_NAME = 'smart-attendance-v4';
+const CACHE_NAME = 'smart-attendance-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './css/style.css',
-  './js/app.js',
-  './js/db.js',
-  './js/sync.js',
-  './js/qr-scanner.js',
-  './js/excel.js',
-  './js/firebase-app.js',
-  './libs/html5-qrcode.min.js',
-  './libs/qrcode.js',
-  './libs/xlsx.full.min.js',
+  './css/style.css?v=5.0',
+  './js/app.js?v=5.0',
+  './js/db.js?v=5.0',
+  './js/sync.js?v=5.0',
+  './js/qr-scanner.js?v=5.0',
+  './js/excel.js?v=5.0',
+  './js/firebase-app.js?v=5.0',
+  './libs/html5-qrcode.min.js?v=5.0',
+  './libs/qrcode.js?v=5.0',
+  './libs/xlsx.full.min.js?v=5.0',
   './manifest.json',
   './icons/icon.svg',
   './icons/icon-192.png',
@@ -22,10 +22,10 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Pre-caching offline assets');
+      console.log('[SW v5] Pre-caching all assets');
       return cache.addAll(ASSETS_TO_CACHE);
     }).catch(err => {
-      console.warn('[SW] Cache addAll warning:', err);
+      console.warn('[SW v5] Cache warning:', err);
     })
   );
 });
@@ -36,7 +36,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
-            console.log('[SW] Deleting old cache:', cache);
+            console.log('[SW v5] Deleting old obsolete cache:', cache);
             return caches.delete(cache);
           }
         })
@@ -46,46 +46,35 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+
   const url = new URL(event.request.url);
 
-  // 1. Navigation requests (Opening the site in browser or refreshing) -> Network First with Offline Fallback
-  if (event.request.mode === 'navigate' || event.request.headers.get('accept')?.includes('text/html')) {
-    event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const copy = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-          }
-          return networkResponse;
-        })
-        .catch(() => {
-          // If device is offline, load cached index.html
-          return caches.match('./index.html') || caches.match('./');
-        })
-    );
+  // Skip firestore and external googleapis from SW cache
+  if (url.origin.includes('firestore.googleapis.com') || url.origin.includes('gstatic.com')) {
     return;
   }
 
-  // 2. Ignore non-GET requests or external analytics
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  // 3. Stale-While-Revalidate for static assets (CSS, JS, Fonts, Images, Libs)
+  // Network First with Offline Fallback
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const copy = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        // Fallback to cache when offline
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html') || caches.match('./');
           }
-          return networkResponse;
-        })
-        .catch(() => cachedResponse);
-
-      return cachedResponse || fetchPromise;
-    })
+        });
+      })
   );
 });

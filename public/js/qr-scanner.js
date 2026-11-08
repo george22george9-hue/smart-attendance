@@ -211,25 +211,41 @@ class QRScannerController {
         }
       }
 
-      // If still not parsed, try regex extraction
+      // If still not parsed, try regex extraction of nid / name / dept
       if (!data) {
         const nidMatch = text.match(/"nid"\s*:\s*"(\d{14})"/);
         const nameMatch = text.match(/"name"\s*:\s*"([^"]+)"/);
         const deptMatch = text.match(/"dept"\s*:\s*"([^"]+)"/);
-        if (nidMatch && nameMatch && deptMatch) {
-          data = { nid: nidMatch[1], name: nameMatch[1], dept: deptMatch[1] };
+        if (nidMatch) {
+          data = {
+            nid: nidMatch[1],
+            name: nameMatch ? nameMatch[1] : 'طالب مسجل',
+            dept: deptMatch ? deptMatch[1] : 'عام'
+          };
         }
       }
 
-      if (!data || !data.nid || !data.name || !data.dept) {
-        throw new Error('QR payload is missing student fields');
+      // Attempt 5: Any 14-digit National ID in the text
+      if (!data) {
+        const rawNidMatch = text.match(/\b\d{14}\b/) || text.match(/\d{14}/);
+        if (rawNidMatch) {
+          data = {
+            nid: rawNidMatch[0],
+            name: 'طالب مسجل',
+            dept: 'عام'
+          };
+        }
+      }
+
+      if (!data || !data.nid) {
+        throw new Error('QR payload is missing student national ID');
       }
 
       if (this.onScanCallback) {
         this.onScanCallback({
           national_id: String(data.nid).trim(),
-          student_name: String(data.name).trim(),
-          department: String(data.dept).trim()
+          student_name: String(data.name || 'طالب مسجل').trim(),
+          department: String(data.dept || 'عام').trim()
         });
       }
     } catch (err) {

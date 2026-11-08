@@ -14,7 +14,35 @@
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/style.css?v=5.0">
+
+  <!-- Auto Cache Buster & Instant Version Invalidation (v5.0) -->
+  <script>
+    (function() {
+      const CURRENT_VERSION = 'v5.0-cloud-firestore';
+      const storedVersion = localStorage.getItem('smart_attendance_build');
+      if (storedVersion !== CURRENT_VERSION) {
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            names.forEach(function(name) {
+              caches.delete(name);
+            });
+          });
+        }
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            registrations.forEach(function(reg) {
+              reg.unregister();
+            });
+          });
+        }
+        localStorage.setItem('smart_attendance_build', CURRENT_VERSION);
+        if (storedVersion) {
+          window.location.reload(true);
+        }
+      }
+    })();
+  </script>
 </head>
 <body>
 
@@ -32,7 +60,7 @@
           </svg>
         </div>
         <div>
-          <h1 class="brand-title">حضور وغياب</h1>
+          <h1 class="brand-title">حضور وغياب <span style="font-size:0.65rem; background:rgba(6,182,212,0.2); color:var(--cyan-light); border:1px solid rgba(6,182,212,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.0</span></h1>
         </div>
       </div>
 
@@ -90,6 +118,13 @@
               <span>◀</span>
             </button>
           </div>
+        </div>
+
+        <!-- Quick Cache Refresh & Version Sync Trigger -->
+        <div style="margin-top: 24px; text-align: center;">
+          <button id="btn-force-update-app" class="tool-btn" style="background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: var(--text-dim); font-size: 0.78rem; padding: 6px 16px; border-radius: 9999px;">
+            <span>🔄 تحديث التطبيق ومسح الذاكرة المؤقتة (v5.0)</span>
+          </button>
         </div>
       </section>
 
@@ -222,10 +257,13 @@
               </p>
             </div>
 
-            <div class="card-actions" style="margin-top: 16px;">
+            <div class="card-actions" style="margin-top: 16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
               <button id="btn-download-qr" class="card-btn download-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 <span>حفظ الكود في المعرض كصورة</span>
+              </button>
+              <button id="btn-regenerate-qr" class="card-btn secondary-btn" style="background:rgba(255,255,255,0.08); color:var(--cyan-light); border:1px solid rgba(6,182,212,0.3);">
+                <span>🔄 تحديث الكود الآن</span>
               </button>
             </div>
           </div>
@@ -720,19 +758,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js"></script>
+  <script src="./js/firebase-app.js?v=5.0"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js"></script>
-  <script src="./libs/html5-qrcode.min.js"></script>
-  <script src="./libs/xlsx.full.min.js"></script>
+  <script src="./libs/qrcode.js?v=5.0"></script>
+  <script src="./libs/html5-qrcode.min.js?v=5.0"></script>
+  <script src="./libs/xlsx.full.min.js?v=5.0"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js"></script>
-  <script src="./js/sync.js"></script>
-  <script src="./js/qr-scanner.js"></script>
-  <script src="./js/excel.js"></script>
-  <script src="./js/app.js"></script>
+  <script src="./js/db.js?v=5.0"></script>
+  <script src="./js/sync.js?v=5.0"></script>
+  <script src="./js/qr-scanner.js?v=5.0"></script>
+  <script src="./js/excel.js?v=5.0"></script>
+  <script src="./js/app.js?v=5.0"></script>
 
 </body>
 </html>

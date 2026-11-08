@@ -278,6 +278,43 @@ function setupStudentFormEvents() {
     });
   }
 
+  // Regenerate QR Code Button
+  const refreshQrBtn = document.getElementById('btn-regenerate-qr');
+  if (refreshQrBtn) {
+    refreshQrBtn.addEventListener('click', () => {
+      if (state.currentStudent) {
+        renderStudentQrCard(state.currentStudent);
+        showToast('تم تحديث كود الـ QR بأحدث معيار بنجاح ✨', 'success');
+      }
+    });
+  }
+
+  // Quick App Cache Refresh & Force Update Button
+  const forceUpdateBtn = document.getElementById('btn-force-update-app');
+  if (forceUpdateBtn) {
+    forceUpdateBtn.addEventListener('click', async () => {
+      if ('caches' in window) {
+        try {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        } catch (e) {}
+      }
+      if ('serviceWorker' in navigator) {
+        try {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (const reg of regs) {
+            await reg.unregister();
+          }
+        } catch (e) {}
+      }
+      localStorage.removeItem('smart_attendance_build');
+      showToast('جاري تحديث التطبيق ومسح الكاش...', 'info');
+      setTimeout(() => {
+        window.location.reload(true);
+      }, 400);
+    });
+  }
+
   // Edit Profile Button
   const editBtn = document.getElementById('btn-edit-student');
   if (editBtn) {
@@ -719,6 +756,19 @@ async function handleScannedStudent(data) {
   }
 
   if (!state.currentLecture) return;
+
+  // Enrich student details if scanned via minimal QR (National ID only)
+  if (!data.student_name || data.student_name === 'طالب مسجل') {
+    try {
+      if (typeof getLocalStudent === 'function') {
+        const local = await getLocalStudent(data.national_id);
+        if (local && local.full_name) {
+          data.student_name = local.full_name;
+          data.department = local.department || data.department;
+        }
+      }
+    } catch (e) {}
+  }
 
   // Department mismatch warning (optional check if lecture is specific)
   if (state.currentLecture.target_dept !== 'الكل' && data.department !== state.currentLecture.target_dept) {
