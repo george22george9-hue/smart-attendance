@@ -735,11 +735,36 @@ async function verifyInstructorPin() {
   }
 }
 
+// Centralized Active Developer PIN Resolver
+async function getActiveDevMasterPin() {
+  if (window.CloudDB && window.CloudDB.getAdminSetting) {
+    try {
+      const cloudPin = await window.CloudDB.getAdminSetting('dev_master_pin');
+      if (cloudPin && typeof cloudPin === 'string' && cloudPin.trim().length > 0) {
+        const cleaned = cloudPin.trim();
+        state.devMasterPin = cleaned;
+        localStorage.setItem('dev_master_pin', cleaned);
+        return cleaned;
+      }
+    } catch (e) {}
+  }
+  const local = localStorage.getItem('dev_master_pin');
+  if (local && typeof local === 'string' && local.trim().length > 0) {
+    state.devMasterPin = local.trim();
+    return local.trim();
+  }
+  state.devMasterPin = DEFAULT_DEV_MASTER_PIN;
+  return DEFAULT_DEV_MASTER_PIN;
+}
+
 // Developer Master PIN Gate
 function openDevPinModal() {
   const modal = document.getElementById('modal-dev-pin');
   const input = document.getElementById('dev-pin-input');
-  if (input) input.value = '';
+  if (input) {
+    input.value = '';
+    input.type = 'password';
+  }
   modal?.classList.add('open');
   setTimeout(() => input?.focus(), 200);
 }
@@ -748,29 +773,27 @@ async function handleDevPinSubmit() {
   const input = document.getElementById('dev-pin-input');
   const entered = input.value.trim();
 
-  let masterPin = state.devMasterPin || localStorage.getItem('dev_master_pin') || DEFAULT_DEV_MASTER_PIN;
-  if (window.CloudDB && window.CloudDB.getAdminSetting) {
-    try {
-      const cloudPin = await window.CloudDB.getAdminSetting('dev_master_pin');
-      if (cloudPin) masterPin = cloudPin;
-    } catch (e) {}
+  if (!entered) {
+    showToast('يرجى إدخال كلمة سر المطور', 'error');
+    input.focus();
+    return;
   }
 
-  // Accept saved PIN, default ENG-22-George (case-insensitive), or legacy 0000
-  const isMatch =
-    entered === masterPin ||
-    entered.toLowerCase() === masterPin.toLowerCase() ||
-    entered === DEFAULT_DEV_MASTER_PIN ||
-    entered.toLowerCase() === DEFAULT_DEV_MASTER_PIN.toLowerCase() ||
-    entered === '0000';
+  const activePin = await getActiveDevMasterPin();
+
+  // Strictly verify against activePin ONLY!
+  // If the developer changed it, NO old password works!
+  const isMatch = (entered === activePin || entered.toLowerCase() === activePin.toLowerCase());
 
   if (isMatch) {
     closeModals();
-    showToast('تم التحقق بنجاح! مرحباً بك يا بشمهندس جورج في لوحة المطور 🛠️', 'success');
+    input.value = '';
+    showToast('تم التحقق بنجاح! مرحباً بك في لوحة المطور 🛠️', 'success');
     await loadDeveloperInstructors();
     showView('view-developer-admin');
   } else {
     showToast('كلمة سر المطور غير صحيحة', 'error');
+    input.value = '';
     input.focus();
   }
 }
@@ -947,29 +970,16 @@ async function handleChangeDevMasterPinSubmit() {
   const newPin = newInput.value.trim();
   const confirmPin = confirmInput.value.trim();
 
-  let storedMasterPin = state.devMasterPin || localStorage.getItem('dev_master_pin') || DEFAULT_DEV_MASTER_PIN;
-  if (window.CloudDB && window.CloudDB.getAdminSetting) {
-    try {
-      const cloudPin = await window.CloudDB.getAdminSetting('dev_master_pin');
-      if (cloudPin) storedMasterPin = cloudPin;
-    } catch (e) {}
-  }
+  const activeMasterPin = await getActiveDevMasterPin();
 
-  const currentMatches =
-    currentPin === storedMasterPin ||
-    currentPin.toLowerCase() === storedMasterPin.toLowerCase() ||
-    currentPin === DEFAULT_DEV_MASTER_PIN ||
-    currentPin.toLowerCase() === DEFAULT_DEV_MASTER_PIN.toLowerCase() ||
-    currentPin === '0000';
-
-  if (!currentMatches) {
+  if (currentPin !== activeMasterPin && currentPin.toLowerCase() !== activeMasterPin.toLowerCase()) {
     showToast('كلمة سر المطور الحالية غير صحيحة', 'error');
     currentInput.focus();
     return;
   }
 
-  if (newPin.length < 4) {
-    showToast('كلمة السر يجب أن تكون 4 أرقام أو حروف على الأقل', 'warning');
+  if (!newPin || newPin.length < 4) {
+    showToast('كلمة السر يجب أن تكون 4 خانات على الأقل', 'warning');
     newInput.focus();
     return;
   }
@@ -980,9 +990,11 @@ async function handleChangeDevMasterPinSubmit() {
     return;
   }
 
+  // Save locally immediately
   state.devMasterPin = newPin;
   localStorage.setItem('dev_master_pin', newPin);
 
+  // Sync to Cloud Firestore
   if (window.CloudDB && window.CloudDB.saveAdminSetting) {
     try {
       await window.CloudDB.saveAdminSetting('dev_master_pin', newPin);
@@ -992,7 +1004,10 @@ async function handleChangeDevMasterPinSubmit() {
   }
 
   closeModals();
-  showToast('تم تغيير كلمة سر المطور الرئيسية بنجاح 🔒', 'success');
+  currentInput.value = '';
+  newInput.value = '';
+  confirmInput.value = '';
+  showToast('تم تغيير وحفظ كلمة سر المطور الجديدة بنجاح 🔒', 'success');
 }
 
 // Load Instructor Dashboard & Lectures
@@ -1438,33 +1453,21 @@ async function handleManualAttendanceSubmit() {
 // 5. Global Listeners, Navigation Buttons, & PWA Service Worker
 // ==========================================================================
 function setupGlobalEvents() {
-  // 1. Top Split Role Selection (Tabs)
-  const roleTabStudent = document.getElementById('role-tab-student');
-  const roleTabInstructor = document.getElementById('role-tab-instructor');
-  const roleContentStudent = document.getElementById('role-content-student');
-  const roleContentInstructor = document.getElementById('role-content-instructor');
-
-  roleTabStudent?.addEventListener('click', () => {
-    roleTabStudent.classList.add('active');
-    roleTabInstructor?.classList.remove('active');
-    if (roleContentStudent) roleContentStudent.style.display = 'block';
-    if (roleContentInstructor) roleContentInstructor.style.display = 'none';
-  });
-
-  roleTabInstructor?.addEventListener('click', () => {
-    roleTabInstructor.classList.add('active');
-    roleTabStudent?.classList.remove('active');
-    if (roleContentInstructor) roleContentInstructor.style.display = 'block';
-    if (roleContentStudent) roleContentStudent.style.display = 'none';
-  });
-
-  // 2. Continue Action Buttons
-  document.getElementById('btn-continue-student')?.addEventListener('click', () => {
+  // 1. Simple Clean Role Action Buttons (Direct & Instant)
+  document.getElementById('btn-main-student')?.addEventListener('click', () => {
     initStudentFlow();
   });
 
-  document.getElementById('btn-continue-instructor')?.addEventListener('click', async () => {
+  document.getElementById('btn-main-instructor')?.addEventListener('click', async () => {
     await initInstructorFlow();
+  });
+
+  // Password visibility eye toggle button
+  document.getElementById('btn-toggle-dev-pin-visibility')?.addEventListener('click', () => {
+    const pinInput = document.getElementById('dev-pin-input');
+    if (pinInput) {
+      pinInput.type = pinInput.type === 'password' ? 'text' : 'password';
+    }
   });
 
   // Legacy Card Clicks Fallback (if present)

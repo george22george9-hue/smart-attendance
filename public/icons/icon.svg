@@ -1,25 +1,109 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="50%" stop-color="#1e1b4b"/>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070c18"/>
+      <stop offset="50%" stop-color="#0d1b2a"/>
+      <stop offset="100%" stop-color="#05131f"/>
+    </linearGradient>
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="50%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="gearGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
       <stop offset="100%" stop-color="#0f172a"/>
     </linearGradient>
-    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#06b6d4"/>
-      <stop offset="100%" stop-color="#8b5cf6"/>
+    <linearGradient id="helmetGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="30%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
     </linearGradient>
+    <linearGradient id="helmetShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ca8a04"/>
+      <stop offset="100%" stop-color="#a16207"/>
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="50%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="wheatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
   </defs>
-  <rect width="512" height="512" rx="128" fill="url(#bg)" stroke="url(#glow)" stroke-width="12"/>
-  <g transform="translate(106, 106)">
-    <rect x="0" y="0" width="300" height="300" rx="36" fill="#ffffff" fill-opacity="0.08" stroke="url(#glow)" stroke-width="6"/>
-    <rect x="30" y="30" width="70" height="70" rx="12" fill="none" stroke="#38bdf8" stroke-width="10"/>
-    <rect x="48" y="48" width="34" height="34" rx="6" fill="#38bdf8"/>
-    <rect x="200" y="30" width="70" height="70" rx="12" fill="none" stroke="#38bdf8" stroke-width="10"/>
-    <rect x="218" y="48" width="34" height="34" rx="6" fill="#38bdf8"/>
-    <rect x="30" y="200" width="70" height="70" rx="12" fill="none" stroke="#38bdf8" stroke-width="10"/>
-    <rect x="48" y="218" width="34" height="34" rx="6" fill="#38bdf8"/>
-    <circle cx="150" cy="150" r="44" fill="#10b981"/>
-    <path d="M136 150 L146 160 L165 138" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Squircle Base -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="8"/>
+
+  <!-- Subtle Ambient Glow -->
+  <circle cx="256" cy="256" r="150" fill="#10b981" opacity="0.14" filter="url(#glow)"/>
+
+  <!-- Engineering Cog / Gear (Representing Agricultural Machinery & Irrigation Systems) -->
+  <g id="engineering-gear" fill="url(#gearGrad)" stroke="#334155" stroke-width="4" opacity="0.9">
+    <circle cx="256" cy="256" r="140"/>
+    <!-- Gear teeth -->
+    <rect x="240" y="96" width="32" height="36" rx="6"/>
+    <rect x="240" y="380" width="32" height="36" rx="6"/>
+    <rect x="96" y="240" width="36" height="32" rx="6"/>
+    <rect x="380" y="240" width="36" height="32" rx="6"/>
+    <rect x="145" y="145" width="34" height="34" rx="6" transform="rotate(45 162 162)"/>
+    <rect x="333" y="145" width="34" height="34" rx="6" transform="rotate(45 350 162)"/>
+    <rect x="145" y="333" width="34" height="34" rx="6" transform="rotate(45 162 350)"/>
+    <rect x="333" y="333" width="34" height="34" rx="6" transform="rotate(45 350 350)"/>
+    <circle cx="256" cy="256" r="95" fill="none" stroke="#475569" stroke-width="3" stroke-dasharray="8 6"/>
   </g>
+
+  <!-- Golden Agricultural Wheat Ears (Right & Left) -->
+  <g id="wheat-stalks" fill="url(#wheatGrad)">
+    <!-- Right Wheat Ear -->
+    <path d="M 320 220 Q 365 240 375 285 Q 360 270 340 260 Z"/>
+    <path d="M 335 180 Q 390 200 395 245 Q 375 235 355 220 Z"/>
+    <path d="M 345 140 Q 405 160 405 205 Q 380 195 360 175 Z"/>
+    <path d="M 345 105 Q 395 115 390 155 Q 370 145 355 130 Z"/>
+
+    <!-- Left Wheat Ear -->
+    <path d="M 192 220 Q 147 240 137 285 Q 152 270 172 260 Z"/>
+    <path d="M 177 180 Q 122 200 117 245 Q 137 235 157 220 Z"/>
+    <path d="M 167 140 Q 107 160 107 205 Q 132 195 152 175 Z"/>
+    <path d="M 167 105 Q 117 115 122 155 Q 142 145 157 130 Z"/>
+  </g>
+
+  <!-- Lush Green Seedling Leaves (Sprouting through Center) -->
+  <g id="green-sprouts">
+    <path d="M 256 310 C 235 250 170 215 160 160 C 205 175 245 225 256 310 Z" fill="url(#leafGrad)"/>
+    <path d="M 256 310 C 277 250 342 215 352 160 C 307 175 267 225 256 310 Z" fill="url(#leafGrad)"/>
+    <!-- Central leaf spine -->
+    <path d="M 256 310 Q 256 210 256 140" stroke="#34d399" stroke-width="4" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- Engineer Hard Hat (Yellow / Golden Safety Helmet) -->
+  <g id="engineer-helmet" transform="translate(0, 10)">
+    <!-- Helmet Crown -->
+    <path d="M 160 270 C 160 185 200 160 256 160 C 312 160 352 185 352 270 Z" fill="url(#helmetGrad)" stroke="#78350f" stroke-width="3"/>
+    
+    <!-- Helmet Center Ridge (Strength spine) -->
+    <path d="M 244 160 C 248 210 248 250 244 270 L 268 270 C 264 250 264 210 268 160 Z" fill="#fef08a" opacity="0.65"/>
+    <path d="M 256 160 L 256 270" stroke="#ca8a04" stroke-width="2"/>
+
+    <!-- Helmet Brim -->
+    <path d="M 136 266 C 136 260 148 258 170 258 L 342 258 C 364 258 376 260 376 266 C 376 276 348 286 256 286 C 164 286 136 276 136 266 Z" fill="url(#helmetShadow)" stroke="#78350f" stroke-width="3"/>
+    <ellipse cx="256" cy="268" rx="115" ry="12" fill="url(#helmetGrad)"/>
+
+    <!-- Engineer Badge on Helmet: Sprout in Gear -->
+    <circle cx="256" cy="225" r="22" fill="#0f172a" stroke="#ca8a04" stroke-width="2.5"/>
+    <path d="M 256 238 C 250 230 242 225 244 218 C 249 220 254 226 256 238 Z" fill="#10b981"/>
+    <path d="M 256 238 C 262 230 270 225 268 218 C 263 220 258 226 256 238 Z" fill="#34d399"/>
+    <circle cx="256" cy="238" r="2" fill="#fef08a"/>
+  </g>
+
+  <!-- Agricultural Irrigation / Water Arc (Sleek Cyan Drop Accent) -->
+  <path d="M 256 360 C 246 360 238 368 238 378 C 238 392 256 410 256 410 C 256 410 274 392 274 378 C 274 368 266 360 256 360 Z" fill="#06b6d4" opacity="0.9"/>
+  <circle cx="252" cy="374" r="3" fill="#ffffff" opacity="0.8"/>
 </svg>
