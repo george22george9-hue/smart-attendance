@@ -120,3 +120,4 @@ const CloudDB = {
 };
 
 window.CloudDB = CloudDB;
+

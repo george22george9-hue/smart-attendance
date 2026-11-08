@@ -17,3 +17,4 @@ echo رابط تطبيقك الدائم الرسمي من Google هو:
 echo 👉 https://smart-attendance-7019f.web.app
 echo ========================================================
 pause
+
