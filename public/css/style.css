@@ -1775,98 +1775,33 @@ body::after {
 /* ==========================================================================
    Transparent & Professional Watermark (BY-ENG-GEORGE)
    ========================================================================== */
-body {
-  padding-bottom: 40px; /* Ensure content clears sticky bottom bar */
-}
-
-/* Background Ambient Text Watermark */
-.bg-watermark-overlay {
-  position: fixed;
-  bottom: 38px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'SF Mono', 'Fira Code', 'Roboto Mono', monospace;
+.app-watermark-footer {
+  text-align: center;
+  margin: 22px auto 16px;
+  padding: 8px 16px;
+  font-family: 'SF Mono', 'Fira Code', 'Roboto Mono', 'Cairo', monospace, sans-serif;
   font-weight: 800;
-  font-size: 0.65rem;
-  letter-spacing: 4px;
-  color: rgba(255, 255, 255, 0.08);
-  pointer-events: none;
+  font-size: 0.74rem;
+  letter-spacing: 3.5px;
   user-select: none;
-  z-index: 5;
-  text-transform: uppercase;
-}
-
-.app-bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 32px;
-  background: rgba(7, 11, 20, 0.72);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  gap: 8px;
+  text-transform: uppercase;
 }
 
-.bottom-bar-inner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.74rem;
-}
-
-.eng-watermark-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 1px 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  border-radius: var(--radius-full);
-}
-
-.eng-bolt {
-  font-size: 0.76rem;
+.app-watermark-footer .wm-bolt {
+  font-size: 0.72rem;
+  opacity: 0.35;
   color: #38bdf8;
-  filter: drop-shadow(0 0 4px #06b6d4);
 }
 
-.eng-title {
-  font-family: 'SF Mono', 'Fira Code', 'Roboto Mono', 'Cairo', monospace, sans-serif;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+.app-watermark-footer .wm-text {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.18));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-size: 0.74rem;
-  opacity: 0.85;
-}
-
-.eng-wm-badge {
-  font-size: 0.55rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 1px 4px;
-  border-radius: 3px;
-  background: rgba(6, 182, 212, 0.12);
-  color: var(--cyan-light);
-  border: 1px solid rgba(6, 182, 212, 0.25);
-}
-
-.bottom-bar-sep {
-  color: var(--text-dim);
-  opacity: 0.5;
-}
-
-.bottom-bar-rights {
-  color: var(--text-dim);
-  font-size: 0.7rem;
-  opacity: 0.8;
 }
 
 /* ==========================================================================
@@ -1971,15 +1906,6 @@ body {
   color: var(--cyan-light);
 }
 
-@media (max-width: 480px) {
-  .bottom-bar-rights,
-  .bottom-bar-sep {
-    display: none;
-  }
-  .app-bottom-bar {
-    height: 32px;
-  }
-}
 
 
 

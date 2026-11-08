@@ -14,12 +14,12 @@
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=5.3">
+  <link rel="stylesheet" href="./css/style.css?v=5.4">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation (v5.3) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation (v5.4) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v5.3-split-entry-pro';
+      const CURRENT_VERSION = 'v5.4-clean-watermark';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
         if ('caches' in window) {
@@ -60,7 +60,7 @@
           </svg>
         </div>
         <div>
-          <h1 class="brand-title">حضور وغياب <span style="font-size:0.65rem; background:rgba(6,182,212,0.2); color:var(--cyan-light); border:1px solid rgba(6,182,212,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.3</span></h1>
+          <h1 class="brand-title">حضور وغياب <span style="font-size:0.65rem; background:rgba(6,182,212,0.2); color:var(--cyan-light); border:1px solid rgba(6,182,212,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.4</span></h1>
         </div>
       </div>
 
@@ -1056,20 +1056,11 @@
       </div>
     </div>
 
-    <!-- Subtle Background Watermark Stamp (Transparent & Pro) -->
-    <div class="bg-watermark-overlay" aria-hidden="true">BY-ENG-GEORGE</div>
-
-    <!-- Transparent Pro Watermark Bottom Bar by Eng George -->
-    <footer class="app-bottom-bar">
-      <div class="bottom-bar-inner">
-        <div class="eng-watermark-pill">
-          <span class="eng-bolt">⚡</span>
-          <span class="eng-title">BY-ENG-GEORGE</span>
-          <span class="eng-wm-badge">OFFICIAL</span>
-        </div>
-        <span class="bottom-bar-sep">•</span>
-        <span class="bottom-bar-rights">نظام تسجيل الحضور والغياب الذكي الموحد © 2026</span>
-      </div>
+    <!-- Transparent Pro Watermark at Bottom (Clean & Minimal) -->
+    <footer class="app-watermark-footer" aria-hidden="true">
+      <span class="wm-bolt">⚡</span>
+      <span class="wm-text">BY — ENG — GEORGE</span>
+      <span class="wm-bolt">⚡</span>
     </footer>
 
     <!-- Toast Notification Container -->
@@ -1080,19 +1071,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=5.3"></script>
+  <script src="./js/firebase-app.js?v=5.4"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=5.3"></script>
-  <script src="./libs/html5-qrcode.min.js?v=5.3"></script>
-  <script src="./libs/xlsx.full.min.js?v=5.3"></script>
+  <script src="./libs/qrcode.js?v=5.4"></script>
+  <script src="./libs/html5-qrcode.min.js?v=5.4"></script>
+  <script src="./libs/xlsx.full.min.js?v=5.4"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=5.3"></script>
-  <script src="./js/sync.js?v=5.3"></script>
-  <script src="./js/qr-scanner.js?v=5.3"></script>
-  <script src="./js/excel.js?v=5.3"></script>
-  <script src="./js/app.js?v=5.3"></script>
+  <script src="./js/db.js?v=5.4"></script>
+  <script src="./js/sync.js?v=5.4"></script>
+  <script src="./js/qr-scanner.js?v=5.4"></script>
+  <script src="./js/excel.js?v=5.4"></script>
+  <script src="./js/app.js?v=5.4"></script>
 
 </body>
 </html>
