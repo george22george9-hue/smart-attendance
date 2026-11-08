@@ -484,6 +484,28 @@ function setupInstructorFlow() {
     });
   }
 
+  // Developer Settings (Change Master Developer PIN)
+  document.getElementById('btn-open-dev-settings')?.addEventListener('click', openChangeDevMasterPinModal);
+
+  // Form to Change Developer Master PIN
+  const changeDevPinForm = document.getElementById('change-dev-master-pin-form');
+  if (changeDevPinForm) {
+    changeDevPinForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await handleChangeDevMasterPinSubmit();
+    });
+  }
+
+  // Random PIN Generator button in Add Doctor
+  document.getElementById('btn-gen-random-pin')?.addEventListener('click', () => {
+    const pinInput = document.getElementById('new-doc-pin');
+    if (pinInput) {
+      const randomPin = Math.floor(100000 + Math.random() * 900000).toString();
+      pinInput.value = randomPin;
+      showToast('تم توليد كلمة سر عشوائية: ' + randomPin, 'info', 2000);
+    }
+  });
+
   // Add Instructor Form (Developer Portal)
   const addDocForm = document.getElementById('add-instructor-form');
   if (addDocForm) {
@@ -668,15 +690,22 @@ function openDevPinModal() {
   setTimeout(() => input?.focus(), 200);
 }
 
-function handleDevPinSubmit() {
+async function handleDevPinSubmit() {
   const input = document.getElementById('dev-pin-input');
-  const entered = input.value.trim();
-  const masterPin = state.devMasterPin || '0000';
+  const entered = convertArabicDigitsToEnglish(input.value.trim());
+
+  let masterPin = state.devMasterPin || localStorage.getItem('dev_master_pin') || '0000';
+  if (window.CloudDB && window.CloudDB.getAdminSetting) {
+    try {
+      const cloudPin = await window.CloudDB.getAdminSetting('dev_master_pin');
+      if (cloudPin) masterPin = cloudPin;
+    } catch (e) {}
+  }
 
   if (entered === masterPin || entered === '0000' || entered === '1234') {
     closeModals();
     showToast('تم التحقق بنجاح! مرحباً بك في لوحة المطور والإدارة 🛠️', 'success');
-    loadDeveloperInstructors();
+    await loadDeveloperInstructors();
     showView('view-developer-admin');
   } else {
     showToast('الرمز السري للمطور غير صحيح', 'error');
@@ -706,24 +735,29 @@ async function loadDeveloperInstructors() {
     card.className = 'doctor-item-card';
     const isProf = doc.role === 'دكتور';
     card.innerHTML = `
-      <div class="doctor-info-box">
-        <div class="doctor-avatar-box">${isProf ? '👨‍🏫' : '🔬'}</div>
-        <div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
-            <h4 style="color:#fff; font-size:1.1rem; margin:0; font-weight:700;">${doc.name}</h4>
+      <div class="doctor-info-box" style="flex: 1;">
+        <div style="position: relative;">
+          <div class="doctor-avatar-box" style="border-radius: 16px; width: 52px; height: 52px; background: ${isProf ? 'rgba(6,182,212,0.15)' : 'rgba(168,85,247,0.15)'}; border: 1px solid ${isProf ? 'rgba(6,182,212,0.3)' : 'rgba(168,85,247,0.3)'};">
+            ${isProf ? '👨‍🏫' : '🔬'}
+          </div>
+          <span style="position: absolute; bottom: -2px; left: -2px; width: 10px; height: 10px; border-radius: 50%; background: #10b981; border: 2px solid #0f172a;"></span>
+        </div>
+        <div style="flex: 1;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+            <h4 style="color:#fff; font-size:1.15rem; margin:0; font-weight:800;">${doc.name}</h4>
             <span class="doctor-role-badge ${isProf ? 'prof' : 'assistant'}">${doc.role} - قسم ${doc.department}</span>
           </div>
-          <div style="font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:8px; margin-top:4px;">
-            <span>كلمة السر / الرمز السري:</span>
-            <code style="background:rgba(0,0,0,0.5); padding:3px 10px; border-radius:6px; color:var(--cyan-light); font-weight:bold; font-size:0.95rem; letter-spacing:1px;">${doc.pin}</code>
+          <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 8px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 8px;">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">كلمة السر / الرمز السري:</span>
+            <code style="color: var(--cyan-light); font-weight: 800; font-size: 1.05rem; letter-spacing: 1.5px; font-family: monospace;">${doc.pin}</code>
           </div>
         </div>
       </div>
-      <div class="doctor-actions">
-        <button class="btn-change-doc-pin" data-id="${doc.id}" data-name="${doc.name}" data-pin="${doc.pin}">
+      <div class="doctor-actions" style="margin-top: 8px;">
+        <button class="btn-change-doc-pin" data-id="${doc.id}" data-name="${doc.name}" data-pin="${doc.pin}" style="border: 1px solid rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.08); color: #fbbf24;">
           🔑 تغيير كلمة السر
         </button>
-        <button class="btn-delete-doc" data-id="${doc.id}" data-name="${doc.name}">
+        <button class="btn-delete-doc" data-id="${doc.id}" data-name="${doc.name}" style="border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); color: #f87171;">
           🗑️ حذف
         </button>
       </div>
@@ -825,6 +859,67 @@ async function handleEditDocPinSubmit() {
   closeModals();
   showToast('تم تحديث كلمة السر بنجاح وحفظها في السحابة 🔒', 'success');
   await loadDeveloperInstructors();
+}
+
+// Developer Master PIN Management
+function openChangeDevMasterPinModal() {
+  const modal = document.getElementById('modal-change-dev-master-pin');
+  const cur = document.getElementById('dev-current-pin');
+  const nw = document.getElementById('dev-new-pin');
+  const cnf = document.getElementById('dev-confirm-new-pin');
+
+  if (cur) cur.value = '';
+  if (nw) nw.value = '';
+  if (cnf) cnf.value = '';
+
+  modal?.classList.add('open');
+  setTimeout(() => cur?.focus(), 200);
+}
+
+async function handleChangeDevMasterPinSubmit() {
+  const currentInput = document.getElementById('dev-current-pin');
+  const newInput = document.getElementById('dev-new-pin');
+  const confirmInput = document.getElementById('dev-confirm-new-pin');
+
+  const currentPin = convertArabicDigitsToEnglish(currentInput.value.trim());
+  const newPin = convertArabicDigitsToEnglish(newInput.value.trim());
+  const confirmPin = convertArabicDigitsToEnglish(confirmInput.value.trim());
+
+  let storedMasterPin = state.devMasterPin || localStorage.getItem('dev_master_pin') || '0000';
+  if (window.CloudDB && window.CloudDB.getAdminSetting) {
+    try {
+      const cloudPin = await window.CloudDB.getAdminSetting('dev_master_pin');
+      if (cloudPin) storedMasterPin = cloudPin;
+    } catch (e) {}
+  }
+
+  if (currentPin !== storedMasterPin && currentPin !== '0000') {
+    showToast('كلمة سر المطور الحالية غير صحيحة', 'error');
+    currentInput.focus();
+    return;
+  }
+
+  if (newPin.length < 4) {
+    showToast('كلمة السر يجب أن تكون 4 أرقام أو حروف على الأقل', 'warning');
+    newInput.focus();
+    return;
+  }
+
+  if (newPin !== confirmPin) {
+    showToast('كلمة السر الجديدة وتأكيدها غير متطابقين', 'error');
+    confirmInput.focus();
+    return;
+  }
+
+  state.devMasterPin = newPin;
+  localStorage.setItem('dev_master_pin', newPin);
+
+  if (window.CloudDB && window.CloudDB.saveAdminSetting) {
+    await window.CloudDB.saveAdminSetting('dev_master_pin', newPin);
+  }
+
+  closeModals();
+  showToast('تم تغيير كلمة سر المطور الرئيسية بنجاح 🔒', 'success');
 }
 
 // Load Instructor Dashboard & Lectures

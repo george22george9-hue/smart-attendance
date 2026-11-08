@@ -1623,3 +1623,185 @@ body::after {
   color: #fff;
 }
 
+/* ==========================================================================
+   Thin Bottom Bar (BY-ENG-GEORGE)
+   ========================================================================== */
+body {
+  padding-bottom: 44px; /* Ensure content clears sticky bottom bar */
+}
+
+.app-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  background: rgba(7, 11, 20, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(6, 182, 212, 0.25);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.bottom-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.78rem;
+}
+
+.eng-brand-capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 12px;
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  border-radius: var(--radius-full);
+}
+
+.eng-bolt {
+  font-size: 0.85rem;
+  color: #38bdf8;
+  filter: drop-shadow(0 0 6px #06b6d4);
+}
+
+.eng-title {
+  font-family: 'SF Mono', 'Fira Code', 'Roboto Mono', 'Cairo', monospace, sans-serif;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 0.8rem;
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4));
+}
+
+.bottom-bar-sep {
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+.bottom-bar-rights {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+/* ==========================================================================
+   Scan Targeting Brackets on Student QR Frame
+   ========================================================================== */
+.qr-frame-box {
+  position: relative;
+  background: #ffffff;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  display: inline-block;
+  margin: 10px auto 16px;
+}
+
+.qr-bracket {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: var(--cyan-primary);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.qr-bracket.top-left {
+  top: 6px;
+  left: 6px;
+  border-width: 3.5px 0 0 3.5px;
+  border-top-left-radius: 6px;
+}
+
+.qr-bracket.top-right {
+  top: 6px;
+  right: 6px;
+  border-width: 3.5px 3.5px 0 0;
+  border-top-right-radius: 6px;
+}
+
+.qr-bracket.bottom-left {
+  bottom: 6px;
+  left: 6px;
+  border-width: 0 0 3.5px 3.5px;
+  border-bottom-left-radius: 6px;
+}
+
+.qr-bracket.bottom-right {
+  bottom: 6px;
+  right: 6px;
+  border-width: 0 3.5px 3.5px 0;
+  border-bottom-right-radius: 6px;
+}
+
+/* Form Inputs with Icons & Gear Button */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon .input-icon {
+  position: absolute;
+  right: 14px;
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.input-with-icon .form-input {
+  padding-right: 44px;
+}
+
+.icon-circle-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: #fff;
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.icon-circle-btn:hover {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: var(--cyan-light);
+  transform: rotate(45deg);
+}
+
+.icon-sq-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--cyan-light);
+}
+
+@media (max-width: 480px) {
+  .bottom-bar-rights,
+  .bottom-bar-sep {
+    display: none;
+  }
+  .app-bottom-bar {
+    height: 32px;
+  }
+}
+
+
+

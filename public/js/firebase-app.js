@@ -336,6 +336,36 @@ const CloudDB = {
       }
     } catch (e) {}
     return true;
+  },
+
+  // 12. Developer Settings (Master Admin PIN)
+  async saveAdminSetting(key, val) {
+    if (cloudDb) {
+      try {
+        await cloudDb.collection('settings').doc('admin').set({
+          [key]: val,
+          updated_at: new Date().toISOString()
+        }, { merge: true });
+      } catch (e) {
+        console.warn('[Firebase] Save admin setting error:', e);
+      }
+    }
+    try {
+      localStorage.setItem(key, val);
+    } catch (e) {}
+    return true;
+  },
+
+  async getAdminSetting(key, defaultVal = '') {
+    if (cloudDb) {
+      try {
+        const doc = await cloudDb.collection('settings').doc('admin').get();
+        if (doc.exists && doc.data()[key] !== undefined) {
+          return doc.data()[key];
+        }
+      } catch (e) {}
+    }
+    return localStorage.getItem(key) || defaultVal;
   }
 };
 
