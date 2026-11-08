@@ -14,12 +14,12 @@
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=5.2">
+  <link rel="stylesheet" href="./css/style.css?v=5.3">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation (v5.2) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation (v5.3) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v5.2-eng-george-design';
+      const CURRENT_VERSION = 'v5.3-split-entry-pro';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
         if ('caches' in window) {
@@ -60,7 +60,7 @@
           </svg>
         </div>
         <div>
-          <h1 class="brand-title">حضور وغياب <span style="font-size:0.65rem; background:rgba(6,182,212,0.2); color:var(--cyan-light); border:1px solid rgba(6,182,212,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.2</span></h1>
+          <h1 class="brand-title">حضور وغياب <span style="font-size:0.65rem; background:rgba(6,182,212,0.2); color:var(--cyan-light); border:1px solid rgba(6,182,212,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.3</span></h1>
         </div>
       </div>
 
@@ -81,52 +81,127 @@
     <main class="main-content">
 
       <!-- ===================================================================
-           1. LANDING & ROLE SELECTION VIEW
+           1. LANDING & SPLIT ROLE SELECTION VIEW (v5.3)
            =================================================================== -->
       <section id="view-landing" class="view-section active">
+        <!-- Compact Hero Header -->
         <div class="hero-header">
-          <div class="hero-badge">⚡ نظام ذكي أوفلاين وأونلاين</div>
+          <div class="hero-badge">⚡ نظام الحضور والغياب الذكي</div>
           <h2 class="hero-title">نظام تسجيل الحضور والغياب</h2>
           <p class="hero-subtitle">
-            منظومة حديثة ببطاقات QR Code الذكية لمسح الغياب بدون إنترنت وتصدير شيتات الإكسيل بضغطة زر واحدة
+            منظومة معتمدة تعمل بالباركود الذكي أوفلاين بدون إنترنت وتدعم تصدير كشوف Excel فورية
           </p>
         </div>
 
-        <div class="roles-grid">
-          <!-- Student Role Card -->
-          <div id="card-select-student" class="role-card student">
-            <div class="role-icon-box">🎓</div>
-            <h3 class="role-card-title">الدخول كطالب</h3>
-            <p class="role-card-desc">
-              تسجيل بياناتك لمرة واحدة فقط وعرض بطاقة الـ QR Code الذكية الخاصة بك لإبرازها في المحاضرة.
-            </p>
-            <button class="role-card-btn student-btn">
-              <span>عرض كود الطالب</span>
-              <span>◀</span>
+        <!-- Split Top Selector: Two Options Side-by-Side -->
+        <div class="role-split-container">
+          <div class="role-split-grid">
+            <!-- Student Split Card -->
+            <button type="button" id="role-tab-student" class="role-split-card active" data-role="student">
+              <div class="role-split-top-row">
+                <span class="role-split-icon-badge">🎓</span>
+                <span class="role-split-check">✓</span>
+              </div>
+              <h3 class="role-split-title">طالب</h3>
+              <p class="role-split-sub">استخراج كود الحضور وسجل المحاضرات</p>
+            </button>
+
+            <!-- Instructor Split Card -->
+            <button type="button" id="role-tab-instructor" class="role-split-card" data-role="instructor">
+              <div class="role-split-top-row">
+                <span class="role-split-icon-badge instructor-icon">👨‍🏫</span>
+                <span class="role-split-check">✓</span>
+              </div>
+              <h3 class="role-split-title">دكتور / معيد</h3>
+              <p class="role-split-sub">بدء المحاضرة ورصد الحضور بالكاميرا</p>
             </button>
           </div>
 
-          <!-- Instructor Role Card -->
-          <div id="card-select-instructor" class="role-card instructor">
-            <div class="role-icon-box">👨‍🏫</div>
-            <h3 class="role-card-title">الدخول كمحاضر</h3>
-            <p class="role-card-desc">
-              فتح الكاميرا ومسح أكواد الطلاب، متابعة العداد اللحظي، وتصدير شيت إكسيل منسق على هاتفك بدون نت.
-            </p>
-            <button class="role-card-btn instructor-btn">
-              <span>لوحة تحكم المحاضر</span>
-              <span>◀</span>
+          <!-- Dynamic Instructions Box Underneath Selected Role -->
+          <div class="role-instructions-panel glass-panel">
+            <!-- Student Instructions -->
+            <div id="role-content-student" class="role-instructions-content active">
+              <div class="instructions-header">
+                <span class="inst-pill-badge student-pill">🎓 بوابة حساب الطالب</span>
+                <h4 class="instructions-title">تعليمات استخدام كود الحضور الذكي:</h4>
+              </div>
+              <ul class="instructions-checklist">
+                <li>
+                  <span class="check-icon">✓</span>
+                  <span><strong>تسجيل البيانات لمرة واحدة:</strong> أدخل اسمك ورقمك القومي وقسمك الدراسي.</span>
+                </li>
+                <li>
+                  <span class="check-icon">✓</span>
+                  <span><strong>كود دائم أوفلاين:</strong> يعمل الـ QR Code داخل القاعات بدون إنترنت طوال العام.</span>
+                </li>
+                <li>
+                  <span class="check-icon">✓</span>
+                  <span><strong>إثبات الحضور:</strong> وجّه شاشة هاتفك أمام كاميرا المحاضر لتسجيل حضورك فورياً.</span>
+                </li>
+                <li>
+                  <span class="check-icon">✓</span>
+                  <span><strong>سجل معتمد وإشعارات:</strong> تابع حضورك واستلم تنبيهات المحاضرين ورسائلهم.</span>
+                </li>
+              </ul>
+              <button type="button" id="btn-continue-student" class="submit-btn continue-action-btn">
+                <span>الاستمرار كطالب</span>
+                <span class="btn-arrow">◀</span>
+              </button>
+            </div>
+
+            <!-- Instructor Instructions -->
+            <div id="role-content-instructor" class="role-instructions-content" style="display: none;">
+              <div class="instructions-header">
+                <span class="inst-pill-badge instructor-pill">👨‍🏫 بوابة أعضاء هيئة التدريس</span>
+                <h4 class="instructions-title">تعليمات إدارة الجلسات ورصد الحضور:</h4>
+              </div>
+              <ul class="instructions-checklist">
+                <li>
+                  <span class="check-icon">✓</span>
+                  <span><strong>دخول مأمن بالرمز السري:</strong> سجّل دخولك باسمك والرمز السري الشخصي الخاص بك.</span>
+                </li>
+                <li>
+                  <span class="check-icon">✓</span>
+                  <span><strong>جلسات متنوعة:</strong> اختر نوع الجلسة (محاضرة نظري 📖 أو سكشن عملي 🔬).</span>
+                </li>
+                <li>
+                  <span class="check-icon">✓</span>
+                  <span><strong>كاميرا فورية:</strong> مسح أكواد الطلاب بدقة فائقة مع تنبيه صوتي لمنع تكرار التسجيل.</span>
+                </li>
+                <li>
+                  <span class="check-icon">✓</span>
+                  <span><strong>تصدير إكسيل رسمي:</strong> استخرج كشف الحضور فوراً بصيغة Excel على هاتفك مباشرة.</span>
+                </li>
+              </ul>
+              <button type="button" id="btn-continue-instructor" class="submit-btn continue-action-btn instructor-btn-grad">
+                <span>الاستمرار كمحاضر</span>
+                <span class="btn-arrow">◀</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Standalone Developer Portal Entry at the Bottom -->
+        <div class="developer-standalone-wrapper">
+          <div class="dev-standalone-box">
+            <div class="dev-standalone-info">
+              <span class="dev-standalone-icon">🛠️</span>
+              <div>
+                <h4 class="dev-standalone-title">بوابة مسؤول النظام والمطور</h4>
+                <p class="dev-standalone-desc">إدارة حسابات الدكاترة والمعيدين، تعديل وتوليد كلمات السر، والتحكم الأكاديمي</p>
+              </div>
+            </div>
+            <button type="button" id="btn-landing-dev-portal" class="dev-standalone-btn">
+              <span>دخول المطور</span>
+              <span class="dev-btn-lock">🔐</span>
             </button>
           </div>
         </div>
 
-        <!-- Quick Cache Refresh & Version Sync Trigger -->
-        <div style="margin-top: 24px; text-align: center; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-          <button id="btn-force-update-app" class="tool-btn" style="background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: var(--text-dim); font-size: 0.78rem; padding: 6px 16px; border-radius: 9999px;">
-            <span>🔄 تحديث التطبيق ومسح الكاش (v5.1)</span>
-          </button>
-          <button id="btn-landing-dev-portal" class="tool-btn" style="background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.3); color: var(--cyan-light); font-size: 0.78rem; padding: 6px 16px; border-radius: 9999px;">
-            <span>🛠️ لوحة المطور وإدارة كلمات السر</span>
+        <!-- App Refresh Trigger -->
+        <div style="margin-top: 14px; text-align: center;">
+          <button id="btn-force-update-app" class="tool-btn" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); color: var(--text-dim); font-size: 0.74rem; padding: 4px 12px; border-radius: 9999px;">
+            <span>🔄 تحديث التطبيق ومسح الكاش (v5.3)</span>
           </button>
         </div>
       </section>
@@ -898,21 +973,27 @@
 
     <!-- Modal 5: Developer Master PIN Gate -->
     <div id="modal-dev-pin" class="modal-backdrop">
-      <div class="modal-dialog" style="max-width: 400px; text-align: center;">
+      <div class="modal-dialog" style="max-width: 420px; text-align: center;">
         <button class="modal-close-btn">&times;</button>
-        <div style="font-size: 2.2rem; margin-bottom: 8px;">🔐</div>
-        <h3 style="font-size:1.2rem; margin-bottom:6px; color:#fff;">دخول لوحة المطور والإدارة</h3>
-        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">
-          أدخل الرمز السري للمطور للتحكم في الدكاترة وتغيير كلمات السر
+        <div style="font-size: 2rem; margin-bottom: 8px;">🔐</div>
+        <h3 style="font-size:1.15rem; margin-bottom:6px; color:#fff;">دخول لوحة المطور والإدارة</h3>
+        <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:16px;">
+          أدخل كلمة سر المطور للتحكم في حسابات الدكاترة وكلمات السر
         </p>
 
         <form id="dev-pin-form">
-          <div class="form-group">
-            <input type="password" id="dev-pin-input" class="form-input pin-input" placeholder="••••" maxlength="8" required autofocus>
-            <p class="form-hint">الرمز الافتراضي: 0000</p>
+          <div class="form-group" style="text-align: right;">
+            <label class="form-label" for="dev-pin-input"><span class="req">*</span> كلمة سر المطور:</label>
+            <div class="input-with-icon">
+              <span class="input-icon">🔑</span>
+              <input type="text" id="dev-pin-input" class="form-input" placeholder="مثال: ENG-22-George" maxlength="40" required autofocus autocomplete="off" spellcheck="false" style="direction: ltr; text-align: left; font-family: monospace; font-size: 0.95rem; font-weight: 600;">
+            </div>
+            <p class="form-hint" style="margin-top: 6px; color: var(--cyan-light); font-size: 0.78rem;">
+              كلمة السر الافتراضية: <strong>ENG-22-George</strong>
+            </p>
           </div>
-          <div style="display:flex; gap:10px; margin-top:14px;">
-            <button type="submit" class="submit-btn" style="flex:1;">فتح لوحة المطور</button>
+          <div style="display:flex; gap:10px; margin-top:16px;">
+            <button type="submit" class="submit-btn" style="flex:1; background: linear-gradient(135deg, #0284c7, #2563eb);">فتح لوحة المطور</button>
             <button type="button" class="back-btn btn-cancel-modal">إلغاء</button>
           </div>
         </form>
@@ -947,25 +1028,25 @@
       <div class="modal-dialog" style="max-width: 440px;">
         <button class="modal-close-btn">&times;</button>
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-          <span style="font-size:1.4rem;">⚙️</span>
-          <h3 style="font-size:1.2rem; color:#fff; margin:0;">تغيير كلمة سر المطور</h3>
+          <span style="font-size:1.3rem;">⚙️</span>
+          <h3 style="font-size:1.15rem; color:#fff; margin:0;">تغيير كلمة سر المطور</h3>
         </div>
-        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:18px;">
+        <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:16px;">
           تغيير الرمز السري الرئيسي الذي يفتح لوحة إدارة الدكاترة والصلاحيات
         </p>
 
         <form id="change-dev-master-pin-form">
           <div class="form-group">
             <label class="form-label" for="dev-current-pin"><span class="req">*</span> كلمة سر المطور الحالية:</label>
-            <input type="password" id="dev-current-pin" class="form-input" placeholder="الرمز الحالي (الافتراضي 0000)" required maxlength="12">
+            <input type="text" id="dev-current-pin" class="form-input" placeholder="كلمة السر الحالية (مثل: ENG-22-George)" required maxlength="40" autocomplete="off" spellcheck="false" style="direction: ltr; text-align: left; font-family: monospace;">
           </div>
           <div class="form-group">
             <label class="form-label" for="dev-new-pin"><span class="req">*</span> كلمة سر المطور الجديدة:</label>
-            <input type="password" id="dev-new-pin" class="form-input" placeholder="الرمز الجديد (4 أرقام أو حروف)" required maxlength="12">
+            <input type="text" id="dev-new-pin" class="form-input" placeholder="كلمة السر الجديدة" required maxlength="40" autocomplete="off" spellcheck="false" style="direction: ltr; text-align: left; font-family: monospace;">
           </div>
           <div class="form-group">
             <label class="form-label" for="dev-confirm-new-pin"><span class="req">*</span> تأكيد كلمة السر الجديدة:</label>
-            <input type="password" id="dev-confirm-new-pin" class="form-input" placeholder="أعد كتابة الرمز الجديد" required maxlength="12">
+            <input type="text" id="dev-confirm-new-pin" class="form-input" placeholder="أعد كتابة كلمة السر الجديدة" required maxlength="40" autocomplete="off" spellcheck="false" style="direction: ltr; text-align: left; font-family: monospace;">
           </div>
           <div style="display:flex; gap:10px; margin-top:18px;">
             <button type="submit" class="submit-btn" style="flex:1; background: linear-gradient(135deg, #0284c7, #2563eb);">حفظ كلمة السر الجديدة</button>
@@ -975,15 +1056,19 @@
       </div>
     </div>
 
-    <!-- Persistent Sleek Bottom Bar by Eng George -->
+    <!-- Subtle Background Watermark Stamp (Transparent & Pro) -->
+    <div class="bg-watermark-overlay" aria-hidden="true">BY-ENG-GEORGE</div>
+
+    <!-- Transparent Pro Watermark Bottom Bar by Eng George -->
     <footer class="app-bottom-bar">
       <div class="bottom-bar-inner">
-        <div class="eng-brand-capsule">
+        <div class="eng-watermark-pill">
           <span class="eng-bolt">⚡</span>
           <span class="eng-title">BY-ENG-GEORGE</span>
+          <span class="eng-wm-badge">OFFICIAL</span>
         </div>
         <span class="bottom-bar-sep">•</span>
-        <span class="bottom-bar-rights">نظام تسجيل الحضور الذكي الموحد © 2026</span>
+        <span class="bottom-bar-rights">نظام تسجيل الحضور والغياب الذكي الموحد © 2026</span>
       </div>
     </footer>
 
@@ -995,19 +1080,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=5.2"></script>
+  <script src="./js/firebase-app.js?v=5.3"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=5.2"></script>
-  <script src="./libs/html5-qrcode.min.js?v=5.2"></script>
-  <script src="./libs/xlsx.full.min.js?v=5.2"></script>
+  <script src="./libs/qrcode.js?v=5.3"></script>
+  <script src="./libs/html5-qrcode.min.js?v=5.3"></script>
+  <script src="./libs/xlsx.full.min.js?v=5.3"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=5.2"></script>
-  <script src="./js/sync.js?v=5.2"></script>
-  <script src="./js/qr-scanner.js?v=5.2"></script>
-  <script src="./js/excel.js?v=5.2"></script>
-  <script src="./js/app.js?v=5.2"></script>
+  <script src="./js/db.js?v=5.3"></script>
+  <script src="./js/sync.js?v=5.3"></script>
+  <script src="./js/qr-scanner.js?v=5.3"></script>
+  <script src="./js/excel.js?v=5.3"></script>
+  <script src="./js/app.js?v=5.3"></script>
 
 </body>
 </html>

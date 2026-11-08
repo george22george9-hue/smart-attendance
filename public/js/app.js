@@ -1,6 +1,14 @@
 /**
- * Smart Attendance PWA - Main Application Controller
+ * Smart Attendance PWA - Main Application Controller (v5.3)
  */
+
+// Master Developer Key (Default requested by user)
+const DEFAULT_DEV_MASTER_PIN = 'ENG-22-George';
+
+// Auto-migrate legacy '0000' PIN to ENG-22-George
+if (!localStorage.getItem('dev_master_pin') || localStorage.getItem('dev_master_pin') === '0000') {
+  localStorage.setItem('dev_master_pin', DEFAULT_DEV_MASTER_PIN);
+}
 
 // Application State
 const state = {
@@ -11,10 +19,13 @@ const state = {
   currentLecture: null,
   currentAttendance: [],
   instructorPin: localStorage.getItem('cached_instructor_pin') || '1234',
-  devMasterPin: '0000',
+  devMasterPin: localStorage.getItem('dev_master_pin') || DEFAULT_DEV_MASTER_PIN,
   qrScanner: null,
   deferredPrompt: null
 };
+
+// Navigation History Stack (Prevents browser from exiting on back navigation)
+const viewHistory = ['view-landing'];
 
 // Arabic numerals to English digits converter
 function convertArabicDigitsToEnglish(str) {
@@ -89,8 +100,10 @@ function showToast(message, type = 'info', duration = 3200) {
   }, duration);
 }
 
-// View Navigation
-function showView(viewId) {
+// Robust View Navigation with History Stack
+function showView(viewId, pushHistory = true) {
+  if (!viewId) return;
+
   document.querySelectorAll('.view-section').forEach(view => {
     view.classList.remove('active');
   });
@@ -100,6 +113,15 @@ function showView(viewId) {
     target.classList.add('active');
     state.currentView = viewId;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (pushHistory) {
+      if (viewHistory[viewHistory.length - 1] !== viewId) {
+        viewHistory.push(viewId);
+      }
+      try {
+        window.history.pushState({ view: viewId }, '', '#' + viewId.replace('view-', ''));
+      } catch (e) {}
+    }
   }
 
   // Handle Scanner lifecycle
@@ -107,6 +129,38 @@ function showView(viewId) {
     state.qrScanner.stop();
   }
 }
+
+// Global Back Navigation: Steps back within the app instead of closing or exiting
+function navigateBack() {
+  const openModal = document.querySelector('.modal-backdrop.open');
+  if (openModal) {
+    closeModals();
+    return;
+  }
+
+  if (viewHistory.length > 1) {
+    viewHistory.pop(); // Remove current view
+    const prevView = viewHistory[viewHistory.length - 1] || 'view-landing';
+    showView(prevView, false);
+    try {
+      window.history.replaceState({ view: prevView }, '', '#' + prevView.replace('view-', ''));
+    } catch (e) {}
+  } else {
+    showView('view-landing', false);
+  }
+}
+
+// Listen to Android hardware / browser popstate back button
+window.addEventListener('popstate', (event) => {
+  if (event.state && event.state.view) {
+    if (viewHistory.length > 1) {
+      viewHistory.pop();
+    }
+    showView(event.state.view, false);
+  } else {
+    navigateBack();
+  }
+});
 
 // ==========================================================================
 // 1. Sync UI Listener
@@ -692,9 +746,9 @@ function openDevPinModal() {
 
 async function handleDevPinSubmit() {
   const input = document.getElementById('dev-pin-input');
-  const entered = convertArabicDigitsToEnglish(input.value.trim());
+  const entered = input.value.trim();
 
-  let masterPin = state.devMasterPin || localStorage.getItem('dev_master_pin') || '0000';
+  let masterPin = state.devMasterPin || localStorage.getItem('dev_master_pin') || DEFAULT_DEV_MASTER_PIN;
   if (window.CloudDB && window.CloudDB.getAdminSetting) {
     try {
       const cloudPin = await window.CloudDB.getAdminSetting('dev_master_pin');
@@ -702,13 +756,21 @@ async function handleDevPinSubmit() {
     } catch (e) {}
   }
 
-  if (entered === masterPin || entered === '0000' || entered === '1234') {
+  // Accept saved PIN, default ENG-22-George (case-insensitive), or legacy 0000
+  const isMatch =
+    entered === masterPin ||
+    entered.toLowerCase() === masterPin.toLowerCase() ||
+    entered === DEFAULT_DEV_MASTER_PIN ||
+    entered.toLowerCase() === DEFAULT_DEV_MASTER_PIN.toLowerCase() ||
+    entered === '0000';
+
+  if (isMatch) {
     closeModals();
-    showToast('تم التحقق بنجاح! مرحباً بك في لوحة المطور والإدارة 🛠️', 'success');
+    showToast('تم التحقق بنجاح! مرحباً بك يا بشمهندس جورج في لوحة المطور 🛠️', 'success');
     await loadDeveloperInstructors();
     showView('view-developer-admin');
   } else {
-    showToast('الرمز السري للمطور غير صحيح', 'error');
+    showToast('كلمة سر المطور غير صحيحة', 'error');
     input.focus();
   }
 }
@@ -881,11 +943,11 @@ async function handleChangeDevMasterPinSubmit() {
   const newInput = document.getElementById('dev-new-pin');
   const confirmInput = document.getElementById('dev-confirm-new-pin');
 
-  const currentPin = convertArabicDigitsToEnglish(currentInput.value.trim());
-  const newPin = convertArabicDigitsToEnglish(newInput.value.trim());
-  const confirmPin = convertArabicDigitsToEnglish(confirmInput.value.trim());
+  const currentPin = currentInput.value.trim();
+  const newPin = newInput.value.trim();
+  const confirmPin = confirmInput.value.trim();
 
-  let storedMasterPin = state.devMasterPin || localStorage.getItem('dev_master_pin') || '0000';
+  let storedMasterPin = state.devMasterPin || localStorage.getItem('dev_master_pin') || DEFAULT_DEV_MASTER_PIN;
   if (window.CloudDB && window.CloudDB.getAdminSetting) {
     try {
       const cloudPin = await window.CloudDB.getAdminSetting('dev_master_pin');
@@ -893,7 +955,14 @@ async function handleChangeDevMasterPinSubmit() {
     } catch (e) {}
   }
 
-  if (currentPin !== storedMasterPin && currentPin !== '0000') {
+  const currentMatches =
+    currentPin === storedMasterPin ||
+    currentPin.toLowerCase() === storedMasterPin.toLowerCase() ||
+    currentPin === DEFAULT_DEV_MASTER_PIN ||
+    currentPin.toLowerCase() === DEFAULT_DEV_MASTER_PIN.toLowerCase() ||
+    currentPin === '0000';
+
+  if (!currentMatches) {
     showToast('كلمة سر المطور الحالية غير صحيحة', 'error');
     currentInput.focus();
     return;
@@ -915,7 +984,11 @@ async function handleChangeDevMasterPinSubmit() {
   localStorage.setItem('dev_master_pin', newPin);
 
   if (window.CloudDB && window.CloudDB.saveAdminSetting) {
-    await window.CloudDB.saveAdminSetting('dev_master_pin', newPin);
+    try {
+      await window.CloudDB.saveAdminSetting('dev_master_pin', newPin);
+    } catch (e) {
+      console.warn('Failed to save master pin to cloud:', e);
+    }
   }
 
   closeModals();
@@ -1365,26 +1438,61 @@ async function handleManualAttendanceSubmit() {
 // 5. Global Listeners, Navigation Buttons, & PWA Service Worker
 // ==========================================================================
 function setupGlobalEvents() {
-  // Navigation Role Selection
-  document.getElementById('card-select-student')?.addEventListener('click', () => {
+  // 1. Top Split Role Selection (Tabs)
+  const roleTabStudent = document.getElementById('role-tab-student');
+  const roleTabInstructor = document.getElementById('role-tab-instructor');
+  const roleContentStudent = document.getElementById('role-content-student');
+  const roleContentInstructor = document.getElementById('role-content-instructor');
+
+  roleTabStudent?.addEventListener('click', () => {
+    roleTabStudent.classList.add('active');
+    roleTabInstructor?.classList.remove('active');
+    if (roleContentStudent) roleContentStudent.style.display = 'block';
+    if (roleContentInstructor) roleContentInstructor.style.display = 'none';
+  });
+
+  roleTabInstructor?.addEventListener('click', () => {
+    roleTabInstructor.classList.add('active');
+    roleTabStudent?.classList.remove('active');
+    if (roleContentInstructor) roleContentInstructor.style.display = 'block';
+    if (roleContentStudent) roleContentStudent.style.display = 'none';
+  });
+
+  // 2. Continue Action Buttons
+  document.getElementById('btn-continue-student')?.addEventListener('click', () => {
     initStudentFlow();
   });
 
+  document.getElementById('btn-continue-instructor')?.addEventListener('click', async () => {
+    await initInstructorFlow();
+  });
+
+  // Legacy Card Clicks Fallback (if present)
+  document.getElementById('card-select-student')?.addEventListener('click', () => {
+    initStudentFlow();
+  });
   document.getElementById('card-select-instructor')?.addEventListener('click', async () => {
     await initInstructorFlow();
   });
 
-  // Back to Landing buttons
-  document.querySelectorAll('.btn-back-landing').forEach(btn => {
-    btn.addEventListener('click', () => {
-      showView('view-landing');
+  // 3. Global Back Buttons Navigation (Never closes app, returns to previous view)
+  document.querySelectorAll('.btn-back-landing, .back-btn:not(#btn-edit-student):not(#btn-student-logout):not(.btn-cancel-modal)').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigateBack();
     });
   });
 
-  // Back to Instructor Dashboard
+  // Brand Header Click -> Smoothly navigates to landing
+  document.querySelector('.brand-container')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    showView('view-landing');
+  });
+
+  // Back to Instructor Dashboard from active lecture
   document.getElementById('btn-back-dashboard')?.addEventListener('click', () => {
     loadInstructorDashboard();
-    showView('view-instructor-dashboard');
+    navigateBack();
   });
 
   // Modal Close Buttons
