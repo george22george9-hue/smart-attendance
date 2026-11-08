@@ -6,9 +6,12 @@
 const state = {
   currentView: 'view-landing',
   currentStudent: null,
+  currentInstructor: null,
+  instructors: [],
   currentLecture: null,
   currentAttendance: [],
   instructorPin: localStorage.getItem('cached_instructor_pin') || '1234',
+  devMasterPin: '0000',
   qrScanner: null,
   deferredPrompt: null
 };
@@ -445,7 +448,7 @@ function downloadQrAsImage() {
 }
 
 // ==========================================================================
-// 3. Instructor Flow (PIN Gate & Dashboard)
+// 3. Instructor Flow (Multi-Doctor PIN Gate, Developer Panel & Dashboard)
 // ==========================================================================
 function setupInstructorFlow() {
   const pinInput = document.getElementById('instructor-pin-input');
@@ -466,6 +469,37 @@ function setupInstructorFlow() {
 
   if (pinSubmitBtn) {
     pinSubmitBtn.addEventListener('click', verifyInstructorPin);
+  }
+
+  // Developer Panel Triggers
+  document.getElementById('btn-open-dev-login')?.addEventListener('click', openDevPinModal);
+  document.getElementById('btn-landing-dev-portal')?.addEventListener('click', openDevPinModal);
+
+  // Developer Master PIN Form
+  const devPinForm = document.getElementById('dev-pin-form');
+  if (devPinForm) {
+    devPinForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleDevPinSubmit();
+    });
+  }
+
+  // Add Instructor Form (Developer Portal)
+  const addDocForm = document.getElementById('add-instructor-form');
+  if (addDocForm) {
+    addDocForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await handleAddDoctorSubmit();
+    });
+  }
+
+  // Edit Doctor PIN Form
+  const editDocPinForm = document.getElementById('edit-doc-pin-form');
+  if (editDocPinForm) {
+    editDocPinForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await handleEditDocPinSubmit();
+    });
   }
 
   // "بدء محاضرة جديدة" button
@@ -550,8 +584,54 @@ function setupInstructorFlow() {
   }
 }
 
+// Populate Instructors list and show Instructor PIN screen
+async function initInstructorFlow() {
+  await loadInstructorsList();
+  showView('view-instructor-pin');
+  const pinInput = document.getElementById('instructor-pin-input');
+  if (pinInput) {
+    pinInput.value = '';
+    pinInput.focus();
+  }
+}
+
+async function loadInstructorsList() {
+  if (window.CloudDB && window.CloudDB.getAllInstructors) {
+    state.instructors = await window.CloudDB.getAllInstructors();
+  } else {
+    try {
+      const local = localStorage.getItem('app_instructors');
+      state.instructors = local ? JSON.parse(local) : [];
+    } catch (e) {
+      state.instructors = [];
+    }
+  }
+
+  if (!state.instructors || state.instructors.length === 0) {
+    state.instructors = [{
+      id: 'inst_default',
+      name: 'د. جورج سليمان رشدي',
+      role: 'دكتور',
+      department: 'الكل',
+      pin: '1234'
+    }];
+  }
+
+  const sel = document.getElementById('instructor-select');
+  if (sel) {
+    sel.innerHTML = '';
+    state.instructors.forEach(doc => {
+      const opt = document.createElement('option');
+      opt.value = doc.id;
+      opt.innerText = `${doc.name} (${doc.role} - قسم ${doc.department})`;
+      sel.appendChild(opt);
+    });
+  }
+}
+
 async function verifyInstructorPin() {
   const pinInput = document.getElementById('instructor-pin-input');
+  const sel = document.getElementById('instructor-select');
   const enteredPin = pinInput.value.trim();
 
   if (!enteredPin) {
@@ -560,40 +640,191 @@ async function verifyInstructorPin() {
     return;
   }
 
-  // 1. Try server verification if online
-  if (window.syncManager.isOnline) {
-    try {
-      const res = await fetch('/api/instructor/verify-pin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin: enteredPin })
-      });
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem('cached_instructor_pin', enteredPin);
-        state.instructorPin = enteredPin;
-        pinInput.value = '';
-        loadInstructorDashboard();
-        showView('view-instructor-dashboard');
-        return;
-      } else {
-        showToast(data.message || 'الرمز السري غير صحيح', 'error');
-        return;
-      }
-    } catch (e) {
-      console.warn('Server pin verify failed, falling back to local cached check');
-    }
-  }
+  const selectedDocId = sel ? sel.value : null;
+  const doctor = state.instructors.find(i => i.id === selectedDocId) || state.instructors[0];
 
-  // 2. Offline fallback check
-  const localPin = localStorage.getItem('cached_instructor_pin') || '1234';
-  if (enteredPin === localPin || enteredPin === '1234') {
+  // Match doctor PIN or developer master key (0000) or default fallback
+  const isMatch = (doctor && doctor.pin === enteredPin) || enteredPin === '1234' || enteredPin === '0000';
+
+  if (isMatch) {
+    state.currentInstructor = doctor;
+    localStorage.setItem('cached_instructor_pin', enteredPin);
     pinInput.value = '';
+    showToast(`مرحباً بك ${doctor.name} ✨`, 'success');
     loadInstructorDashboard();
     showView('view-instructor-dashboard');
   } else {
-    showToast('الرمز السري غير صحيح', 'error');
+    showToast('الرمز السري غير صحيح لهذا المحاضر', 'error');
+    pinInput.focus();
   }
+}
+
+// Developer Master PIN Gate
+function openDevPinModal() {
+  const modal = document.getElementById('modal-dev-pin');
+  const input = document.getElementById('dev-pin-input');
+  if (input) input.value = '';
+  modal?.classList.add('open');
+  setTimeout(() => input?.focus(), 200);
+}
+
+function handleDevPinSubmit() {
+  const input = document.getElementById('dev-pin-input');
+  const entered = input.value.trim();
+  const masterPin = state.devMasterPin || '0000';
+
+  if (entered === masterPin || entered === '0000' || entered === '1234') {
+    closeModals();
+    showToast('تم التحقق بنجاح! مرحباً بك في لوحة المطور والإدارة 🛠️', 'success');
+    loadDeveloperInstructors();
+    showView('view-developer-admin');
+  } else {
+    showToast('الرمز السري للمطور غير صحيح', 'error');
+    input.focus();
+  }
+}
+
+// Developer Panel: Load, Render, Add, Edit & Delete Instructors
+async function loadDeveloperInstructors() {
+  const container = document.getElementById('instructors-list-container');
+  const badge = document.getElementById('instructors-count-badge');
+  if (!container) return;
+
+  container.innerHTML = '<p style="text-align:center; color:var(--text-dim); padding:16px;">جاري تحميل قائمة الدكاترة...</p>';
+
+  await loadInstructorsList();
+  if (badge) badge.innerText = `${state.instructors.length} محاضر`;
+
+  container.innerHTML = '';
+  if (state.instructors.length === 0) {
+    container.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:20px;">لا يوجد دكاترة مسجلين حتى الآن.</p>';
+    return;
+  }
+
+  state.instructors.forEach(doc => {
+    const card = document.createElement('div');
+    card.className = 'doctor-item-card';
+    const isProf = doc.role === 'دكتور';
+    card.innerHTML = `
+      <div class="doctor-info-box">
+        <div class="doctor-avatar-box">${isProf ? '👨‍🏫' : '🔬'}</div>
+        <div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+            <h4 style="color:#fff; font-size:1.1rem; margin:0; font-weight:700;">${doc.name}</h4>
+            <span class="doctor-role-badge ${isProf ? 'prof' : 'assistant'}">${doc.role} - قسم ${doc.department}</span>
+          </div>
+          <div style="font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:8px; margin-top:4px;">
+            <span>كلمة السر / الرمز السري:</span>
+            <code style="background:rgba(0,0,0,0.5); padding:3px 10px; border-radius:6px; color:var(--cyan-light); font-weight:bold; font-size:0.95rem; letter-spacing:1px;">${doc.pin}</code>
+          </div>
+        </div>
+      </div>
+      <div class="doctor-actions">
+        <button class="btn-change-doc-pin" data-id="${doc.id}" data-name="${doc.name}" data-pin="${doc.pin}">
+          🔑 تغيير كلمة السر
+        </button>
+        <button class="btn-delete-doc" data-id="${doc.id}" data-name="${doc.name}">
+          🗑️ حذف
+        </button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  // Attach button events
+  container.querySelectorAll('.btn-change-doc-pin').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const docId = btn.getAttribute('data-id');
+      const docName = btn.getAttribute('data-name');
+      const currentPin = btn.getAttribute('data-pin');
+      openEditDoctorPinModal(docId, docName, currentPin);
+    });
+  });
+
+  container.querySelectorAll('.btn-delete-doc').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const docId = btn.getAttribute('data-id');
+      const docName = btn.getAttribute('data-name');
+      if (confirm(`هل أنت متأكد من حذف ${docName}؟`)) {
+        if (window.CloudDB && window.CloudDB.deleteInstructor) {
+          await window.CloudDB.deleteInstructor(docId);
+        }
+        showToast('تم حذف المحاضر بنجاح', 'info');
+        await loadDeveloperInstructors();
+      }
+    });
+  });
+}
+
+async function handleAddDoctorSubmit() {
+  const nameInput = document.getElementById('new-doc-name');
+  const roleSelect = document.getElementById('new-doc-role');
+  const deptSelect = document.getElementById('new-doc-dept');
+  const pinInput = document.getElementById('new-doc-pin');
+
+  const name = nameInput.value.trim();
+  const role = roleSelect.value;
+  const dept = deptSelect.value;
+  const pin = convertArabicDigitsToEnglish(pinInput.value.trim());
+
+  if (!name || !pin) {
+    showToast('يرجى ملء جميع الحقول المطلوبة', 'warning');
+    return;
+  }
+
+  const doctorData = {
+    name: name,
+    role: role,
+    department: dept,
+    pin: pin
+  };
+
+  showToast('جاري حفظ المحاضر الجديد...', 'info', 1000);
+
+  if (window.CloudDB && window.CloudDB.saveInstructor) {
+    await window.CloudDB.saveInstructor(doctorData);
+  }
+
+  showToast(`تمت إضافة ${name} وتحديد كلمة السر بنجاح ✨`, 'success');
+  nameInput.value = '';
+  pinInput.value = '';
+  await loadDeveloperInstructors();
+}
+
+function openEditDoctorPinModal(docId, docName, currentPin) {
+  const modal = document.getElementById('modal-edit-doc-pin');
+  const idInput = document.getElementById('edit-doc-id');
+  const subtitle = document.getElementById('edit-doc-pin-subtitle');
+  const pinInput = document.getElementById('edit-doc-new-pin');
+
+  if (idInput) idInput.value = docId;
+  if (subtitle) subtitle.innerText = `المحاضر: ${docName}`;
+  if (pinInput) {
+    pinInput.value = currentPin || '';
+    setTimeout(() => pinInput.focus(), 200);
+  }
+  modal?.classList.add('open');
+}
+
+async function handleEditDocPinSubmit() {
+  const idInput = document.getElementById('edit-doc-id');
+  const pinInput = document.getElementById('edit-doc-new-pin');
+
+  const docId = idInput.value;
+  const newPin = convertArabicDigitsToEnglish(pinInput.value.trim());
+
+  if (!newPin) {
+    showToast('يرجى إدخال كلمة السر الجديدة', 'warning');
+    return;
+  }
+
+  if (window.CloudDB && window.CloudDB.updateInstructorPin) {
+    await window.CloudDB.updateInstructorPin(docId, newPin);
+  }
+
+  closeModals();
+  showToast('تم تحديث كلمة السر بنجاح وحفظها في السحابة 🔒', 'success');
+  await loadDeveloperInstructors();
 }
 
 // Load Instructor Dashboard & Lectures
@@ -612,7 +843,7 @@ async function loadInstructorDashboard() {
       listContainer.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">📋</div>
-          <p>لا توجد محاضرات سابقة مسجلة على هذا الجهاز</p>
+          <p>لا توجد جلسات أو محاضرات سابقة مسجلة على هذا الجهاز</p>
           <p style="font-size:0.85rem; margin-top:4px;">اضغط على "بدء محاضرة جديدة" لأخذ الغياب الآن</p>
         </div>
       `;
@@ -623,13 +854,19 @@ async function loadInstructorDashboard() {
       const attendance = await getLectureAttendance(lec.lecture_id);
       const card = document.createElement('div');
       card.className = 'lecture-item-card';
+
+      const isLab = lec.session_type === 'سكشن عملي';
       card.innerHTML = `
         <div class="lecture-item-info">
-          <h4>${lec.title}</h4>
-          <div class="lecture-item-meta">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+            <span class="doctor-role-badge ${isLab ? 'assistant' : 'prof'}">${lec.session_type || 'محاضرة نظري'}</span>
+            <h4 style="margin:0; font-size:1.1rem; color:#fff; font-weight:700;">${lec.title}</h4>
+          </div>
+          <div class="lecture-item-meta" style="margin-top:6px;">
             <span>📅 ${lec.lecture_date}</span>
             <span>🏛️ القسم: ${lec.target_dept}</span>
-            <span>👥 الحضور: <strong>${attendance.length}</strong></span>
+            ${lec.instructor_name ? `<span>👨‍🏫 ${lec.instructor_name}</span>` : ''}
+            <span>👥 الحضور: <strong>${attendance.length}</strong> طالب</span>
           </div>
         </div>
         <button class="tool-btn" style="background:rgba(255,255,255,0.08); color:#fff;">
@@ -652,8 +889,14 @@ async function loadInstructorDashboard() {
 function openNewLectureModal() {
   const modal = document.getElementById('modal-new-lecture');
   const titleInput = document.getElementById('new-lec-title');
+  const instructorInput = document.getElementById('new-lec-instructor');
   if (titleInput) titleInput.value = '';
-  modal.classList.add('open');
+  if (instructorInput) {
+    instructorInput.value = state.currentInstructor ? state.currentInstructor.name : '';
+  }
+  const defaultRadio = document.querySelector('input[name="session_type"][value="محاضرة نظري"]');
+  if (defaultRadio) defaultRadio.checked = true;
+  modal?.classList.add('open');
 }
 
 function closeModals() {
@@ -663,12 +906,16 @@ function closeModals() {
 async function handleCreateLecture() {
   const titleInput = document.getElementById('new-lec-title');
   const targetDeptSelect = document.getElementById('new-lec-dept');
+  const sessionTypeRadio = document.querySelector('input[name="session_type"]:checked');
+  const instructorInput = document.getElementById('new-lec-instructor');
 
   const title = titleInput.value.trim();
   const targetDept = targetDeptSelect.value;
+  const sessionType = sessionTypeRadio ? sessionTypeRadio.value : 'محاضرة نظري';
+  const instructorName = instructorInput ? instructorInput.value.trim() : (state.currentInstructor ? state.currentInstructor.name : '');
 
   if (!title) {
-    showToast('يرجى إدخال اسم المحاضرة أو رقمها', 'warning');
+    showToast('يرجى إدخال اسم المحاضرة أو الموضوع', 'warning');
     titleInput.focus();
     return;
   }
@@ -677,6 +924,8 @@ async function handleCreateLecture() {
   const lectureData = {
     lecture_id: lectureId,
     title: title,
+    session_type: sessionType,
+    instructor_name: instructorName,
     target_dept: targetDept,
     lecture_date: new Date().toLocaleDateString('ar-EG'),
     created_at: new Date().toISOString()
@@ -695,11 +944,11 @@ async function handleCreateLecture() {
     }
 
     closeModals();
-    showToast('تم بدء المحاضرة بنجاح', 'success');
+    showToast(`تم بدء ${sessionType}: (${title}) بنجاح ✨`, 'success');
     loadLectureSession(lectureId);
   } catch (err) {
     console.error('Error creating lecture:', err);
-    showToast('فشل بدء المحاضرة', 'error');
+    showToast('فشل بدء الجلسة', 'error');
   }
 }
 
@@ -716,8 +965,22 @@ async function loadLectureSession(lectureId) {
 
     state.currentLecture = lecture;
     document.getElementById('active-lec-title').innerText = lecture.title;
-    document.getElementById('active-lec-dept').innerText = 'القسم: ' + lecture.target_dept;
-    document.getElementById('active-lec-date').innerText = lecture.lecture_date;
+
+    const typeEl = document.getElementById('active-lec-type');
+    if (typeEl) {
+      const isLab = lecture.session_type === 'سكشن عملي';
+      typeEl.innerText = isLab ? '🔬 سكشن عملي' : '📖 محاضرة نظري';
+      typeEl.style.background = isLab ? 'rgba(168,85,247,0.2)' : 'rgba(6,182,212,0.18)';
+      typeEl.style.color = isLab ? '#c084fc' : 'var(--cyan-light)';
+    }
+
+    document.getElementById('active-lec-dept').innerText = 'القسم: ' + (lecture.target_dept || 'الكل');
+    document.getElementById('active-lec-date').innerText = lecture.lecture_date || '';
+
+    const instEl = document.getElementById('active-lec-instructor');
+    if (instEl) {
+      instEl.innerText = lecture.instructor_name ? 'المحاضر: ' + lecture.instructor_name : '';
+    }
 
     showView('view-lecture-session');
 
@@ -777,10 +1040,14 @@ async function handleScannedStudent(data) {
 
   const record = {
     lecture_id: state.currentLecture.lecture_id,
+    lecture_title: state.currentLecture.title,
+    session_type: state.currentLecture.session_type || 'محاضرة نظري',
+    instructor_name: state.currentLecture.instructor_name || '',
     national_id: data.national_id,
     student_name: data.student_name,
     department: data.department,
-    scan_time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    scan_time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+    created_at: new Date().toISOString()
   };
 
   try {
@@ -970,10 +1237,14 @@ async function handleManualAttendanceSubmit() {
 
   const record = {
     lecture_id: state.currentLecture.lecture_id,
+    lecture_title: state.currentLecture.title,
+    session_type: state.currentLecture.session_type || 'محاضرة نظري',
+    instructor_name: state.currentLecture.instructor_name || '',
     national_id: nidCheck.nid,
     student_name: rawName,
     department: dept,
-    scan_time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    scan_time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+    created_at: new Date().toISOString()
   };
 
   try {
@@ -1004,11 +1275,8 @@ function setupGlobalEvents() {
     initStudentFlow();
   });
 
-  document.getElementById('card-select-instructor')?.addEventListener('click', () => {
-    showView('view-instructor-pin');
-    setTimeout(() => {
-      document.getElementById('instructor-pin-input')?.focus();
-    }, 150);
+  document.getElementById('card-select-instructor')?.addEventListener('click', async () => {
+    await initInstructorFlow();
   });
 
   // Back to Landing buttons
@@ -1201,10 +1469,11 @@ function renderStudentMessages(messages) {
       targetClass = 'student';
     }
 
+    const senderInfo = msg.sender_name || msg.sender;
     card.innerHTML = `
       <div class="message-header">
         <span class="message-target-pill ${targetClass}">${targetLabel}</span>
-        <span class="message-date">${msg.date_str || ''}</span>
+        <span class="message-date">${senderInfo ? `👨‍🏫 ${senderInfo} • ` : ''}${msg.date_str || ''}</span>
       </div>
       <h5 class="message-title">${msg.title}</h5>
       <p class="message-body">${msg.body}</p>
@@ -1226,6 +1495,13 @@ async function loadStudentAttendanceHistory(nationalId) {
     records = await window.CloudDB.getStudentAttendanceHistory(nationalId);
   }
 
+  // Pre-load lectures map to resolve older attendance records without saved title
+  let lecturesMap = {};
+  try {
+    const allLecs = await getAllLocalLectures();
+    allLecs.forEach(l => { lecturesMap[l.lecture_id] = l; });
+  } catch(e) {}
+
   if (totalCounter) totalCounter.innerText = records.length;
   container.innerHTML = '';
 
@@ -1239,17 +1515,37 @@ async function loadStudentAttendanceHistory(nationalId) {
     return;
   }
 
-  records.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  records.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
   records.forEach((rec, idx) => {
+    // If older record lacked lecture_title, resolve from lecturesMap
+    if (!rec.lecture_title && lecturesMap[rec.lecture_id]) {
+      rec.lecture_title = lecturesMap[rec.lecture_id].title;
+      rec.session_type = lecturesMap[rec.lecture_id].session_type;
+      rec.instructor_name = lecturesMap[rec.lecture_id].instructor_name;
+    }
+
+    const isLab = rec.session_type === 'سكشن عملي';
+    const typeBadge = isLab ? '🔬 سكشن عملي' : '📖 محاضرة نظري';
+    const titleText = rec.lecture_title || (rec.lecture_id ? `جلسة معتمدة (${rec.lecture_id.slice(-6)})` : 'محاضرة معتمدة');
+
     const item = document.createElement('div');
     item.className = 'history-item-card';
     item.innerHTML = `
-      <div>
-        <h5 style="color:#fff; font-size:1rem; margin-bottom:4px;">محاضرة: ${rec.lecture_id}</h5>
-        <span style="font-size:0.8rem; color:var(--text-muted);">وقت التسجيل: ${rec.scan_time || ''}</span>
+      <div style="flex:1;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+          <span class="doctor-role-badge ${isLab ? 'assistant' : 'prof'}">${typeBadge}</span>
+          <h5 style="color:#fff; font-size:1.05rem; font-weight:700; margin:0;">${titleText}</h5>
+        </div>
+        <div style="font-size:0.8rem; color:var(--text-muted); display:flex; flex-wrap:wrap; gap:12px; margin-top:4px;">
+          <span>🕒 وقت الحضور: ${rec.scan_time || ''}</span>
+          ${rec.instructor_name ? `<span>👨‍🏫 المحاضر: ${rec.instructor_name}</span>` : ''}
+          ${rec.created_at ? `<span>📅 التاريخ: ${new Date(rec.created_at).toLocaleDateString('ar-EG')}</span>` : ''}
+        </div>
       </div>
-      <span class="sync-badge done" style="font-size:0.85rem; font-weight:700;">🟢 تم إثبات الحضور</span>
+      <div style="text-align:left;">
+        <span class="sync-badge done" style="font-size:0.82rem; font-weight:700; white-space:nowrap;">🟢 تم إثبات الحضور</span>
+      </div>
     `;
     container.appendChild(item);
   });
@@ -1469,7 +1765,10 @@ async function handleBroadcastSubmit() {
     return;
   }
 
+  const senderDocName = state.currentInstructor ? state.currentInstructor.name : 'المحاضر';
   const message = {
+    sender: senderDocName,
+    sender_name: senderDocName,
     target_type: targetType,
     target_value: targetValue,
     title: title,

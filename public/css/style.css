@@ -1471,12 +1471,155 @@ body::after {
 
 /* Attendance History Chips */
 .history-item-card {
-  background: rgba(11, 15, 25, 0.65);
+  background: rgba(11, 15, 25, 0.75);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  transition: var(--transition-normal);
 }
+
+.history-item-card:hover {
+  border-color: rgba(6, 182, 212, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Session Type Selector in New Lecture Modal */
+.session-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.session-type-label input {
+  display: none;
+}
+
+.session-type-card {
+  padding: 14px 10px;
+  text-align: center;
+  background: rgba(11, 15, 25, 0.7);
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.session-type-card .icon {
+  font-size: 1.3rem;
+}
+
+.session-type-label input:checked + .session-type-card {
+  background: rgba(6, 182, 212, 0.18);
+  border-color: var(--cyan-light);
+  color: #fff;
+  box-shadow: 0 0 16px var(--cyan-glow);
+}
+
+/* Doctor & Instructor Management (Developer Panel) */
+.developer-panel {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.doctor-item-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.doctor-info-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.doctor-avatar-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--cyan-primary), #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.doctor-role-badge {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.doctor-role-badge.prof {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--cyan-light);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.doctor-role-badge.assistant {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--purple-light);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.doctor-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-change-doc-pin {
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  color: var(--cyan-light);
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-change-doc-pin:hover {
+  background: var(--cyan-primary);
+  color: #fff;
+}
+
+.btn-delete-doc {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-delete-doc:hover {
+  background: #ef4444;
+  color: #fff;
+}
+

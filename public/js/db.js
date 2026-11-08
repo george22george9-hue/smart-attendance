@@ -105,6 +105,8 @@ async function saveLocalLecture(lecture) {
     const record = {
       lecture_id: lecture.lecture_id,
       title: lecture.title,
+      session_type: lecture.session_type || 'محاضرة نظري',
+      instructor_name: lecture.instructor_name || '',
       target_dept: lecture.target_dept || 'الكل',
       lecture_date: lecture.lecture_date || new Date().toLocaleDateString('ar-EG'),
       created_at: lecture.created_at || new Date().toISOString(),
@@ -169,6 +171,9 @@ async function recordLocalAttendance(record) {
       // 2. Insert new record
       const newEntry = {
         lecture_id: record.lecture_id,
+        lecture_title: record.lecture_title || '',
+        session_type: record.session_type || 'محاضرة نظري',
+        instructor_name: record.instructor_name || '',
         national_id: String(record.national_id).trim(),
         student_name: record.student_name.trim(),
         department: record.department.trim(),

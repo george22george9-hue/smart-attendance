@@ -79,6 +79,8 @@ const CloudDB = {
       await cloudDb.collection('lectures').doc(lecId).set({
         lecture_id: lecId,
         title: lecture.title,
+        session_type: lecture.session_type || 'محاضرة نظري',
+        instructor_name: lecture.instructor_name || '',
         target_dept: lecture.target_dept || 'الكل',
         lecture_date: lecture.lecture_date,
         created_at: lecture.created_at || new Date().toISOString()
@@ -104,6 +106,9 @@ const CloudDB = {
 
       const payload = {
         lecture_id: record.lecture_id,
+        lecture_title: record.lecture_title || '',
+        session_type: record.session_type || 'محاضرة نظري',
+        instructor_name: record.instructor_name || '',
         national_id: String(record.national_id).trim(),
         student_name: record.student_name.trim(),
         department: record.department.trim(),
@@ -157,7 +162,8 @@ const CloudDB = {
       const docRef = cloudDb.collection('announcements').doc();
       const payload = {
         id: docRef.id,
-        sender: 'المحاضر',
+        sender: message.sender || 'المحاضر',
+        sender_name: message.sender_name || 'دكتور المحاضرة',
         target_type: message.target_type || 'all', // 'all' | 'dept' | 'student'
         target_value: message.target_value || '',  // dept name or national_id
         title: message.title.trim(),
@@ -224,6 +230,112 @@ const CloudDB = {
       }, (err) => {
         console.warn('[Firebase] Instructor messages listener error:', err);
       });
+  },
+
+  // 11. Instructors Directory & Multi-Doctor Password Management
+  async getAllInstructors() {
+    let list = [];
+    if (cloudDb) {
+      try {
+        const snap = await cloudDb.collection('instructors').get();
+        snap.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+      } catch (err) {
+        console.warn('[Firebase] Get instructors cloud error:', err);
+      }
+    }
+
+    // If cloud is empty or offline, check localStorage
+    if (list.length === 0) {
+      try {
+        const local = localStorage.getItem('app_instructors');
+        if (local) list = JSON.parse(local);
+      } catch (e) {}
+    }
+
+    // Default Seed Instructor if brand new
+    if (list.length === 0) {
+      const defaultDoctor = {
+        id: 'inst_default',
+        name: 'د. جورج سليمان رشدي',
+        role: 'دكتور',
+        department: 'الكل',
+        pin: '1234',
+        updated_at: new Date().toISOString()
+      };
+      list.push(defaultDoctor);
+      this.saveInstructor(defaultDoctor);
+    } else {
+      try {
+        localStorage.setItem('app_instructors', JSON.stringify(list));
+      } catch (e) {}
+    }
+
+    return list;
+  },
+
+  async saveInstructor(instructor) {
+    const id = instructor.id || ('inst_' + Date.now());
+    const payload = {
+      id: id,
+      name: String(instructor.name || '').trim(),
+      role: instructor.role || 'دكتور',
+      department: instructor.department || 'الكل',
+      pin: String(instructor.pin || '1234').trim(),
+      updated_at: new Date().toISOString()
+    };
+
+    if (cloudDb) {
+      try {
+        await cloudDb.collection('instructors').doc(id).set(payload, { merge: true });
+      } catch (e) {
+        console.warn('[Firebase] Save instructor error:', e);
+      }
+    }
+
+    try {
+      const local = JSON.parse(localStorage.getItem('app_instructors') || '[]');
+      const idx = local.findIndex(i => i.id === id);
+      if (idx >= 0) local[idx] = payload;
+      else local.push(payload);
+      localStorage.setItem('app_instructors', JSON.stringify(local));
+    } catch (e) {}
+
+    return payload;
+  },
+
+  async deleteInstructor(id) {
+    if (cloudDb) {
+      try {
+        await cloudDb.collection('instructors').doc(id).delete();
+      } catch (e) {}
+    }
+    try {
+      const local = JSON.parse(localStorage.getItem('app_instructors') || '[]');
+      const filtered = local.filter(i => i.id !== id);
+      localStorage.setItem('app_instructors', JSON.stringify(filtered));
+    } catch (e) {}
+    return true;
+  },
+
+  async updateInstructorPin(id, newPin) {
+    const cleanPin = String(newPin).trim();
+    if (cloudDb) {
+      try {
+        await cloudDb.collection('instructors').doc(id).update({
+          pin: cleanPin,
+          updated_at: new Date().toISOString()
+        });
+      } catch (e) {}
+    }
+    try {
+      const local = JSON.parse(localStorage.getItem('app_instructors') || '[]');
+      const inst = local.find(i => i.id === id);
+      if (inst) {
+        inst.pin = cleanPin;
+        localStorage.setItem('app_instructors', JSON.stringify(local));
+      }
+    } catch (e) {}
+    return true;
   }
 };
 

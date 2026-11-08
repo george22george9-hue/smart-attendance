@@ -14,12 +14,12 @@
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=5.0">
+  <link rel="stylesheet" href="./css/style.css?v=5.1">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation (v5.0) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation (v5.1) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v5.0-cloud-firestore';
+      const CURRENT_VERSION = 'v5.1-multi-doctor-session';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
         if ('caches' in window) {
@@ -60,7 +60,7 @@
           </svg>
         </div>
         <div>
-          <h1 class="brand-title">حضور وغياب <span style="font-size:0.65rem; background:rgba(6,182,212,0.2); color:var(--cyan-light); border:1px solid rgba(6,182,212,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.0</span></h1>
+          <h1 class="brand-title">حضور وغياب <span style="font-size:0.65rem; background:rgba(6,182,212,0.2); color:var(--cyan-light); border:1px solid rgba(6,182,212,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.1</span></h1>
         </div>
       </div>
 
@@ -121,9 +121,12 @@
         </div>
 
         <!-- Quick Cache Refresh & Version Sync Trigger -->
-        <div style="margin-top: 24px; text-align: center;">
+        <div style="margin-top: 24px; text-align: center; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
           <button id="btn-force-update-app" class="tool-btn" style="background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: var(--text-dim); font-size: 0.78rem; padding: 6px 16px; border-radius: 9999px;">
-            <span>🔄 تحديث التطبيق ومسح الذاكرة المؤقتة (v5.0)</span>
+            <span>🔄 تحديث التطبيق ومسح الكاش (v5.1)</span>
+          </button>
+          <button id="btn-landing-dev-portal" class="tool-btn" style="background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.3); color: var(--cyan-light); font-size: 0.78rem; padding: 6px 16px; border-radius: 9999px;">
+            <span>🛠️ لوحة المطور وإدارة كلمات السر</span>
           </button>
         </div>
       </section>
@@ -297,19 +300,28 @@
       </section>
 
       <!-- ===================================================================
-           4. INSTRUCTOR FLOW: PIN GATE
+           4. INSTRUCTOR FLOW: PIN GATE & MULTI-DOCTOR LOGIN
            =================================================================== -->
       <section id="view-instructor-pin" class="view-section">
         <div class="glass-panel pin-dialog-card">
-          <div class="pin-icon-box">🔒</div>
-          <h3 style="font-size: 1.3rem; margin-bottom: 6px;">كود دخول المحاضر</h3>
+          <div class="pin-icon-box">👨‍🏫</div>
+          <h3 style="font-size: 1.3rem; margin-bottom: 6px;">تسجيل دخول عضو هيئة التدريس</h3>
           <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 22px;">
-            أدخل الرمز السري الخاص بك لفتح لوحة أخذ الغياب والكاميرا
+            حدد اسمك وأدخل الرمز السري لبدء المحاضرة وأخذ الغياب
           </p>
 
-          <div class="form-group">
-            <input type="password" id="instructor-pin-input" class="form-input pin-input" maxlength="8" placeholder="••••" autocomplete="off" autofocus>
-            <p class="form-hint">الرمز الافتراضي: 1234</p>
+          <!-- Doctor Selector Dropdown -->
+          <div class="form-group" style="text-align: right;">
+            <label class="form-label" for="instructor-select">اختر اسم الدكتور / المعيد:</label>
+            <select id="instructor-select" class="form-input" style="font-size: 1.05rem; padding: 12px 14px; background: #111827;">
+              <!-- Dynamically populated from registered instructors -->
+            </select>
+          </div>
+
+          <div class="form-group" style="text-align: right;">
+            <label class="form-label" for="instructor-pin-input">كلمة السر / الرمز السري:</label>
+            <input type="password" id="instructor-pin-input" class="form-input pin-input" maxlength="12" placeholder="••••" autocomplete="off" autofocus>
+            <p id="instructor-pin-hint" class="form-hint">أدخل الرمز السري المخصص لك</p>
           </div>
 
           <button id="btn-verify-pin" class="submit-btn" style="background: linear-gradient(135deg, var(--purple-primary), #6d28d9); box-shadow: 0 4px 15px var(--purple-glow);">
@@ -317,10 +329,82 @@
             <span>🔓</span>
           </button>
 
-          <div style="margin-top: 18px;">
-            <button class="back-btn btn-back-landing" style="margin: 0 auto;">
+          <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+            <button id="btn-open-dev-login" type="button" class="tool-btn" style="background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.3); color: var(--cyan-light); font-size: 0.82rem; padding: 6px 14px; border-radius: 9999px;">
+              🛠️ لوحة المطور: تحديد الدكاترة وتغيير كلمات السر
+            </button>
+            <button class="back-btn btn-back-landing">
               <span>العودة للرئيسية</span>
             </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           4.5 DEVELOPER & INSTRUCTORS MANAGEMENT PORTAL
+           =================================================================== -->
+      <section id="view-developer-admin" class="view-section">
+        <div class="developer-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">
+              <span>🛠️</span>
+              <span>لوحة المطور: إدارة الدكاترة وكلمات السر</span>
+            </h3>
+            <button class="back-btn btn-back-landing">
+              <span>الرئيسية</span>
+              <span>◀</span>
+            </button>
+          </div>
+
+          <!-- Add New Instructor Card -->
+          <div class="glass-panel" style="padding: 22px; margin-bottom: 20px;">
+            <h4 style="font-size: 1.15rem; color: #fff; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+              <span>➕</span>
+              <span>إضافة دكتور أو معيد جديد للنظام</span>
+            </h4>
+            <form id="add-instructor-form">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                <div class="form-group" style="margin: 0;">
+                  <label class="form-label" for="new-doc-name"><span class="req">*</span> اسم الدكتور / المعيد:</label>
+                  <input type="text" id="new-doc-name" class="form-input" placeholder="مثال: د. جورج سليمان" required>
+                </div>
+                <div class="form-group" style="margin: 0;">
+                  <label class="form-label" for="new-doc-role">الصفة / الرتبة:</label>
+                  <select id="new-doc-role" class="form-input" style="background: #111827;">
+                    <option value="دكتور">دكتور (محاضرات نظري)</option>
+                    <option value="معيد">معيد (سكاشن عملي)</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin: 0;">
+                  <label class="form-label" for="new-doc-dept">القسم التابع له:</label>
+                  <select id="new-doc-dept" class="form-input" style="background: #111827;">
+                    <option value="الكل">جميع الأقسام</option>
+                    <option value="آلات">آلات</option>
+                    <option value="نظم">نظم</option>
+                    <option value="ري">ري</option>
+                    <option value="عام">عام</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin: 0;">
+                  <label class="form-label" for="new-doc-pin"><span class="req">*</span> كلمة المرور / الرمز السري:</label>
+                  <input type="text" id="new-doc-pin" class="form-input" placeholder="مثال: 1234" required maxlength="12">
+                </div>
+              </div>
+              <button type="submit" class="submit-btn" style="margin-top: 10px; padding: 10px 18px; font-size: 0.95rem;">
+                <span>➕ حفظ وإضافة الدكتور للنظام</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Instructors Directory & Password Manager -->
+          <div class="glass-panel" style="padding: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h4 style="font-size: 1.15rem; color: #fff;">قائمة الدكاترة المسجلين وكلمات السر</h4>
+              <span id="instructors-count-badge" class="dept-badge" style="background: rgba(6,182,212,0.15); color: var(--cyan-light);">0 محاضر</span>
+            </div>
+            <div id="instructors-list-container">
+              <!-- Doctor cards injected here -->
+            </div>
           </div>
         </div>
       </section>
@@ -517,11 +601,16 @@
         <!-- Active Lecture Header -->
         <div class="panel-header">
           <div>
-            <h3 id="active-lec-title" class="panel-title" style="margin-bottom: 4px;">عنوان المحاضرة</h3>
-            <div style="display:flex; gap:12px; font-size:0.85rem; color:var(--text-muted);">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+              <span id="active-lec-type" class="dept-badge" style="background:rgba(6,182,212,0.18); color:var(--cyan-light); font-size:0.8rem;">📖 محاضرة نظري</span>
+              <h3 id="active-lec-title" class="panel-title" style="margin:0;">عنوان المحاضرة</h3>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:0.85rem; color:var(--text-muted);">
               <span id="active-lec-dept">القسم: الكل</span>
               <span>•</span>
               <span id="active-lec-date">2026/11/08</span>
+              <span>•</span>
+              <span id="active-lec-instructor">المحاضر: د. جورج</span>
             </div>
           </div>
           <button id="btn-back-dashboard" class="back-btn">
@@ -627,16 +716,42 @@
          MODALS
          =================================================================== -->
 
-    <!-- Modal 1: New Lecture -->
+    <!-- Modal 1: New Lecture / Section -->
     <div id="modal-new-lecture" class="modal-backdrop">
       <div class="modal-dialog">
         <button class="modal-close-btn">&times;</button>
-        <h3 style="font-size:1.25rem; margin-bottom:16px; color:#fff;">بدء محاضرة جديدة</h3>
+        <h3 style="font-size:1.25rem; margin-bottom:14px; color:#fff;">بدء جلسة حضور جديدة</h3>
         
         <form id="create-lecture-form">
+          <!-- Session Type Selector: نظري / عملي -->
           <div class="form-group">
-            <label class="form-label" for="new-lec-title">اسم المادة / رقم المحاضرة:</label>
-            <input type="text" id="new-lec-title" class="form-input" placeholder="مثال: هندسة القوى - المحاضرة 4" required autofocus>
+            <label class="form-label">نوع الجلسة:</label>
+            <div class="session-type-grid">
+              <label class="session-type-label">
+                <input type="radio" name="session_type" value="محاضرة نظري" checked>
+                <div class="session-type-card">
+                  <span class="icon">📖</span>
+                  <span>محاضرة نظري</span>
+                </div>
+              </label>
+              <label class="session-type-label">
+                <input type="radio" name="session_type" value="سكشن عملي">
+                <div class="session-type-card">
+                  <span class="icon">🔬</span>
+                  <span>سكشن عملي</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-lec-title">اسم المادة / عنوان الموضوع:</label>
+            <input type="text" id="new-lec-title" class="form-input" placeholder="مثال: هندسة القوى الكهربية - محاضرة 1" required autofocus>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-lec-instructor">المحاضر / المعيد المسؤول:</label>
+            <input type="text" id="new-lec-instructor" class="form-input" placeholder="اسم الدكتور أو المعيد">
           </div>
 
           <div class="form-group">
@@ -651,7 +766,7 @@
           </div>
 
           <div style="display:flex; gap:10px; margin-top:20px;">
-            <button type="submit" class="submit-btn" style="flex:1;">بدء الجلسة الآن</button>
+            <button type="submit" class="submit-btn" style="flex:1;">بدء الجلسة الآن 🚀</button>
             <button type="button" class="back-btn btn-cancel-modal">إلغاء</button>
           </div>
         </form>
@@ -750,6 +865,52 @@
       </div>
     </div>
 
+    <!-- Modal 5: Developer Master PIN Gate -->
+    <div id="modal-dev-pin" class="modal-backdrop">
+      <div class="modal-dialog" style="max-width: 400px; text-align: center;">
+        <button class="modal-close-btn">&times;</button>
+        <div style="font-size: 2.2rem; margin-bottom: 8px;">🔐</div>
+        <h3 style="font-size:1.2rem; margin-bottom:6px; color:#fff;">دخول لوحة المطور والإدارة</h3>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">
+          أدخل الرمز السري للمطور للتحكم في الدكاترة وتغيير كلمات السر
+        </p>
+
+        <form id="dev-pin-form">
+          <div class="form-group">
+            <input type="password" id="dev-pin-input" class="form-input pin-input" placeholder="••••" maxlength="8" required autofocus>
+            <p class="form-hint">الرمز الافتراضي: 0000</p>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button type="submit" class="submit-btn" style="flex:1;">فتح لوحة المطور</button>
+            <button type="button" class="back-btn btn-cancel-modal">إلغاء</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal 6: Edit Doctor PIN (from Developer Panel) -->
+    <div id="modal-edit-doc-pin" class="modal-backdrop">
+      <div class="modal-dialog" style="max-width: 440px;">
+        <button class="modal-close-btn">&times;</button>
+        <h3 style="font-size:1.2rem; margin-bottom:6px; color:#fff;">تغيير كلمة سر الدكتور</h3>
+        <p id="edit-doc-pin-subtitle" style="font-size:0.85rem; color:var(--cyan-light); margin-bottom:16px;">
+          د. جورج سليمان
+        </p>
+
+        <form id="edit-doc-pin-form">
+          <input type="hidden" id="edit-doc-id">
+          <div class="form-group">
+            <label class="form-label" for="edit-doc-new-pin">كلمة السر / الرمز السري الجديد:</label>
+            <input type="text" id="edit-doc-new-pin" class="form-input" placeholder="مثال: 5566" required maxlength="12">
+          </div>
+          <div style="display:flex; gap:10px; margin-top:16px;">
+            <button type="submit" class="submit-btn" style="flex:1;">حفظ كلمة السر الجديدة</button>
+            <button type="button" class="back-btn btn-cancel-modal">إلغاء</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Toast Notification Container -->
     <div id="toast-container"></div>
 
@@ -758,19 +919,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=5.0"></script>
+  <script src="./js/firebase-app.js?v=5.1"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=5.0"></script>
-  <script src="./libs/html5-qrcode.min.js?v=5.0"></script>
-  <script src="./libs/xlsx.full.min.js?v=5.0"></script>
+  <script src="./libs/qrcode.js?v=5.1"></script>
+  <script src="./libs/html5-qrcode.min.js?v=5.1"></script>
+  <script src="./libs/xlsx.full.min.js?v=5.1"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=5.0"></script>
-  <script src="./js/sync.js?v=5.0"></script>
-  <script src="./js/qr-scanner.js?v=5.0"></script>
-  <script src="./js/excel.js?v=5.0"></script>
-  <script src="./js/app.js?v=5.0"></script>
+  <script src="./js/db.js?v=5.1"></script>
+  <script src="./js/sync.js?v=5.1"></script>
+  <script src="./js/qr-scanner.js?v=5.1"></script>
+  <script src="./js/excel.js?v=5.1"></script>
+  <script src="./js/app.js?v=5.1"></script>
 
 </body>
 </html>

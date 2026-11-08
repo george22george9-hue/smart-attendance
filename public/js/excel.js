@@ -13,9 +13,10 @@ class AttendanceExcelExporter {
     const rows = [];
 
     // Header info rows
-    rows.push(['نظام الحضور والغياب الذكي - كشف حضور محاضرة']);
-    rows.push(['اسم المحاضرة / المادة:', lecture.title || 'بدون عنوان', 'التاريخ:', lecture.lecture_date || new Date().toLocaleDateString('ar-EG')]);
-    rows.push(['القسم المستهدف:', lecture.target_dept || 'الكل', 'إجمالي الحضور:', attendanceList.length]);
+    rows.push(['نظام الحضور والغياب الذكي - كشف حضور معتمد']);
+    rows.push(['نوع الجلسة:', lecture.session_type || 'محاضرة نظري', 'اسم المادة / المحاضرة:', lecture.title || 'بدون عنوان']);
+    rows.push(['المحاضر / المعيد:', lecture.instructor_name || 'غير محدد', 'التاريخ:', lecture.lecture_date || new Date().toLocaleDateString('ar-EG')]);
+    rows.push(['القسم المستهدف:', lecture.target_dept || 'الكل', 'إجمالي الحضور:', attendanceList.length + ' طالب']);
     rows.push([]); // blank line separator
 
     // Table Columns Header
