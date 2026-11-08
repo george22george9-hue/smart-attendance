@@ -44,22 +44,45 @@ function validateNationalId(nid) {
   return { valid: true, nid: clean };
 }
 
-// UI Toasts
-function showToast(message, type = 'info', duration = 3500) {
+// UI Toasts (Luxurious Floating Glass Pill - Single Instance)
+let currentActiveToast = null;
+
+function showToast(message, type = 'info', duration = 3200) {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
+  // Dismiss previous toast to prevent awkward overlapping stacks
+  if (currentActiveToast) {
+    try { currentActiveToast.remove(); } catch(e){}
+    currentActiveToast = null;
+  }
+
   const toast = document.createElement('div');
   toast.className = `app-toast ${type}`;
+
+  let icon = 'ℹ️';
+  if (type === 'success') icon = '✅';
+  else if (type === 'error') icon = '⚠️';
+  else if (type === 'warning') icon = '⚡';
+
   toast.innerHTML = `
-    <span>${message}</span>
+    <span class="toast-icon-chip">${icon}</span>
+    <span class="toast-message-text">${message}</span>
   `;
+
   container.appendChild(toast);
+  currentActiveToast = toast;
 
   setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(8px)';
-    setTimeout(() => toast.remove(), 300);
+    if (toast === currentActiveToast) {
+      toast.classList.add('hiding');
+      setTimeout(() => {
+        if (toast === currentActiveToast) {
+          try { toast.remove(); } catch(e){}
+          currentActiveToast = null;
+        }
+      }, 250);
+    }
   }, duration);
 }
 
@@ -213,30 +236,34 @@ function setupStudentFormEvents() {
 
       try {
         // Dual Save:
-        // 1. Save in LocalStorage
+        // 1. Save in LocalStorage immediately
         localStorage.setItem('student_profile', JSON.stringify(studentData));
         state.currentStudent = studentData;
 
-        // 2. Save in IndexedDB
-        await saveLocalStudent(studentData);
+        // 2. Save in IndexedDB (Safe attempt)
+        try {
+          await saveLocalStudent(studentData);
+        } catch (dbErr) {
+          console.warn('IndexedDB save warning (non-fatal):', dbErr);
+        }
 
         // 3. Trigger background sync to server
-        window.syncManager.syncNow(true);
-      if (window.CloudDB) {
-        window.CloudDB.recordAttendance(record);
-      }
+        if (window.syncManager) {
+          try { window.syncManager.syncNow(true); } catch (e) {}
+        }
 
         // 4. Save to Firebase Cloud Firestore
         if (window.CloudDB) {
-          window.CloudDB.saveStudent(studentData);
+          try { window.CloudDB.saveStudent(studentData); } catch (e) {}
         }
 
-        showToast('تم حفظ البيانات وتوليد كود الحضور الذكي', 'success');
+        // 5. Generate and show Smart QR Card
         renderStudentQrCard(studentData);
+        showToast('تم تسجيل بياناتك وتوليد بطاقة الحضور بنجاح ✨', 'success');
         showView('view-student-card');
       } catch (err) {
         console.error('Error saving student:', err);
-        showToast('حدث خطأ أثناء حفظ البيانات', 'error');
+        showToast('حدث خطأ أثناء حفظ البيانات: ' + (err.message || ''), 'error');
       }
     });
   }
