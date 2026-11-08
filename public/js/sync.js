@@ -1,6 +1,6 @@
 /**
  * Dual-Database Synchronization Engine
- * Automatically monitors network connectivity and syncs local IndexedDB with SQLite backend
+ * Automatically monitors network connectivity and syncs local IndexedDB with Cloud Firestore (or Express SQLite)
  */
 class SyncManager {
   constructor() {
@@ -28,7 +28,7 @@ class SyncManager {
       this.notifyStatus('offline');
     });
 
-    // Periodic sync attempt (every 25 seconds)
+    // Periodic sync attempt (every 25 seconds if online)
     this.syncInterval = setInterval(() => {
       if (this.isOnline && !this.isSyncing) {
         this.syncNow(true); // silent background sync
@@ -37,20 +37,17 @@ class SyncManager {
 
     // Initial check on load
     setTimeout(() => {
-      this.checkServerReachability().then((reachable) => {
-        this.isOnline = reachable;
-        if (reachable) {
-          this.syncNow(true);
-        } else {
-          this.notifyStatus('offline');
-        }
-      });
-    }, 1000);
+      this.isOnline = navigator.onLine;
+      if (this.isOnline) {
+        this.syncNow(true);
+      } else {
+        this.notifyStatus('offline');
+      }
+    }, 1200);
   }
 
   onStatusChange(callback) {
     this.listeners.push(callback);
-    // Trigger immediately with current status
     callback(this.getStatus());
   }
 
@@ -69,50 +66,61 @@ class SyncManager {
     };
   }
 
-  async checkServerReachability() {
-    if (!navigator.onLine) return false;
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500);
-      const res = await fetch('/api/stats', {
-        method: 'GET',
-        cache: 'no-store',
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      return res.ok;
-    } catch (e) {
-      return false;
-    }
-  }
-
   async syncNow(silent = false) {
     if (this.isSyncing) return;
-
-    // Check if truly reachable
-    const reachable = await this.checkServerReachability();
-    this.isOnline = reachable;
-
-    if (!reachable) {
+    if (!navigator.onLine) {
+      this.isOnline = false;
       this.notifyStatus('offline');
-      return { success: false, offline: true, message: 'الخادم غير متاح حالياً' };
+      return { success: false, offline: true, message: 'الجهاز غير متصل بالإنترنت حالياً' };
     }
 
     this.isSyncing = true;
     this.notifyStatus('syncing');
 
     try {
-      // 1. Gather all unsynced data from IndexedDB
+      // 1. Gather all unsynced data from local IndexedDB
       const unsynced = await getUnsyncedRecords();
       const totalCount = unsynced.students.length + unsynced.lectures.length + unsynced.attendance.length;
 
       if (totalCount === 0) {
         this.isSyncing = false;
         this.notifyStatus('synced');
-        return { success: true, count: 0, message: 'جميع البيانات متزامنة ومحدثة' };
+        return { success: true, count: 0, message: 'جميع البيانات متزامنة ومأمنة في السحابة' };
       }
 
-      // 2. Transmit batch to server
+      // 2. Primary Cloud Sync: Sync via Firebase Cloud Firestore if available
+      if (window.CloudDB && typeof firebase !== 'undefined') {
+        // Sync students
+        for (const st of unsynced.students) {
+          await window.CloudDB.saveStudent(st);
+        }
+        // Sync lectures
+        for (const lec of unsynced.lectures) {
+          await window.CloudDB.saveLecture(lec);
+        }
+        // Sync attendance records
+        for (const att of unsynced.attendance) {
+          await window.CloudDB.recordAttendance(att);
+        }
+
+        // Mark as synced locally
+        await markRecordsAsSynced(unsynced);
+
+        this.lastSyncTime = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+        localStorage.setItem('last_sync_timestamp', this.lastSyncTime);
+
+        this.isSyncing = false;
+        this.notifyStatus('synced');
+        window.dispatchEvent(new CustomEvent('sync-completed', { detail: { count: totalCount } }));
+
+        return {
+          success: true,
+          count: totalCount,
+          message: `تم رفع ${totalCount} سجل إلى سحابة Google بنجاح`
+        };
+      }
+
+      // 3. Fallback: Local Server Sync (/api/sync) if running on local Node.js server
       const response = await fetch('/api/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -128,25 +136,14 @@ class SyncManager {
       }
 
       const result = await response.json();
-
       if (result.success) {
-        // 3. Mark records as synced in local IndexedDB
         await markRecordsAsSynced(unsynced);
-
         this.lastSyncTime = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
         localStorage.setItem('last_sync_timestamp', this.lastSyncTime);
-
         this.isSyncing = false;
         this.notifyStatus('synced');
-
-        // Dispatch window event so UI can re-render if needed
         window.dispatchEvent(new CustomEvent('sync-completed', { detail: result }));
-
-        return {
-          success: true,
-          count: totalCount,
-          message: `تم رفع ${totalCount} سجل إلى السيرفر بنجاح`
-        };
+        return { success: true, count: totalCount, message: `تم رفع البيانات بنجاح` };
       } else {
         throw new Error(result.message || 'فشلت المزامنة');
       }
@@ -161,4 +158,3 @@ class SyncManager {
 
 // Global singleton
 window.syncManager = new SyncManager();
-

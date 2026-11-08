@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-attendance-v2';
+const CACHE_NAME = 'smart-attendance-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const ASSETS_TO_CACHE = [
   './js/sync.js',
   './js/qr-scanner.js',
   './js/excel.js',
+  './js/firebase-app.js',
   './libs/html5-qrcode.min.js',
   './libs/qrcode.js',
   './libs/xlsx.full.min.js',
@@ -18,11 +19,14 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[SW] Pre-caching offline assets');
       return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    }).catch(err => {
+      console.warn('[SW] Cache addAll warning:', err);
+    })
   );
 });
 
@@ -32,7 +36,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
-            console.log('[SW] Clearing old cache:', cache);
+            console.log('[SW] Deleting old cache:', cache);
             return caches.delete(cache);
           }
         })
@@ -44,51 +48,44 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // If requesting API, try network first; do not cache POST requests
-  if (url.pathname.startsWith('/api/')) {
+  // 1. Navigation requests (Opening the site in browser or refreshing) -> Network First with Offline Fallback
+  if (event.request.mode === 'navigate' || event.request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
-      fetch(event.request).catch(() => {
-        return new Response(
-          JSON.stringify({
-            success: false,
-            offline: true,
-            message: 'الخادم غير متصل. تم حفظ العملية في الطابور المحلي للمزامنة التلقائية.'
-          }),
-          { headers: { 'Content-Type': 'application/json' } }
-        );
-      })
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const copy = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // If device is offline, load cached index.html
+          return caches.match('./index.html') || caches.match('./');
+        })
     );
     return;
   }
 
-  // Cache-first strategy for static assets
+  // 2. Ignore non-GET requests or external analytics
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  // 3. Stale-While-Revalidate for static assets (CSS, JS, Fonts, Images, Libs)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (
-          !networkResponse ||
-          networkResponse.status !== 200 ||
-          networkResponse.type !== 'basic'
-        ) {
+      const fetchPromise = fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const copy = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
           return networkResponse;
-        }
+        })
+        .catch(() => cachedResponse);
 
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return networkResponse;
-      });
-    }).catch(() => {
-      // Fallback for HTML documents to index.html
-      if (event.request.headers.get('accept')?.includes('text/html')) {
-        return caches.match('./index.html');
-      }
+      return cachedResponse || fetchPromise;
     })
   );
 });
-
