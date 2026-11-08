@@ -332,11 +332,15 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
-// Initialize DB and start server
+// Initialize DB and start server (or export for Vercel Serverless)
 initDb().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }
 }).catch(err => {
-  console.error('Failed to start server:', err);
+  console.error('Failed to initialize DB:', err);
 });
+
+module.exports = app;

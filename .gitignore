@@ -3,3 +3,4 @@ cloudflared.exe
 .gemini/
 *.log
 npm-debug.log*
+
