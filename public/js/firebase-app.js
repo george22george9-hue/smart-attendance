@@ -1,6 +1,6 @@
 /**
  * Firebase Initialization & Cloud Firestore Integration
- * Enables real-time cloud sync and offline persistence for students, lectures, and attendance
+ * Enables real-time cloud sync, messaging, and offline persistence
  */
 const firebaseConfig = {
   apiKey: "AIzaSyBsV_WcXz4JG9PSJRX8VCUO5fmAcIX9dNE",
@@ -56,7 +56,22 @@ const CloudDB = {
     }
   },
 
-  // 2. Save or sync lecture
+  // 2. Fetch all registered students
+  async getAllStudents() {
+    if (!cloudDb) return [];
+    try {
+      const snap = await cloudDb.collection('students').get();
+      const list = [];
+      snap.forEach(doc => list.push(doc.data()));
+      list.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '', 'ar'));
+      return list;
+    } catch (err) {
+      console.warn('[Firebase] Get students error:', err);
+      return [];
+    }
+  },
+
+  // 3. Save or sync lecture
   async saveLecture(lecture) {
     if (!cloudDb) return false;
     try {
@@ -75,7 +90,7 @@ const CloudDB = {
     }
   },
 
-  // 3. Record attendance in Cloud Firestore
+  // 4. Record attendance in Cloud Firestore
   async recordAttendance(record) {
     if (!cloudDb) return { success: false };
     try {
@@ -104,7 +119,7 @@ const CloudDB = {
     }
   },
 
-  // 4. Real-time listener for lecture attendance
+  // 5. Real-time listener for lecture attendance
   listenToLecture(lectureId, callback) {
     if (!cloudDb) return null;
     return cloudDb.collection('attendance')
@@ -116,8 +131,100 @@ const CloudDB = {
       }, (err) => {
         console.warn('[Firebase] Attendance listener error:', err);
       });
+  },
+
+  // 6. Get attendance history for a specific student
+  async getStudentAttendanceHistory(nationalId) {
+    if (!cloudDb) return [];
+    try {
+      const nid = String(nationalId).trim();
+      const snap = await cloudDb.collection('attendance')
+        .where('national_id', '==', nid)
+        .get();
+      const records = [];
+      snap.forEach(doc => records.push(doc.data()));
+      return records;
+    } catch (err) {
+      console.warn('[Firebase] Get student attendance error:', err);
+      return [];
+    }
+  },
+
+  // 7. Send Announcement/Message from Instructor
+  async sendMessage(message) {
+    if (!cloudDb) return false;
+    try {
+      const docRef = cloudDb.collection('announcements').doc();
+      const payload = {
+        id: docRef.id,
+        sender: 'المحاضر',
+        target_type: message.target_type || 'all', // 'all' | 'dept' | 'student'
+        target_value: message.target_value || '',  // dept name or national_id
+        title: message.title.trim(),
+        body: message.body.trim(),
+        created_at: new Date().toISOString(),
+        date_str: new Date().toLocaleDateString('ar-EG') + ' ' + new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+      };
+      await docRef.set(payload);
+      return true;
+    } catch (err) {
+      console.warn('[Firebase] Send message error:', err);
+      return false;
+    }
+  },
+
+  // 8. Delete message
+  async deleteMessage(msgId) {
+    if (!cloudDb) return false;
+    try {
+      await cloudDb.collection('announcements').doc(msgId).delete();
+      return true;
+    } catch (err) {
+      return false;
+    }
+  },
+
+  // 9. Real-time listener for student messages
+  listenToStudentMessages(student, callback) {
+    if (!cloudDb || !student) return null;
+    const nid = String(student.national_id).trim();
+    const dept = String(student.department).trim();
+
+    return cloudDb.collection('announcements')
+      .onSnapshot((snapshot) => {
+        const list = [];
+        snapshot.forEach(doc => {
+          const msg = doc.data();
+          // Filter: for all, for student's department, or specifically for this student
+          if (
+            msg.target_type === 'all' ||
+            (msg.target_type === 'dept' && msg.target_value === dept) ||
+            (msg.target_type === 'student' && String(msg.target_value).trim() === nid)
+          ) {
+            list.push(msg);
+          }
+        });
+        // Sort newest first
+        list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        callback(list);
+      }, (err) => {
+        console.warn('[Firebase] Student messages listener error:', err);
+      });
+  },
+
+  // 10. Real-time listener for instructor messages
+  listenToAllMessages(callback) {
+    if (!cloudDb) return null;
+    return cloudDb.collection('announcements')
+      .onSnapshot((snapshot) => {
+        const list = [];
+        snapshot.forEach(doc => list.push(doc.data()));
+        list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        callback(list);
+      }, (err) => {
+        console.warn('[Firebase] Instructor messages listener error:', err);
+      });
   }
 };
 
 window.CloudDB = CloudDB;
-

@@ -158,6 +158,7 @@ async function initStudentFlow() {
     try {
       state.currentStudent = JSON.parse(localData);
       renderStudentQrCard(state.currentStudent);
+      initStudentInboxListener(state.currentStudent);
       showView('view-student-card');
       return;
     } catch (e) {
@@ -259,6 +260,7 @@ function setupStudentFormEvents() {
 
         // 5. Generate and show Smart QR Card
         renderStudentQrCard(studentData);
+        initStudentInboxListener(studentData);
         showToast('تم تسجيل بياناتك وتوليد بطاقة الحضور بنجاح ✨', 'success');
         showView('view-student-card');
       } catch (err) {
@@ -310,6 +312,11 @@ function renderStudentQrCard(student) {
   });
 
   try {
+    // Ensure UTF-8 Arabic support in qrcode generator
+    if (typeof qrcode !== 'undefined' && qrcode.stringToBytesFuncs && qrcode.stringToBytesFuncs['UTF-8']) {
+      qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
+    }
+
     // Generate QR with qrcode-generator
     const typeNumber = 0; // auto-detection
     const errorCorrectionLevel = 'M';
@@ -1044,9 +1051,453 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSyncUI();
   setupStudentFormEvents();
   setupInstructorFlow();
+  setupStudentProfileFeatures();
+  setupInstructorPortalTabs();
   setupGlobalEvents();
   registerServiceWorker();
 
   console.log('Smart Attendance PWA initialized successfully.');
 });
 
+
+
+// ==========================================================================
+// 6. Student Profile Features (Inbox, Tabs, History, Logout)
+// ==========================================================================
+function setupStudentProfileFeatures() {
+  // Student Profile Tabs
+  const studentTabBtns = document.querySelectorAll('.nav-tab-btn[data-target^="panel-student-"]');
+  studentTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      studentTabBtns.forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.student-subpanel').forEach(p => p.style.display = 'none');
+
+      btn.classList.add('active');
+      const targetId = btn.getAttribute('data-target');
+      const targetPanel = document.getElementById(targetId);
+      if (targetPanel) targetPanel.style.display = 'block';
+
+      if (targetId === 'panel-student-history' && state.currentStudent) {
+        loadStudentAttendanceHistory(state.currentStudent.national_id);
+      }
+    });
+  });
+
+  // Student Logout / Switch Account
+  const logoutBtn = document.getElementById('btn-student-logout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      if (confirm('هل ترغب في تسجيل الخروج من هذا الحساب؟')) {
+        localStorage.removeItem('student_profile');
+        state.currentStudent = null;
+        showToast('تم تسجيل الخروج بنجاح', 'info');
+        showView('view-landing');
+      }
+    });
+  }
+}
+
+// Listen to announcements from instructor in real-time
+let studentMsgUnsubscribe = null;
+function initStudentInboxListener(student) {
+  if (studentMsgUnsubscribe) {
+    studentMsgUnsubscribe();
+    studentMsgUnsubscribe = null;
+  }
+
+  if (window.CloudDB && window.CloudDB.listenToStudentMessages) {
+    studentMsgUnsubscribe = window.CloudDB.listenToStudentMessages(student, (messages) => {
+      renderStudentMessages(messages);
+    });
+  }
+}
+
+function renderStudentMessages(messages) {
+  const container = document.getElementById('student-messages-list');
+  const badge = document.getElementById('student-msg-badge');
+  if (!container) return;
+
+  if (badge) {
+    if (messages.length > 0) {
+      badge.innerText = messages.length;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  container.innerHTML = '';
+  if (messages.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📬</div>
+        <p>لا توجد رسائل أو تنبيهات جديدة من المحاضر حتى الآن</p>
+      </div>
+    `;
+    return;
+  }
+
+  messages.forEach(msg => {
+    const card = document.createElement('div');
+    card.className = 'message-card';
+
+    let targetLabel = '📢 لجميع الطلاب';
+    let targetClass = 'all';
+    if (msg.target_type === 'dept') {
+      targetLabel = '🏛️ لطلاب قسم ' + msg.target_value;
+      targetClass = 'dept';
+    } else if (msg.target_type === 'student') {
+      targetLabel = '👤 رسالة خاصة لك';
+      targetClass = 'student';
+    }
+
+    card.innerHTML = `
+      <div class="message-header">
+        <span class="message-target-pill ${targetClass}">${targetLabel}</span>
+        <span class="message-date">${msg.date_str || ''}</span>
+      </div>
+      <h5 class="message-title">${msg.title}</h5>
+      <p class="message-body">${msg.body}</p>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// Load Student Attendance History
+async function loadStudentAttendanceHistory(nationalId) {
+  const container = document.getElementById('student-attendance-history-list');
+  const totalCounter = document.getElementById('student-total-attended');
+  if (!container) return;
+
+  container.innerHTML = '<p style="text-align:center; color:var(--text-dim); padding:20px;">جاري تحميل سجل الحضور...</p>';
+
+  let records = [];
+  if (window.CloudDB && window.CloudDB.getStudentAttendanceHistory) {
+    records = await window.CloudDB.getStudentAttendanceHistory(nationalId);
+  }
+
+  if (totalCounter) totalCounter.innerText = records.length;
+  container.innerHTML = '';
+
+  if (records.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <p>لم يتم تسجيل حضورك في أي محاضرة حتى الآن</p>
+      </div>
+    `;
+    return;
+  }
+
+  records.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  records.forEach((rec, idx) => {
+    const item = document.createElement('div');
+    item.className = 'history-item-card';
+    item.innerHTML = `
+      <div>
+        <h5 style="color:#fff; font-size:1rem; margin-bottom:4px;">محاضرة: ${rec.lecture_id}</h5>
+        <span style="font-size:0.8rem; color:var(--text-muted);">وقت التسجيل: ${rec.scan_time || ''}</span>
+      </div>
+      <span class="sync-badge done" style="font-size:0.85rem; font-weight:700;">🟢 تم إثبات الحضور</span>
+    `;
+    container.appendChild(item);
+  });
+}
+
+// ==========================================================================
+// 7. Instructor Portal (Tabs, Students Directory, Broadcast Messaging)
+// ==========================================================================
+function setupInstructorPortalTabs() {
+  const instTabs = document.querySelectorAll('.nav-tab-btn[data-target^="panel-inst-"]');
+  instTabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      instTabs.forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.instructor-subpanel').forEach(p => p.style.display = 'none');
+
+      btn.classList.add('active');
+      const targetId = btn.getAttribute('data-target');
+      const targetPanel = document.getElementById(targetId);
+      if (targetPanel) targetPanel.style.display = 'block';
+
+      if (targetId === 'panel-inst-students') {
+        loadStudentsDirectory();
+      } else if (targetId === 'panel-inst-broadcast') {
+        initInstructorBroadcast();
+      }
+    });
+  });
+
+  // Target Type Selector toggle in broadcast form
+  const targetSelect = document.getElementById('msg-target-type');
+  const nidGroup = document.getElementById('msg-student-nid-group');
+  if (targetSelect && nidGroup) {
+    targetSelect.addEventListener('change', () => {
+      nidGroup.style.display = targetSelect.value === 'student' ? 'block' : 'none';
+      if (targetSelect.value === 'student') {
+        document.getElementById('msg-student-nid')?.focus();
+      }
+    });
+  }
+
+  // Broadcast Message Form Submit
+  const broadcastForm = document.getElementById('broadcast-message-form');
+  if (broadcastForm) {
+    broadcastForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await handleBroadcastSubmit();
+    });
+  }
+
+  // Students Directory Search & Filters
+  const searchInput = document.getElementById('students-directory-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      filterStudentsDirectory(e.target.value.trim().toLowerCase());
+    });
+  }
+
+  document.querySelectorAll('.filter-dept-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-dept-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'rgba(255,255,255,0.06)';
+        b.style.color = 'var(--text-muted)';
+      });
+      btn.classList.add('active');
+      btn.style.background = 'rgba(6,182,212,0.15)';
+      btn.style.color = 'var(--cyan-light)';
+
+      const dept = btn.getAttribute('data-dept');
+      filterStudentsByDept(dept);
+    });
+  });
+}
+
+// Load and render all students in Instructor Directory
+let allDirectoryStudents = [];
+async function loadStudentsDirectory() {
+  const tbody = document.getElementById('students-directory-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:25px; color:var(--text-dim);">جاري جلب بيانات الطلاب...</td></tr>';
+
+  let students = [];
+  if (window.CloudDB && window.CloudDB.getAllStudents) {
+    students = await window.CloudDB.getAllStudents();
+  }
+
+  if (students.length === 0) {
+    students = await getAllLocalStudents();
+  }
+
+  allDirectoryStudents = students;
+  updateDirectoryCounts(students);
+  renderStudentsDirectoryRows(students);
+}
+
+function updateDirectoryCounts(students) {
+  const counts = { all: students.length, 'آلات': 0, 'نظم': 0, 'ري': 0, 'عام': 0 };
+  students.forEach(st => {
+    if (counts[st.department] !== undefined) counts[st.department]++;
+    else counts[st.department] = (counts[st.department] || 0) + 1;
+  });
+
+  document.getElementById('count-dir-all').innerText = counts.all;
+  document.getElementById('count-dir-alat').innerText = counts['آلات'];
+  document.getElementById('count-dir-nuzum').innerText = counts['نظم'];
+  document.getElementById('count-dir-ray').innerText = counts['ري'];
+  document.getElementById('count-dir-aam').innerText = counts['عام'];
+}
+
+function renderStudentsDirectoryRows(students) {
+  const tbody = document.getElementById('students-directory-tbody');
+  tbody.innerHTML = '';
+
+  if (students.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-dim);">لا يوجد طلاب مسجلين في هذا القسم حتى الآن.</td></tr>';
+    return;
+  }
+
+  students.forEach((st, idx) => {
+    const tr = document.createElement('tr');
+    const badgeClass = getDeptBadgeClass(st.department);
+    const dateStr = st.registered_at ? new Date(st.registered_at).toLocaleDateString('ar-EG') : '';
+
+    tr.innerHTML = `
+      <td>${idx + 1}</td>
+      <td style="font-weight:700; color:#fff;">${st.full_name}</td>
+      <td style="font-family:monospace; color:#cbd5e1;">${st.national_id}</td>
+      <td><span class="table-dept-badge ${badgeClass}">${st.department}</span></td>
+      <td style="color:var(--text-muted); font-size:0.82rem;">${dateStr}</td>
+      <td>
+        <button class="tool-btn btn-direct-msg-student" data-nid="${st.national_id}" data-name="${st.full_name}" style="background:rgba(6,182,212,0.15); color:var(--cyan-light); padding:5px 10px; font-size:0.8rem;">
+          ✉️ رسالة
+        </button>
+      </td>
+    `;
+
+    tr.querySelector('.btn-direct-msg-student').addEventListener('click', () => {
+      openDirectMessageToStudent(st);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+function openDirectMessageToStudent(student) {
+  // Switch to broadcast tab
+  document.getElementById('tab-btn-inst-broadcast')?.click();
+
+  const targetSelect = document.getElementById('msg-target-type');
+  const nidGroup = document.getElementById('msg-student-nid-group');
+  const nidInput = document.getElementById('msg-student-nid');
+  const titleInput = document.getElementById('msg-title');
+
+  if (targetSelect) targetSelect.value = 'student';
+  if (nidGroup) nidGroup.style.display = 'block';
+  if (nidInput) nidInput.value = student.national_id;
+  if (titleInput) {
+    titleInput.value = `تنبيه خاص للطالب: ${student.full_name}`;
+    titleInput.focus();
+  }
+
+  showToast(`تم تحديد الطالب: ${student.full_name} لإرسال رسالة إليه`, 'info');
+}
+
+function filterStudentsDirectory(query) {
+  if (!query) {
+    renderStudentsDirectoryRows(allDirectoryStudents);
+    return;
+  }
+  const filtered = allDirectoryStudents.filter(st => {
+    return (st.full_name || '').toLowerCase().includes(query) ||
+           (st.national_id || '').includes(query) ||
+           (st.department || '').includes(query);
+  });
+  renderStudentsDirectoryRows(filtered);
+}
+
+function filterStudentsByDept(dept) {
+  if (dept === 'all') {
+    renderStudentsDirectoryRows(allDirectoryStudents);
+  } else {
+    const filtered = allDirectoryStudents.filter(st => st.department === dept);
+    renderStudentsDirectoryRows(filtered);
+  }
+}
+
+// Handle Broadcast Submission
+async function handleBroadcastSubmit() {
+  const targetSelect = document.getElementById('msg-target-type');
+  const nidInput = document.getElementById('msg-student-nid');
+  const titleInput = document.getElementById('msg-title');
+  const bodyInput = document.getElementById('msg-body');
+
+  const rawTarget = targetSelect.value;
+  let targetType = 'all';
+  let targetValue = '';
+
+  if (rawTarget.startsWith('dept:')) {
+    targetType = 'dept';
+    targetValue = rawTarget.split(':')[1];
+  } else if (rawTarget === 'student') {
+    targetType = 'student';
+    targetValue = nidInput.value.trim();
+    if (targetValue.length !== 14) {
+      showToast('يرجى إدخال رقم قومي صحيح مكون من 14 رقماً', 'warning');
+      nidInput.focus();
+      return;
+    }
+  }
+
+  const title = titleInput.value.trim();
+  const body = bodyInput.value.trim();
+
+  if (!title || !body) {
+    showToast('يرجى كتابة عنوان ونص الرسالة', 'warning');
+    return;
+  }
+
+  const message = {
+    target_type: targetType,
+    target_value: targetValue,
+    title: title,
+    body: body
+  };
+
+  showToast('جاري إرسال الرسالة...', 'info', 1500);
+
+  let success = false;
+  if (window.CloudDB && window.CloudDB.sendMessage) {
+    success = await window.CloudDB.sendMessage(message);
+  }
+
+  if (success) {
+    showToast('تم إرسال الرسالة بنجاح ووصلت لهواتف الطلاب 🚀', 'success');
+    titleInput.value = '';
+    bodyInput.value = '';
+    if (nidInput) nidInput.value = '';
+  } else {
+    showToast('حدث خطأ أثناء إرسال الرسالة', 'error');
+  }
+}
+
+// Listen to all sent messages in Instructor Broadcast Center
+let instMsgUnsubscribe = null;
+function initInstructorBroadcast() {
+  if (instMsgUnsubscribe) return;
+
+  if (window.CloudDB && window.CloudDB.listenToAllMessages) {
+    instMsgUnsubscribe = window.CloudDB.listenToAllMessages((messages) => {
+      renderInstructorSentMessages(messages);
+    });
+  }
+}
+
+function renderInstructorSentMessages(messages) {
+  const container = document.getElementById('sent-messages-list');
+  if (!container) return;
+
+  container.innerHTML = '';
+  if (messages.length === 0) {
+    container.innerHTML = '<p style="text-align:center; color:var(--text-dim); padding:20px;">لم يتم إرسال أي رسائل بعد.</p>';
+    return;
+  }
+
+  messages.forEach(msg => {
+    const card = document.createElement('div');
+    card.className = 'message-card';
+
+    let targetLabel = '📢 لجميع الطلاب';
+    let targetClass = 'all';
+    if (msg.target_type === 'dept') {
+      targetLabel = '🏛️ لطلاب قسم ' + msg.target_value;
+      targetClass = 'dept';
+    } else if (msg.target_type === 'student') {
+      targetLabel = '👤 لطالب برقم: ' + msg.target_value;
+      targetClass = 'student';
+    }
+
+    card.innerHTML = `
+      <div class="message-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="message-target-pill ${targetClass}">${targetLabel}</span>
+          <span class="message-date">${msg.date_str || ''}</span>
+        </div>
+        <button class="del-row-btn btn-del-msg" data-id="${msg.id}" title="حذف الرسالة">🗑️</button>
+      </div>
+      <h5 class="message-title">${msg.title}</h5>
+      <p class="message-body">${msg.body}</p>
+    `;
+
+    card.querySelector('.btn-del-msg').addEventListener('click', async () => {
+      if (confirm('هل ترغب في حذف هذه الرسالة؟')) {
+        await window.CloudDB.deleteMessage(msg.id);
+        showToast('تم حذف الرسالة', 'info');
+      }
+    });
+
+    container.appendChild(card);
+  });
+}

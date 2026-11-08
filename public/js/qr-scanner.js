@@ -175,11 +175,54 @@ class QRScannerController {
     this.lastScannedPayload = decodedText;
     this.lastScannedTime = now;
 
-    // Validate QR code payload format
+    // Multi-format QR decoder (JSON, URL encoded, pipe delimited, base64)
     try {
-      const data = JSON.parse(decodedText);
-      if (!data.nid || !data.name || !data.dept) {
-        throw new Error('QR code does not contain required attendance fields');
+      let data = null;
+      let text = String(decodedText).trim();
+
+      // Attempt 1: URL encoded JSON
+      if (text.includes('%')) {
+        try { text = decodeURIComponent(text); } catch (e) {}
+      }
+
+      // Attempt 2: Direct JSON
+      if (text.startsWith('{') && text.endsWith('}')) {
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          // If JSON failed, try cleaning quotes or brackets
+          console.warn('Direct JSON parse failed, trying relaxed parse:', e);
+        }
+      }
+
+      // Attempt 3: Prefix format ATTEND:nid|name|dept
+      if (!data && text.startsWith('ATTEND:')) {
+        const parts = text.substring(7).split('|');
+        if (parts.length >= 3) {
+          data = { nid: parts[0], name: parts[1], dept: parts[2] };
+        }
+      }
+
+      // Attempt 4: Pipe separated nid|name|dept
+      if (!data && text.includes('|')) {
+        const parts = text.split('|');
+        if (parts.length >= 3) {
+          data = { nid: parts[0], name: parts[1], dept: parts[2] };
+        }
+      }
+
+      // If still not parsed, try regex extraction
+      if (!data) {
+        const nidMatch = text.match(/"nid"\s*:\s*"(\d{14})"/);
+        const nameMatch = text.match(/"name"\s*:\s*"([^"]+)"/);
+        const deptMatch = text.match(/"dept"\s*:\s*"([^"]+)"/);
+        if (nidMatch && nameMatch && deptMatch) {
+          data = { nid: nidMatch[1], name: nameMatch[1], dept: deptMatch[1] };
+        }
+      }
+
+      if (!data || !data.nid || !data.name || !data.dept) {
+        throw new Error('QR payload is missing student fields');
       }
 
       if (this.onScanCallback) {
