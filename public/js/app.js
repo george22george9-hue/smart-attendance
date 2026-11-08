@@ -222,6 +222,14 @@ function setupStudentFormEvents() {
 
         // 3. Trigger background sync to server
         window.syncManager.syncNow(true);
+      if (window.CloudDB) {
+        window.CloudDB.recordAttendance(record);
+      }
+
+        // 4. Save to Firebase Cloud Firestore
+        if (window.CloudDB) {
+          window.CloudDB.saveStudent(studentData);
+        }
 
         showToast('تم حفظ البيانات وتوليد كود الحضور الذكي', 'success');
         renderStudentQrCard(studentData);
@@ -610,6 +618,11 @@ async function handleCreateLecture() {
     // 2. Trigger sync
     window.syncManager.syncNow(true);
 
+    // 3. Save to Firebase Cloud Firestore
+    if (window.CloudDB) {
+      window.CloudDB.saveLecture(lectureData);
+    }
+
     closeModals();
     showToast('تم بدء المحاضرة بنجاح', 'success');
     loadLectureSession(lectureId);
@@ -705,6 +718,14 @@ async function handleScannedStudent(data) {
 
       // Trigger silent background sync if online
       window.syncManager.syncNow(true);
+      if (window.CloudDB) {
+        window.CloudDB.recordAttendance(record);
+      }
+
+      // Record in Firebase Cloud Firestore
+      if (window.CloudDB) {
+        window.CloudDB.recordAttendance(record);
+      }
     }
   } catch (err) {
     console.error('Attendance record error:', err);
@@ -880,6 +901,9 @@ async function handleManualAttendanceSubmit() {
       showToast(`تمت إضافة ${rawName} بنجاح يدويّاً`, 'success');
       await loadLectureAttendanceTable(state.currentLecture.lecture_id);
       window.syncManager.syncNow(true);
+      if (window.CloudDB) {
+        window.CloudDB.recordAttendance(record);
+      }
     }
   } catch (err) {
     console.error('Manual attendance error:', err);
