@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="نظام الحضور والغياب الذكي - يعمل بدون إنترنت مع مسح QR وتصدير إكسيل فوري">
+
+  <title>نظام الحضور والغياب الذكي</title>
+
+  <!-- PWA Manifest & Favicon -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+
+  <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <div id="app-root">
+
+    <!-- Top Navigation & Sync Status Bar -->
+    <header class="app-header">
+      <div class="brand-container btn-back-landing">
+        <div class="brand-logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">حضور وغياب</h1>
+        </div>
+      </div>
+
+      <!-- Live Sync Pill -->
+      <div id="sync-status-indicator" class="sync-status-pill synced" title="اضغط للتحقق من المزامنة">
+        <span class="sync-status-dot"></span>
+        <span id="sync-status-text">البيانات متزامنة ومأمنة</span>
+      </div>
+    </header>
+
+    <!-- Optional PWA Install Banner -->
+    <div id="pwa-install-banner" style="display:none; background:rgba(6,182,212,0.15); border-bottom:1px solid rgba(6,182,212,0.3); padding:8px 20px; justify-content:space-between; align-items:center; font-size:0.85rem;">
+      <span>📱 ثبّت التطبيق على شاشة موبايلك للتشغيل الفوري بدون إنترنت</span>
+      <button id="btn-install-pwa" class="tool-btn" style="background:var(--cyan-primary); color:#fff; padding:4px 12px; font-size:0.8rem;">تثبيت PWA</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- ===================================================================
+           1. LANDING & ROLE SELECTION VIEW
+           =================================================================== -->
+      <section id="view-landing" class="view-section active">
+        <div class="hero-header">
+          <div class="hero-badge">⚡ نظام ذكي أوفلاين وأونلاين</div>
+          <h2 class="hero-title">نظام تسجيل الحضور والغياب</h2>
+          <p class="hero-subtitle">
+            منظومة حديثة ببطاقات QR Code الذكية لمسح الغياب بدون إنترنت وتصدير شيتات الإكسيل بضغطة زر واحدة
+          </p>
+        </div>
+
+        <div class="roles-grid">
+          <!-- Student Role Card -->
+          <div id="card-select-student" class="role-card student">
+            <div class="role-icon-box">🎓</div>
+            <h3 class="role-card-title">الدخول كطالب</h3>
+            <p class="role-card-desc">
+              تسجيل بياناتك لمرة واحدة فقط وعرض بطاقة الـ QR Code الذكية الخاصة بك لإبرازها في المحاضرة.
+            </p>
+            <button class="role-card-btn student-btn">
+              <span>عرض كود الطالب</span>
+              <span>◀</span>
+            </button>
+          </div>
+
+          <!-- Instructor Role Card -->
+          <div id="card-select-instructor" class="role-card instructor">
+            <div class="role-icon-box">👨‍🏫</div>
+            <h3 class="role-card-title">الدخول كمحاضر</h3>
+            <p class="role-card-desc">
+              فتح الكاميرا ومسح أكواد الطلاب، متابعة العداد اللحظي، وتصدير شيت إكسيل منسق على هاتفك بدون نت.
+            </p>
+            <button class="role-card-btn instructor-btn">
+              <span>لوحة تحكم المحاضر</span>
+              <span>◀</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           2. STUDENT FLOW: REGISTRATION FORM
+           =================================================================== -->
+      <section id="view-student-form" class="view-section">
+        <div class="glass-panel" style="max-width: 520px; margin: 0 auto;">
+          <div class="panel-header">
+            <h3 class="panel-title">
+              <span>📝</span>
+              <span>تسجيل بيانات الطالب</span>
+            </h3>
+            <button class="back-btn btn-back-landing">
+              <span>الرئيسية</span>
+              <span>◀</span>
+            </button>
+          </div>
+
+          <form id="student-reg-form">
+            <!-- Full Name (Arabic 3 words minimum) -->
+            <div class="form-group">
+              <label class="form-label" for="student-name-input">
+                <span class="req">*</span> الاسم ثلاثي بالعربي:
+              </label>
+              <input type="text" id="student-name-input" class="form-input" placeholder="مثال: أحمد محمد علي" required autocomplete="name">
+              <p class="form-hint">حروف عربية فقط مع مسافتين على الأقل (بدون إنجليزي أو أرقام)</p>
+            </div>
+
+            <!-- National ID (14 Digits) -->
+            <div class="form-group">
+              <label class="form-label" for="student-nid-input">
+                <span class="req">*</span> الرقم القومي:
+              </label>
+              <input type="tel" id="student-nid-input" class="form-input" placeholder="14 رقماً بالضبط" maxlength="14" required autocomplete="off">
+              <p class="form-hint">سيتم تحويل الأرقام العربية إلى الإنجليزية تلقائياً</p>
+            </div>
+
+            <!-- Department (4 Options Only) -->
+            <div class="form-group">
+              <label class="form-label">
+                <span class="req">*</span> القسم الدراسي:
+              </label>
+              <div class="dept-grid">
+                <label class="dept-radio-label">
+                  <input type="radio" name="student_dept" value="آلات" checked>
+                  <div class="dept-radio-card">آلات</div>
+                </label>
+                <label class="dept-radio-label">
+                  <input type="radio" name="student_dept" value="نظم">
+                  <div class="dept-radio-card">نظم</div>
+                </label>
+                <label class="dept-radio-label">
+                  <input type="radio" name="student_dept" value="ري">
+                  <div class="dept-radio-card">ري</div>
+                </label>
+                <label class="dept-radio-label">
+                  <input type="radio" name="student_dept" value="عام">
+                  <div class="dept-radio-card">عام</div>
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+              <span>حفظ وتوليد الكود</span>
+              <span>⚡</span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           3. STUDENT FLOW: SMART QR CARD
+           =================================================================== -->
+      <section id="view-student-card" class="view-section">
+        <div class="smart-qr-card-wrapper">
+          <div class="panel-header" style="width:100%; max-width:420px; border:none; padding:0 0 14px 0;">
+            <button class="back-btn btn-back-landing">
+              <span>الرئيسية</span>
+              <span>◀</span>
+            </button>
+            <button id="btn-edit-student" class="back-btn">
+              <span>✏️ تعديل بياناتي</span>
+            </button>
+          </div>
+
+          <!-- The Glass QR Card -->
+          <div class="smart-qr-card">
+            <div class="card-badge">✨ بطاقة الحضور الرسمية</div>
+            <h2 id="card-student-name" class="card-student-name">اسم الطالب</h2>
+            <div id="card-student-dept" class="card-student-dept">القسم</div>
+
+            <!-- Centered White Frame for Ultra Fast Camera Scanning -->
+            <div class="qr-frame-box">
+              <div id="qr-code-canvas-container">
+                <!-- QR Code image injected here -->
+              </div>
+            </div>
+
+            <div>
+              <div class="card-nid-box">
+                <span>الرقم القومي: </span>
+                <span id="card-student-nid">00000000000000</span>
+              </div>
+            </div>
+
+            <p class="card-instruction">
+              أظهر هذا الكود أمام كاميرا المحاضر لتسجيل حضورك في ثوانٍ معدودة.
+            </p>
+          </div>
+
+          <!-- Card Actions -->
+          <div class="card-actions">
+            <button id="btn-download-qr" class="card-btn download-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>حفظ الكود كصورة</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           4. INSTRUCTOR FLOW: PIN GATE
+           =================================================================== -->
+      <section id="view-instructor-pin" class="view-section">
+        <div class="glass-panel pin-dialog-card">
+          <div class="pin-icon-box">🔒</div>
+          <h3 style="font-size: 1.3rem; margin-bottom: 6px;">كود دخول المحاضر</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 22px;">
+            أدخل الرمز السري الخاص بك لفتح لوحة أخذ الغياب والكاميرا
+          </p>
+
+          <div class="form-group">
+            <input type="password" id="instructor-pin-input" class="form-input pin-input" maxlength="8" placeholder="••••" autocomplete="off" autofocus>
+            <p class="form-hint">الرمز الافتراضي: 1234</p>
+          </div>
+
+          <button id="btn-verify-pin" class="submit-btn" style="background: linear-gradient(135deg, var(--purple-primary), #6d28d9); box-shadow: 0 4px 15px var(--purple-glow);">
+            <span>دخول لوحة التحكم</span>
+            <span>🔓</span>
+          </button>
+
+          <div style="margin-top: 18px;">
+            <button class="back-btn btn-back-landing" style="margin: 0 auto;">
+              <span>العودة للرئيسية</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           5. INSTRUCTOR FLOW: DASHBOARD & SESSIONS LIST
+           =================================================================== -->
+      <section id="view-instructor-dashboard" class="view-section">
+        <div class="panel-header">
+          <h3 class="panel-title">
+            <span>👨‍🏫</span>
+            <span>لوحة تحكم المحاضر</span>
+          </h3>
+          <button class="back-btn btn-back-landing">
+            <span>خروج</span>
+            <span>🚪</span>
+          </button>
+        </div>
+
+        <!-- Dashboard Metrics -->
+        <div class="dashboard-metrics">
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background: rgba(6,182,212,0.15); color: var(--cyan-light);">📚</div>
+            <div class="metric-info">
+              <div id="metric-total-lectures" class="val">0</div>
+              <div class="label">إجمالي المحاضرات</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background: rgba(139,92,246,0.15); color: var(--purple-light);">👥</div>
+            <div class="metric-info">
+              <div id="metric-total-students" class="val">0</div>
+              <div class="label">الطلاب المسجلين</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lecture Action Bar -->
+        <div class="glass-panel" style="padding: 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+            <h4 style="font-size:1.1rem; color:#fff;">سجل المحاضرات والجلسات</h4>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button id="btn-open-share-modal" class="tool-btn" style="background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.35); color:var(--cyan-light); padding:9px 14px;">
+                <span>📲 مشاركة الرابط للطلاب (QR)</span>
+              </button>
+              <button id="btn-open-change-pin" class="tool-btn" style="background:rgba(255,255,255,0.08); border:1px solid var(--glass-border); color:var(--text-muted); padding:9px 14px;">
+                <span>🔑 تغيير الرمز السري</span>
+              </button>
+              <button id="btn-open-new-lecture-modal" class="tool-btn" style="background:linear-gradient(135deg, var(--cyan-primary), #2563eb); color:#fff; padding:10px 18px; font-size:0.95rem;">
+                <span>+ بدء محاضرة جديدة</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="instructor-lectures-list" class="lectures-list">
+            <!-- Lectures injected here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           6. INSTRUCTOR FLOW: ACTIVE LECTURE & OFFLINE QR SCANNER
+           =================================================================== -->
+      <section id="view-lecture-session" class="view-section">
+        <!-- Active Lecture Header -->
+        <div class="panel-header">
+          <div>
+            <h3 id="active-lec-title" class="panel-title" style="margin-bottom: 4px;">عنوان المحاضرة</h3>
+            <div style="display:flex; gap:12px; font-size:0.85rem; color:var(--text-muted);">
+              <span id="active-lec-dept">القسم: الكل</span>
+              <span>•</span>
+              <span id="active-lec-date">2026/11/08</span>
+            </div>
+          </div>
+          <button id="btn-back-dashboard" class="back-btn">
+            <span>قائمة المحاضرات</span>
+            <span>◀</span>
+          </button>
+        </div>
+
+        <!-- Smart Offline QR Camera Viewport -->
+        <div class="scanner-viewport-card">
+          <div id="qr-reader"></div>
+
+          <!-- Controls inside camera -->
+          <div class="scanner-overlay-controls">
+            <button id="btn-toggle-cam" class="scanner-ctrl-btn">
+              <span>⏸ إيقاف الكاميرا</span>
+            </button>
+            <div style="background:rgba(0,0,0,0.6); padding:4px 12px; border-radius:var(--radius-full); font-size:0.75rem; color:#fff;">
+              🎯 وجّه الكاميرا نحو كود الطالب
+            </div>
+          </div>
+        </div>
+
+        <!-- Instant Feedback Alert Banner (Green on Success, Orange on Duplicate) -->
+        <div id="scan-feedback-banner" class="scan-feedback-banner"></div>
+
+        <!-- Live Counters & Breakdown by Department -->
+        <div class="live-counter-section">
+          <div class="counter-primary-box">
+            <div class="total-attendees-display">
+              <span class="label">إجمالي الحضور الآن:</span>
+              <span id="counter-total-num" class="num">0</span>
+              <span class="label">طالب</span>
+            </div>
+
+            <!-- Action buttons inside counter -->
+            <div class="action-buttons-group">
+              <button id="btn-export-excel" class="tool-btn excel-export-btn" title="تصدير شيت إكسيل على هاتفك بدون إنترنت">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>تصدير شيت Excel</span>
+              </button>
+
+              <button id="btn-open-manual-add" class="tool-btn manual-add-btn">
+                <span>+ إضافة يدوية</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Department Breakdown Chips -->
+          <div class="dept-breakdown-chips">
+            <div class="dept-chip alat">
+              <span class="dept-name">آلات</span>
+              <span id="count-alat" class="dept-val">0</span>
+            </div>
+            <div class="dept-chip nuzum">
+              <span class="dept-name">نظم</span>
+              <span id="count-nuzum" class="dept-val">0</span>
+            </div>
+            <div class="dept-chip ray">
+              <span class="dept-name">ري</span>
+              <span id="count-ray" class="dept-val">0</span>
+            </div>
+            <div class="dept-chip aam">
+              <span class="dept-name">عام</span>
+              <span id="count-aam" class="dept-val">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Attendance List / Table -->
+        <div class="glass-panel" style="padding: 20px;">
+          <div class="table-header-tools">
+            <h4 style="font-size:1.05rem; color:#fff;">كشف حضور المحاضرة اللحظي</h4>
+            <div class="search-input-box">
+              <input type="text" id="attendance-search-input" placeholder="بحث بالاسم أو الرقم القومي...">
+              <span class="search-icon">🔍</span>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="glass-table">
+              <thead>
+                <tr>
+                  <th style="width: 40px;">م</th>
+                  <th>الاسم ثلاثي</th>
+                  <th>الرقم القومي</th>
+                  <th>القسم</th>
+                  <th>وقت الحضور</th>
+                  <th>المزامنة</th>
+                </tr>
+              </thead>
+              <tbody id="attendance-table-body">
+                <!-- Rows injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ===================================================================
+         MODALS
+         =================================================================== -->
+
+    <!-- Modal 1: New Lecture -->
+    <div id="modal-new-lecture" class="modal-backdrop">
+      <div class="modal-dialog">
+        <button class="modal-close-btn">&times;</button>
+        <h3 style="font-size:1.25rem; margin-bottom:16px; color:#fff;">بدء محاضرة جديدة</h3>
+        
+        <form id="create-lecture-form">
+          <div class="form-group">
+            <label class="form-label" for="new-lec-title">اسم المادة / رقم المحاضرة:</label>
+            <input type="text" id="new-lec-title" class="form-input" placeholder="مثال: هندسة القوى - المحاضرة 4" required autofocus>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-lec-dept">القسم المستهدف:</label>
+            <select id="new-lec-dept" class="form-input" style="background:#111827;">
+              <option value="الكل">جميع الأقسام (متاح للكل)</option>
+              <option value="آلات">آلات فقط</option>
+              <option value="نظم">نظم فقط</option>
+              <option value="ري">ري فقط</option>
+              <option value="عام">عام فقط</option>
+            </select>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:20px;">
+            <button type="submit" class="submit-btn" style="flex:1;">بدء الجلسة الآن</button>
+            <button type="button" class="back-btn btn-cancel-modal">إلغاء</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal 2: Manual Student Attendance Entry -->
+    <div id="modal-manual-add" class="modal-backdrop">
+      <div class="modal-dialog">
+        <button class="modal-close-btn">&times;</button>
+        <h3 style="font-size:1.2rem; margin-bottom:8px; color:#fff;">إضافة حضور طالب يدوياً</h3>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:18px;">
+          في حال نفاذ شحن بطارية هاتف الطالب داخل المدرج
+        </p>
+
+        <form id="manual-add-student-form">
+          <div class="form-group">
+            <label class="form-label" for="manual-nid">الرقم القومي (14 رقم):</label>
+            <input type="tel" id="manual-nid" class="form-input" placeholder="14 رقم" maxlength="14" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="manual-name">اسم الطالب ثلاثي بالعربي:</label>
+            <input type="text" id="manual-name" class="form-input" placeholder="مثال: محمود علي حسن" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="manual-dept">القسم:</label>
+            <select id="manual-dept" class="form-input" style="background:#111827;">
+              <option value="آلات">آلات</option>
+              <option value="نظم">نظم</option>
+              <option value="ري">ري</option>
+              <option value="عام">عام</option>
+            </select>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:20px;">
+            <button type="submit" class="submit-btn" style="flex:1;">تسجيل الحضور</button>
+            <button type="button" class="back-btn btn-cancel-modal">إلغاء</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal 3: Share App with Students (Onboarding QR) -->
+    <div id="modal-share-app" class="modal-backdrop">
+      <div class="modal-dialog" style="text-align: center;">
+        <button class="modal-close-btn">&times;</button>
+        <div style="font-size: 2.2rem; margin-bottom: 8px;">📲</div>
+        <h3 style="font-size:1.25rem; margin-bottom:6px; color:#fff;">مشاركة التطبيق مع الطلاب</h3>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">
+          اطلب من الطلاب في المدرج توجيه كاميرا هواتفهم نحو هذا الكود لفتح التطبيق وتسجيل بياناتهم فوراً
+        </p>
+
+        <!-- White QR Container for scanning off screen/projector -->
+        <div class="qr-frame-box" style="margin-bottom: 14px;">
+          <div id="share-qr-canvas-container"></div>
+        </div>
+
+        <div style="background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); border-radius:var(--radius-md); padding:10px 14px; margin-bottom:16px;">
+          <div style="font-size:0.75rem; color:var(--text-dim); margin-bottom:4px;">الرابط المباشر للشبكة المحلية:</div>
+          <a id="share-app-url-link" href="#" target="_blank" style="color:var(--cyan-light); font-family:monospace; font-size:1rem; font-weight:700; text-decoration:none;">
+            http://localhost:3000
+          </a>
+        </div>
+
+        <button type="button" class="submit-btn btn-cancel-modal" style="width:100%;">إغلاق</button>
+      </div>
+    </div>
+
+    <!-- Modal 4: Change Instructor PIN -->
+    <div id="modal-change-pin" class="modal-backdrop">
+      <div class="modal-dialog">
+        <button class="modal-close-btn">&times;</button>
+        <h3 style="font-size:1.25rem; margin-bottom:6px; color:#fff;">تغيير الرمز السري للمحاضر</h3>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:18px;">
+          الرمز السري يمنع الطلاب من فتح لوحة التحكم أو التلاعب بالغياب
+        </p>
+
+        <form id="change-pin-form">
+          <div class="form-group">
+            <label class="form-label" for="old-pin-input">الرمز السري الحالي:</label>
+            <input type="password" id="old-pin-input" class="form-input" placeholder="••••" maxlength="8" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-pin-input">الرمز السري الجديد (4 أرقام على الأقل):</label>
+            <input type="password" id="new-pin-input" class="form-input" placeholder="••••" maxlength="8" required>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:20px;">
+            <button type="submit" class="submit-btn" style="flex:1;">تحديث الرمز السري</button>
+            <button type="button" class="back-btn btn-cancel-modal">إلغاء</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+  </div>
+
+  <!-- Local Bundled Libraries (100% Offline Capable) -->
+  <script src="./libs/qrcode.js"></script>
+  <script src="./libs/html5-qrcode.min.js"></script>
+  <script src="./libs/xlsx.full.min.js"></script>
+
+  <!-- Application Modules -->
+  <script src="./js/db.js"></script>
+  <script src="./js/sync.js"></script>
+  <script src="./js/qr-scanner.js"></script>
+  <script src="./js/excel.js"></script>
+  <script src="./js/app.js"></script>
+
+</body>
+</html>
+
