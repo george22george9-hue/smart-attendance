@@ -2442,7 +2442,7 @@ async function loadLectureSession(lectureId) {
       typeEl.style.color = isLab ? '#c084fc' : 'var(--cyan-light)';
     }
 
-    document.getElementById('active-lec-dept').innerText = 'القسم: ' + (lecture.target_dept || 'الكل');
+    document.getElementById('active-lec-dept').innerText = 'الفرقة: ' + (lecture.target_year && lecture.target_year !== 'الكل' ? lecture.target_year : 'جميع الفرق') + ' • القسم: ' + (lecture.target_dept || 'الكل');
     document.getElementById('active-lec-date').innerText = lecture.lecture_date || '';
 
     const instEl = document.getElementById('active-lec-instructor');

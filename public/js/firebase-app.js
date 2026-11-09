@@ -137,6 +137,7 @@ const CloudDB = {
         session_type: lecture.session_type || 'محاضرة نظري',
         instructor_id: lecture.instructor_id || '',
         instructor_name: lecture.instructor_name || '',
+        target_year: lecture.target_year || 'الكل',
         target_dept: lecture.target_dept || 'الكل',
         lecture_date: lecture.lecture_date,
         created_at: lecture.created_at || new Date().toISOString()
@@ -232,6 +233,7 @@ const CloudDB = {
         instructor_name: record.instructor_name || '',
         national_id: String(record.national_id).trim(),
         student_name: record.student_name.trim(),
+        academic_year: record.academic_year || 'الفرقة الأولى',
         department: record.department.trim(),
         scan_time: record.scan_time || new Date().toLocaleTimeString('ar-EG'),
         created_at: record.created_at || new Date().toISOString()

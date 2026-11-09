@@ -16,7 +16,7 @@ class AttendanceExcelExporter {
     rows.push(['نظام الحضور والغياب الذكي - كشف حضور معتمد']);
     rows.push(['نوع الجلسة:', lecture.session_type || 'محاضرة نظري', 'اسم المادة / المحاضرة:', lecture.title || 'بدون عنوان']);
     rows.push(['المحاضر / المعيد:', lecture.instructor_name || 'غير محدد', 'التاريخ:', lecture.lecture_date || new Date().toLocaleDateString('ar-EG')]);
-    rows.push(['القسم المستهدف:', lecture.target_dept || 'الكل', 'إجمالي الحضور:', attendanceList.length + ' طالب']);
+    rows.push(['الفرقة والقسم:', (lecture.target_year && lecture.target_year !== 'الكل' ? lecture.target_year : 'جميع الفرق') + ' • ' + (lecture.target_dept || 'الكل'), 'إجمالي الحضور:', attendanceList.length + ' طالب']);
     rows.push([]); // blank line separator
 
     // Table Columns Header
@@ -24,7 +24,8 @@ class AttendanceExcelExporter {
       'م',
       'الاسم ثلاثي',
       'الرقم القومي',
-      'القسم',
+      'الفرقة الدراسية',
+      'القسم / السكشن',
       'وقت الحضور',
       'حالة المزامنة'
     ]);
@@ -35,8 +36,8 @@ class AttendanceExcelExporter {
       rows.push([
         index + 1,
         record.student_name,
-        // Prepend quote or keep as string to ensure Excel treats 14 digits as text
         String(record.national_id),
+        record.academic_year || 'الفرقة الأولى',
         record.department,
         record.scan_time || '',
         syncStatusText
@@ -45,7 +46,18 @@ class AttendanceExcelExporter {
 
     // Summary at bottom
     rows.push([]);
-    rows.push(['إحصائية الحضور حسب الأقسام:']);
+    rows.push(['إحصائية الحضور حسب الفرق الدراسية:']);
+    const yearCounts = { 'الفرقة الأولى': 0, 'الفرقة الثانية': 0, 'الفرقة الثالثة': 0, 'الفرقة الرابعة': 0 };
+    attendanceList.forEach(r => {
+      const y = r.academic_year || 'الفرقة الأولى';
+      if (yearCounts[y] !== undefined) yearCounts[y]++;
+      else yearCounts[y] = (yearCounts[y] || 0) + 1;
+    });
+    Object.entries(yearCounts).forEach(([yr, cnt]) => {
+      if (cnt > 0) rows.push([yr, cnt + ' طالب']);
+    });
+    rows.push([]);
+    rows.push(['إحصائية الحضور حسب الأقسام / السكاشن:']);
     const deptCounts = { 'آلات': 0, 'نظم': 0, 'ري': 0, 'عام': 0 };
     attendanceList.forEach(r => {
       if (deptCounts[r.department] !== undefined) {
@@ -65,11 +77,12 @@ class AttendanceExcelExporter {
     // Set Column Widths
     ws['!cols'] = [
       { wch: 8 },  // م
-      { wch: 32 }, // الاسم ثلاثي
+      { wch: 30 }, // الاسم ثلاثي
       { wch: 22 }, // الرقم القومي
-      { wch: 14 }, // القسم
+      { wch: 18 }, // الفرقة الدراسية
+      { wch: 16 }, // القسم / السكشن
       { wch: 18 }, // وقت الحضور
-      { wch: 22 }  // حالة المزامنة
+      { wch: 20 }  // حالة المزامنة
     ];
 
     // Right-to-Left sheet view configuration

@@ -1,25 +1,25 @@
-const CACHE_NAME = 'smart-attendance-v7.4';
+const CACHE_NAME = 'smart-attendance-v7.5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './css/style.css?v=7.3',
-  './js/app.js?v=7.3',
-  './js/db.js?v=7.3',
-  './js/sync.js?v=7.3',
-  './js/qr-scanner.js?v=7.3',
-  './js/excel.js?v=7.3',
-  './js/firebase-app.js?v=7.3',
-  './libs/html5-qrcode.min.js?v=7.3',
-  './libs/qrcode.js?v=7.3',
-  './libs/xlsx.full.min.js?v=7.3',
-  './manifest.json?v=7.3',
+  './css/style.css?v=7.5',
+  './js/app.js?v=7.5',
+  './js/db.js?v=7.5',
+  './js/sync.js?v=7.5',
+  './js/qr-scanner.js?v=7.5',
+  './js/excel.js?v=7.5',
+  './js/firebase-app.js?v=7.5',
+  './libs/html5-qrcode.min.js?v=7.5',
+  './libs/qrcode.js?v=7.5',
+  './libs/xlsx.full.min.js?v=7.5',
+  './manifest.json?v=7.5',
   './icons/icon.svg',
-  './icons/icon-192.png?v=7.3',
-  './icons/icon-512.png?v=7.3',
-  './icons/icon-maskable-192.png?v=7.3',
-  './icons/icon-maskable-512.png?v=7.3',
-  './icons/apple-touch-icon.png?v=7.3',
-  './icons/favicon.png?v=7.3'
+  './icons/icon-192.png?v=7.5',
+  './icons/icon-512.png?v=7.5',
+  './icons/icon-maskable-192.png?v=7.5',
+  './icons/icon-maskable-512.png?v=7.5',
+  './icons/apple-touch-icon.png?v=7.5',
+  './icons/favicon.png?v=7.5'
 ];
 
 self.addEventListener('install', (event) => {
