@@ -2358,11 +2358,13 @@ window.closeModals = closeModals;
 
 async function handleCreateLecture() {
   const titleInput = document.getElementById('new-lec-title');
+  const targetYearSelect = document.getElementById('new-lec-year');
   const targetDeptSelect = document.getElementById('new-lec-dept');
   const sessionTypeRadio = document.querySelector('input[name="session_type"]:checked');
   const instructorInput = document.getElementById('new-lec-instructor');
 
   const title = titleInput.value.trim();
+  const targetYear = targetYearSelect ? targetYearSelect.value : 'الكل';
   const targetDept = targetDeptSelect.value;
   const sessionType = sessionTypeRadio ? sessionTypeRadio.value : 'محاضرة نظري';
   const currentDoc = state.currentInstructor;
@@ -2382,6 +2384,7 @@ async function handleCreateLecture() {
     session_type: sessionType,
     instructor_id: instructorId,
     instructor_name: instructorName,
+    target_year: targetYear,
     target_dept: targetDept,
     lecture_date: new Date().toLocaleDateString('ar-EG'),
     created_at: new Date().toISOString()
@@ -2541,11 +2544,6 @@ async function handleScannedStudent(data) {
       if (window.CloudDB) {
         window.CloudDB.recordAttendance(record);
       }
-
-      // Record in Firebase Cloud Firestore
-      if (window.CloudDB) {
-        window.CloudDB.recordAttendance(record);
-      }
     }
   } catch (err) {
     console.error('Attendance record error:', err);
@@ -2682,10 +2680,12 @@ function openManualAddModal() {
 async function handleManualAttendanceSubmit() {
   const nidInput = document.getElementById('manual-nid');
   const nameInput = document.getElementById('manual-name');
+  const yearSelect = document.getElementById('manual-year');
   const deptSelect = document.getElementById('manual-dept');
 
   const rawNid = nidInput.value.trim();
   const rawName = nameInput.value.trim();
+  const studentYear = yearSelect ? yearSelect.value : 'الفرقة الرابعة';
   const dept = deptSelect.value;
 
   const nidCheck = validateNationalId(rawNid);
@@ -2711,6 +2711,7 @@ async function handleManualAttendanceSubmit() {
     instructor_name: state.currentLecture.instructor_name || '',
     national_id: nidCheck.nid,
     student_name: rawName,
+    academic_year: studentYear,
     department: dept,
     scan_time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
     created_at: new Date().toISOString()

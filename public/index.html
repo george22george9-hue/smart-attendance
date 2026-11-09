@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f0fdf4">
   <meta name="description" content="نظام الحضور والغياب الذكي - يعمل بدون إنترنت مع مسح QR وتصدير إكسيل فوري">
 
@@ -13,50 +13,21 @@
   <title>Agricultural engineer</title>
 
   <!-- PWA Manifest & App Home Screen Icons (Agricultural Engineer) -->
-  <link rel="manifest" href="./manifest.json?v=7.4">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=7.4">
-  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=7.4">
-  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=7.4">
-  <link rel="shortcut icon" href="./icons/icon-192.png?v=7.4">
-  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=7.4">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=7.4">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=7.5">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=7.5">
+  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=7.5">
+  <link rel="shortcut icon" href="./icons/icon-192.png?v=7.5">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=7.5">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=7.5">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Agricultural engineer">
   <meta name="application-name" content="Agricultural engineer">
 
-  <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=7.4">
-
-  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v7.5) -->
-  <script>
-    (function() {
-      const CURRENT_VERSION = 'v7.5-all-academic-years';
-      const storedVersion = localStorage.getItem('smart_attendance_build');
-      if (storedVersion !== CURRENT_VERSION) {
-        // Clear cached assets to ensure fresh JS/CSS files without deleting student profile!
-        if ('caches' in window) {
-          caches.keys().then(function(names) {
-            names.forEach(function(name) {
-              caches.delete(name);
-            });
-          });
-        }
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            registrations.forEach(function(reg) {
-              reg.unregister();
-            });
-          });
-        }
-        localStorage.setItem('smart_attendance_build', CURRENT_VERSION);
-        if (storedVersion) {
-          window.location.reload(true);
-        }
-      }
-    })();
-  </script>
+  <!-- Main Stylesheet (Glassmorphism Dark & Light Mode) -->
+  <link rel="stylesheet" href="./css/style.css?v=7.5">
   <!-- Instant FOUC Prevention for Theme -->
   <script>
     (function() {
@@ -116,7 +87,7 @@
           <!-- Clean App Header with Agricultural Engineer Emblem -->
           <div class="simple-brand-header">
             <div class="agri-eng-badge" title="Agricultural engineer" style="overflow: hidden; padding: 0;">
-              <img src="./icons/icon-192.png?v=7.4" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
+              <img src="./icons/icon-192.png?v=7.5" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
             </div>
             <h2 class="simple-app-title">Agricultural engineer</h2>
             <p class="simple-app-sub">منظومة الحضور والغياب الذكي بالـ QR Code</p>
@@ -124,7 +95,7 @@
 
           <!-- The Two Direct Clean Buttons -->
           <div class="simple-role-actions">
-            <button type="button" id="btn-main-student" class="simple-role-btn student-glow" onclick="window.initStudentFlow && window.initStudentFlow()">
+            <button type="button" id="btn-main-student" class="simple-role-btn student-glow" aria-label="دخول الطالب">
               <div class="btn-icon-circle">🎓</div>
               <div class="btn-text-content">
                 <strong class="btn-main-text">دخول الطالب</strong>
@@ -133,7 +104,7 @@
               <span class="btn-arrow-icon">◀</span>
             </button>
 
-            <button type="button" id="btn-main-instructor" class="simple-role-btn instructor-glow" onclick="window.initInstructorFlow && window.initInstructorFlow()">
+            <button type="button" id="btn-main-instructor" class="simple-role-btn instructor-glow" aria-label="دخول المحاضر">
               <div class="btn-icon-circle instructor">👨‍🏫</div>
               <div class="btn-text-content">
                 <strong class="btn-main-text">دخول المحاضر</strong>
@@ -145,7 +116,7 @@
 
           <!-- Discrete Developer Link at the bottom -->
           <div class="simple-dev-link-wrap">
-            <button type="button" id="btn-landing-dev-portal" class="simple-dev-link" onclick="window.openDevPinModal && window.openDevPinModal()">
+            <button type="button" id="btn-landing-dev-portal" class="simple-dev-link" aria-label="دخول مسؤول النظام والمطور">
               <span>🔐</span>
               <span>دخول مسؤول النظام والمطور</span>
             </button>
@@ -153,7 +124,7 @@
 
           <!-- Subtle App Refresh Trigger -->
           <div style="margin-top: 14px; text-align: center;">
-            <button id="btn-force-update-app" class="tool-btn" onclick="window.forceUpdateApp && window.forceUpdateApp()" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
+            <button id="btn-force-update-app" class="tool-btn" aria-label="تحديث التطبيق ومسح الكاش" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
               <span>🔄 تحديث التطبيق ومسح الكاش (v7.5)</span>
             </button>
           </div>
@@ -352,7 +323,7 @@
                 <span id="card-student-year" class="table-dept-badge badge-alat" style="font-size: 0.82rem; background: rgba(139,92,246,0.2); color: var(--purple-light); border: 1px solid rgba(139,92,246,0.35);">الفرقة الأولى</span>
                 <span id="card-student-dept" class="table-dept-badge badge-alat" style="font-size: 0.82rem;">القسم</span>
                 <span style="font-size: 0.82rem; color: var(--text-dim);">|</span>
-                <span style="font-family: monospace; font-size: 0.85rem; color: #475569;">الرقم القومي: <span id="card-student-nid" style="color: var(--text-main); font-weight: 700;">00000000000000</span></span>
+                <span style="font-family: monospace; font-size: 0.85rem; color: var(--text-dim);">الرقم القومي: <span id="card-student-nid" style="color: var(--text-main); font-weight: 700;">00000000000000</span></span>
               </div>
             </div>
           </div>
@@ -405,8 +376,8 @@
               <!-- Security note matching design -->
               <div class="security-lock-note" style="margin-top: 18px; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: var(--radius-md); padding: 10px 14px; display: flex; align-items: center; justify-content: center; gap: 8px;">
                 <span style="font-size: 1.1rem;">🔒</span>
-                <span style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
-                  الكود مشفر بتقنية <strong>UTF-8</strong> ومحفوظ في ذاكرة هاتفك ليعمل بدون إنترنت طوال العام الدراسي.
+                <span style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+                  كود الحضور المعتمد محفوظ بأمان في ذاكرة هاتفك ليعمل بدون إنترنت طوال العام الدراسي.
                 </span>
               </div>
             </div>
@@ -471,7 +442,7 @@
 
           <div class="form-group" style="text-align: right;">
             <label class="form-label" for="instructor-pin-input">كلمة السر / الرمز السري:</label>
-            <input type="password" id="instructor-pin-input" class="form-input pin-input" maxlength="12" placeholder="••••" autocomplete="off" autofocus>
+            <input type="password" id="instructor-pin-input" class="form-input pin-input" maxlength="16" placeholder="••••" autocomplete="off">
             <p id="instructor-pin-hint" class="form-hint">أدخل الرمز السري المخصص لك</p>
           </div>
 
@@ -680,7 +651,7 @@
               </div>
               <!-- Search Bar -->
               <div style="margin-bottom: 16px;">
-                <input type="text" id="dev-student-search-input" class="form-input" placeholder="🔍 ابحث بالاسم أو الرقم القومي أو القسم..." style="background: #f8fafc;">
+                <input type="text" id="dev-student-search-input" class="form-input" placeholder="🔍 ابحث بالاسم أو الرقم القومي أو القسم...">
               </div>
               <div id="dev-students-list-container">
                 <!-- Injected via JavaScript -->
@@ -699,7 +670,7 @@
               </div>
               <!-- Search Bar -->
               <div style="margin-bottom: 16px;">
-                <input type="text" id="dev-lecture-search-input" class="form-input" placeholder="🔍 ابحث باسم المحاضرة أو اسم المحاضر أو القسم..." style="background: #f8fafc;">
+                <input type="text" id="dev-lecture-search-input" class="form-input" placeholder="🔍 ابحث باسم المحاضرة أو اسم المحاضر أو القسم...">
               </div>
               <div id="dev-lectures-list-container">
                 <!-- Injected via JavaScript -->
@@ -1159,9 +1130,9 @@
          =================================================================== -->
 
     <!-- Modal 1: New Lecture / Section -->
-    <div id="modal-new-lecture" class="modal-backdrop">
+    <div id="modal-new-lecture" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="بدء جلسة حضور جديدة">
       <div class="modal-dialog">
-        <button class="modal-close-btn">&times;</button>
+        <button class="modal-close-btn" aria-label="إغلاق النافذة">&times;</button>
         <h3 style="font-size:1.25rem; margin-bottom:14px; color: var(--text-main);">بدء جلسة حضور جديدة</h3>
         
         <form id="create-lecture-form">
@@ -1188,7 +1159,7 @@
 
           <div class="form-group">
             <label class="form-label" for="new-lec-title">اسم المادة / عنوان الموضوع:</label>
-            <input type="text" id="new-lec-title" class="form-input" placeholder="مثال: هندسة القوى الكهربية - محاضرة 1" required autofocus>
+            <input type="text" id="new-lec-title" class="form-input" placeholder="مثال: هندسة القوى الكهربية - محاضرة 1" required>
           </div>
 
           <div class="form-group">
@@ -1197,8 +1168,19 @@
           </div>
 
           <div class="form-group">
+            <label class="form-label" for="new-lec-year">الفرقة المستهدفة:</label>
+            <select id="new-lec-year" class="form-input">
+              <option value="الكل">جميع الفرق (متاح للكل بالحضور)</option>
+              <option value="الفرقة الأولى">الفرقة الأولى</option>
+              <option value="الفرقة الثانية">الفرقة الثانية</option>
+              <option value="الفرقة الثالثة">الفرقة الثالثة</option>
+              <option value="الفرقة الرابعة">الفرقة الرابعة</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label class="form-label" for="new-lec-dept">القسم المستهدف:</label>
-            <select id="new-lec-dept" class="form-input" style="">
+            <select id="new-lec-dept" class="form-input">
               <option value="الكل">جميع الأقسام (متاح للكل)</option>
               <option value="آلات">آلات فقط</option>
               <option value="نظم">نظم فقط</option>
@@ -1216,9 +1198,9 @@
     </div>
 
     <!-- Modal 2: Manual Student Attendance Entry -->
-    <div id="modal-manual-add" class="modal-backdrop">
+    <div id="modal-manual-add" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="إضافة حضور طالب يدوياً">
       <div class="modal-dialog">
-        <button class="modal-close-btn">&times;</button>
+        <button class="modal-close-btn" aria-label="إغلاق النافذة">&times;</button>
         <h3 style="font-size:1.2rem; margin-bottom:8px; color: var(--text-main);">إضافة حضور طالب يدوياً</h3>
         <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:18px;">
           في حال نفاذ شحن بطارية هاتف الطالب داخل المدرج
@@ -1236,8 +1218,18 @@
           </div>
 
           <div class="form-group">
+            <label class="form-label" for="manual-year">الفرقة الدراسية:</label>
+            <select id="manual-year" class="form-input">
+              <option value="الفرقة الرابعة">الفرقة الرابعة</option>
+              <option value="الفرقة الأولى">الفرقة الأولى</option>
+              <option value="الفرقة الثانية">الفرقة الثانية</option>
+              <option value="الفرقة الثالثة">الفرقة الثالثة</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label class="form-label" for="manual-dept">القسم:</label>
-            <select id="manual-dept" class="form-input" style="">
+            <select id="manual-dept" class="form-input">
               <option value="آلات">آلات</option>
               <option value="نظم">نظم</option>
               <option value="ري">ري</option>
@@ -1280,9 +1272,9 @@
     </div>
 
     <!-- Modal 4: Change Instructor PIN -->
-    <div id="modal-change-pin" class="modal-backdrop">
+    <div id="modal-change-pin" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="تغيير الرمز السري للمحاضر">
       <div class="modal-dialog">
-        <button class="modal-close-btn">&times;</button>
+        <button class="modal-close-btn" aria-label="إغلاق النافذة">&times;</button>
         <h3 style="font-size:1.25rem; margin-bottom:6px; color: var(--text-main);">تغيير الرمز السري للمحاضر</h3>
         <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:18px;">
           الرمز السري يمنع الطلاب من فتح لوحة التحكم أو التلاعب بالغياب
@@ -1291,12 +1283,12 @@
         <form id="change-pin-form">
           <div class="form-group">
             <label class="form-label" for="old-pin-input">الرمز السري الحالي:</label>
-            <input type="password" id="old-pin-input" class="form-input" placeholder="••••" maxlength="8" required>
+            <input type="password" id="old-pin-input" class="form-input" placeholder="••••" maxlength="16" required>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="new-pin-input">الرمز السري الجديد (4 أرقام على الأقل):</label>
-            <input type="password" id="new-pin-input" class="form-input" placeholder="••••" maxlength="8" required>
+            <input type="password" id="new-pin-input" class="form-input" placeholder="••••" maxlength="16" required>
           </div>
 
           <div style="display:flex; gap:10px; margin-top:20px;">
@@ -1308,9 +1300,9 @@
     </div>
 
     <!-- Modal 5: Developer Master PIN Gate (Secured & Private) -->
-    <div id="modal-dev-pin" class="modal-backdrop">
+    <div id="modal-dev-pin" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="دخول مسؤول النظام والمطور">
       <div class="modal-dialog" style="max-width: 380px; text-align: center;">
-        <button class="modal-close-btn">&times;</button>
+        <button class="modal-close-btn" aria-label="إغلاق النافذة">&times;</button>
         <div style="font-size: 2rem; margin-bottom: 8px;">🔐</div>
         <h3 style="font-size:1.15rem; margin-bottom:6px; color: var(--text-main);">دخول مسؤول النظام والمطور</h3>
         <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:16px;">
@@ -1322,7 +1314,7 @@
             <label class="form-label" for="dev-pin-input"><span class="req">*</span> كلمة المرور:</label>
             <div class="input-with-icon" style="position: relative;">
               <span class="input-icon">🔑</span>
-              <input type="password" id="dev-pin-input" class="form-input" placeholder="••••••••" maxlength="40" required autofocus autocomplete="current-password" spellcheck="false" style="padding-left: 38px; font-size: 1.1rem; letter-spacing: 2px;">
+              <input type="password" id="dev-pin-input" class="form-input" placeholder="••••••••" maxlength="40" required autocomplete="current-password" spellcheck="false" style="padding-left: 38px; font-size: 1.1rem; letter-spacing: 2px;">
               <button type="button" id="btn-toggle-dev-pin-visibility" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.05rem; padding: 4px;" title="إظهار / إخفاء">
                 👁️
               </button>
@@ -1337,9 +1329,9 @@
     </div>
 
     <!-- Modal 6: Edit Doctor PIN (from Developer Panel) -->
-    <div id="modal-edit-doc-pin" class="modal-backdrop">
+    <div id="modal-edit-doc-pin" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="تغيير كلمة سر الدكتور">
       <div class="modal-dialog" style="max-width: 440px;">
-        <button class="modal-close-btn">&times;</button>
+        <button class="modal-close-btn" aria-label="إغلاق النافذة">&times;</button>
         <h3 style="font-size:1.2rem; margin-bottom:6px; color: var(--text-main);">تغيير كلمة سر الدكتور</h3>
         <p id="edit-doc-pin-subtitle" style="font-size:0.85rem; color:var(--cyan-light); margin-bottom:16px;">
           د. جورج سليمان
@@ -1349,7 +1341,7 @@
           <input type="hidden" id="edit-doc-id">
           <div class="form-group">
             <label class="form-label" for="edit-doc-new-pin">كلمة السر / الرمز السري الجديد:</label>
-            <input type="text" id="edit-doc-new-pin" class="form-input" placeholder="مثال: 5566" required maxlength="12">
+            <input type="text" id="edit-doc-new-pin" class="form-input" placeholder="مثال: 5566" required maxlength="16">
           </div>
           <div style="display:flex; gap:10px; margin-top:16px;">
             <button type="submit" class="submit-btn" style="flex:1;">حفظ كلمة السر الجديدة</button>
@@ -1360,9 +1352,9 @@
     </div>
 
     <!-- Modal 7: Change Developer Master Password (Secured) -->
-    <div id="modal-change-dev-master-pin" class="modal-backdrop">
+    <div id="modal-change-dev-master-pin" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="تغيير كلمة سر المطور">
       <div class="modal-dialog" style="max-width: 400px;">
-        <button class="modal-close-btn">&times;</button>
+        <button class="modal-close-btn" aria-label="إغلاق النافذة">&times;</button>
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
           <span style="font-size:1.3rem;">⚙️</span>
           <h3 style="font-size:1.15rem; color: var(--text-main); margin:0;">تغيير كلمة سر المطور</h3>
@@ -1393,9 +1385,9 @@
     </div>
 
     <!-- Modal 8: Owner / Developer - Detailed Student Profile & Attendance History -->
-    <div id="modal-owner-student-profile" class="modal-backdrop">
+    <div id="modal-owner-student-profile" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="بيانات الطالب وسجل الحضور">
       <div class="modal-dialog" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
-        <button class="modal-close-btn">&times;</button>
+        <button class="modal-close-btn" aria-label="إغلاق النافذة">&times;</button>
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
           <div class="doctor-avatar-box" style="border-radius:14px; width:52px; height:52px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); font-size:1.4rem;">
             🎓
@@ -1410,7 +1402,7 @@
         </div>
 
         <!-- National ID Info Card -->
-        <div style="background: #f8fafc; border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="background: var(--bg-secondary); border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
           <div>
             <span style="font-size:0.75rem; color:var(--text-muted); display:block;">الرقم القومي (14 رقم):</span>
             <code id="owner-student-prof-nid" style="font-size:1.05rem; color:var(--cyan-light); font-family:monospace; font-weight:700; letter-spacing:1px;">00000000000000</code>
@@ -1421,7 +1413,7 @@
         </div>
 
         <!-- Password Info Card -->
-        <div style="background: #f8fafc; border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="background: var(--bg-secondary); border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
           <div>
             <span style="font-size:0.75rem; color:var(--text-muted); display:block;">كلمة المرور المسجلة:</span>
             <code id="owner-student-prof-pass" style="font-size:1.05rem; color:var(--purple-light); font-family:monospace; font-weight:700;">******</code>
@@ -1432,8 +1424,8 @@
         </div>
 
         <!-- Student Smart QR Code Container -->
-        <div style="background: #f0fdf4; border:1px solid var(--glass-border); border-radius:14px; padding:14px; text-align:center; margin-bottom:16px;">
-          <div style="font-size:0.82rem; color:#cbd5e1; font-weight:700; margin-bottom:10px;">كود الحضور الذكي للطالب (QR Code)</div>
+        <div style="background: var(--bg-surface); border:1px solid var(--glass-border); border-radius:14px; padding:14px; text-align:center; margin-bottom:16px;">
+          <div style="font-size:0.82rem; color:var(--text-muted); font-weight:700; margin-bottom:10px;">كود الحضور الذكي للطالب (QR Code)</div>
           <div class="qr-frame-box" style="margin: 0 auto 10px auto; width: 170px; height: 170px;">
             <div id="owner-student-qr-container"></div>
           </div>
@@ -1464,9 +1456,9 @@
     </div>
 
     <!-- Modal 9: Owner / Developer - Detailed Instructor Profile -->
-    <div id="modal-owner-instructor-profile" class="modal-backdrop">
+    <div id="modal-owner-instructor-profile" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="بيانات المحاضر">
       <div class="modal-dialog" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
-        <button class="modal-close-btn">&times;</button>
+        <button class="modal-close-btn" aria-label="إغلاق النافذة">&times;</button>
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
           <div id="owner-inst-prof-avatar" class="doctor-avatar-box" style="border-radius:14px; width:52px; height:52px; background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3); font-size:1.4rem;">
             👨‍🏫
@@ -1481,7 +1473,7 @@
         </div>
 
         <!-- Password Card with Reveal Toggle & Quick Edit -->
-        <div style="background: #f8fafc; border:1px solid var(--glass-border); border-radius:12px; padding:12px 14px; margin-bottom:16px;">
+        <div style="background: var(--bg-secondary); border:1px solid var(--glass-border); border-radius:12px; padding:12px 14px; margin-bottom:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div>
               <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">كلمة السر / الرمز السري الحالي:</span>
@@ -1549,19 +1541,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=7.4"></script>
+  <script src="./js/firebase-app.js?v=7.5"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=7.4"></script>
-  <script src="./libs/html5-qrcode.min.js?v=7.4"></script>
-  <script src="./libs/xlsx.full.min.js?v=7.4"></script>
+  <script src="./libs/qrcode.js?v=7.5"></script>
+  <script src="./libs/html5-qrcode.min.js?v=7.5"></script>
+  <script src="./libs/xlsx.full.min.js?v=7.5"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=7.4"></script>
-  <script src="./js/sync.js?v=7.4"></script>
-  <script src="./js/qr-scanner.js?v=7.4"></script>
-  <script src="./js/excel.js?v=7.4"></script>
-  <script src="./js/app.js?v=7.4"></script>
+  <script src="./js/db.js?v=7.5"></script>
+  <script src="./js/sync.js?v=7.5"></script>
+  <script src="./js/qr-scanner.js?v=7.5"></script>
+  <script src="./js/excel.js?v=7.5"></script>
+  <script src="./js/app.js?v=7.5"></script>
 
 </body>
 </html>
