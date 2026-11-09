@@ -1,6 +1,6 @@
 {
   "name": "smart-attendance-pwa",
-  "version": "7.5.0",
+  "version": "1.3.0",
   "description": "Smart Attendance PWA System - Agricultural Engineer Edition with Real-Time QR, Offline SQLite/IndexedDB, SheetJS Export, and Modern Dark/Light Glassmorphism UI",
   "main": "server/index.js",
   "scripts": {

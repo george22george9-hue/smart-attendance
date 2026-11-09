@@ -2353,6 +2353,11 @@ function openNewLectureModal() {
 
 function closeModals() {
   document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open'));
+  if (window.location.hash === '#dev' || window.location.hash === '#developer') {
+    try {
+      history.replaceState(null, '', window.location.pathname + (window.location.search || ''));
+    } catch (_) {}
+  }
 }
 window.closeModals = closeModals;
 
@@ -2838,6 +2843,56 @@ function setupGlobalEvents() {
       }
     }
   });
+
+  // Secret Developer Triggers (Private Link #dev, Shortcut Ctrl+Shift+D, 5-Tap on Brand)
+  setupDeveloperSecretTriggers();
+}
+
+// Developer Secret Route & Access Handlers
+function setupDeveloperSecretTriggers() {
+  const checkDevRoute = () => {
+    const hash = (window.location.hash || '').toLowerCase();
+    const search = (window.location.search || '').toLowerCase();
+    if (hash === '#dev' || hash === '#developer' || search.includes('dev=true') || search.includes('dev=1')) {
+      openDevPinModal();
+    }
+  };
+
+  // Check immediately on load
+  checkDevRoute();
+
+  // Listen for hash changes (e.g. clicking a link or typing in URL)
+  window.addEventListener('hashchange', checkDevRoute);
+
+  // Secret Keyboard Shortcut: Ctrl + Shift + D or Alt + Shift + D
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) ||
+        (e.altKey && e.shiftKey && (e.key === 'D' || e.key === 'd'))) {
+      e.preventDefault();
+      openDevPinModal();
+    }
+  });
+
+  // Secret 5-Tap Gesture on Brand Header
+  let tapCount = 0;
+  let tapTimer = null;
+  const brandEl = document.querySelector('.brand-container');
+  if (brandEl) {
+    brandEl.addEventListener('click', (e) => {
+      tapCount++;
+      clearTimeout(tapTimer);
+      if (tapCount >= 5) {
+        tapCount = 0;
+        e.preventDefault();
+        e.stopPropagation();
+        openDevPinModal();
+        return;
+      }
+      tapTimer = setTimeout(() => {
+        tapCount = 0;
+      }, 1800);
+    });
+  }
 }
 
 // Register PWA Service Worker
@@ -2886,7 +2941,7 @@ function initApp() {
     setupInstructorPortalTabs();
     setupGlobalEvents();
     registerServiceWorker();
-    console.log('Agricultural engineer PWA v7.3 initialized successfully.');
+    console.log('Agricultural engineer PWA v1.3 initialized successfully.');
   } catch (e) {
     console.error('Error during initApp:', e);
   }
@@ -3203,45 +3258,60 @@ function renderStudentsDirectoryRows(students) {
 
     const dateStr = st.registered_at ? new Date(st.registered_at).toLocaleDateString('ar-EG') : '٢٠٢٦/١١/٩';
     const dept = st.department || 'عام';
-    const year = st.academic_year || '';
+    const year = st.academic_year || 'الفرقة الرابعة';
 
     card.innerHTML = `
-      <div class="student-dir-card-body">
-        <div class="student-dir-info-side">
-          <!-- Index Badge -->
-          <div class="student-dir-index-badge">#${idx + 1}</div>
-          <div class="student-dir-details">
-            <!-- Row 1: Student Name + Dept Badge + Year Badge -->
-            <div class="student-dir-name-row">
-              <h4 class="student-dir-name">${st.full_name}</h4>
-              <span class="student-dir-dept-tag">${dept}</span>
-              ${year ? `<span class="student-dir-year-tag">${year}</span>` : ''}
-            </div>
-            <!-- Row 2: National ID + Register Date -->
-            <div class="student-dir-meta-row">
-              <div class="student-dir-meta-item">
-                <span class="meta-label">الرقم القومي:</span>
-                <span class="meta-nid font-mono-numbers">${st.national_id}</span>
-              </div>
-              <div class="student-dir-meta-item">
-                <span class="meta-label">تاريخ التسجيل:</span>
-                <span class="meta-date font-mono-numbers">${dateStr}</span>
-              </div>
-            </div>
-          </div>
+      <!-- Line 1: Full Student Name on Right, Message Action on Left -->
+      <div class="student-card-top-row">
+        <div class="student-name-box">
+          <span class="student-index-num">#${idx + 1}</span>
+          <h4 class="student-full-name">${st.full_name}</h4>
         </div>
-        <!-- Message Button -->
-        <button type="button" class="student-dir-msg-action btn-direct-msg-student" aria-label="إرسال رسالة إلى ${st.full_name}" data-nid="${st.national_id}" data-name="${st.full_name}">
-          <svg class="msg-svg" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button type="button" class="student-card-msg-action btn-direct-msg-student" aria-label="إرسال رسالة إلى ${st.full_name}" data-nid="${st.national_id}" data-name="${st.full_name}">
+          <svg class="msg-svg" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
           </svg>
-          <span class="msg-label">رسالة</span>
+          <span>رسالة</span>
         </button>
+      </div>
+
+      <!-- Line 2: Academic Year & Department Under Name -->
+      <div class="student-badges-group">
+        <span class="student-badge-year">🎓 ${year}</span>
+        <span class="student-badge-dept">🏛️ قسم ${dept}</span>
+      </div>
+
+      <!-- Line 3: National ID Under Badges -->
+      <div class="student-card-field-row">
+        <span class="field-title">🪪 الرقم القومي:</span>
+        <span class="field-nid-code">${st.national_id}</span>
+        <button type="button" class="btn-copy-card-nid" title="نسخ الرقم القومي" data-nid="${st.national_id}">📋</button>
+      </div>
+
+      <!-- Line 4: Registration Date Under National ID -->
+      <div class="student-card-field-row">
+        <span class="field-title">📅 تاريخ التسجيل:</span>
+        <span class="field-date-val">${dateStr}</span>
       </div>
     `;
 
-    card.querySelector('.btn-direct-msg-student').addEventListener('click', () => {
+    // Click handler for Message button
+    card.querySelector('.btn-direct-msg-student')?.addEventListener('click', () => {
       openDirectMessageToStudent(st);
+    });
+
+    // Click handler for Copy NID button
+    card.querySelector('.btn-copy-card-nid')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(st.national_id).then(() => {
+          showToast(`تم نسخ الرقم القومي (${st.national_id}) بنجاح`, 'success');
+        }).catch(() => {
+          showToast(`الرقم القومي: ${st.national_id}`, 'info');
+        });
+      } else {
+        showToast(`الرقم القومي: ${st.national_id}`, 'info');
+      }
     });
 
     container.appendChild(card);

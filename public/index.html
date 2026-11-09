@@ -14,12 +14,12 @@
 
   <!-- PWA Manifest & App Home Screen Icons (Agricultural Engineer) -->
   <link rel="manifest" href="./manifest.json">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=7.5">
-  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=7.5">
-  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=7.5">
-  <link rel="shortcut icon" href="./icons/icon-192.png?v=7.5">
-  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=7.5">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=7.5">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=1.3">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=1.3">
+  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=1.3">
+  <link rel="shortcut icon" href="./icons/icon-192.png?v=1.3">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=1.3">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=1.3">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -27,7 +27,7 @@
   <meta name="application-name" content="Agricultural engineer">
 
   <!-- Main Stylesheet (Glassmorphism Dark & Light Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=7.5">
+  <link rel="stylesheet" href="./css/style.css?v=1.3">
   <!-- Instant FOUC Prevention for Theme -->
   <script>
     (function() {
@@ -46,11 +46,11 @@
     <header class="app-header">
       <div class="brand-container btn-back-landing" title="الصفحة الرئيسية">
         <div class="brand-logo">
-          <img src="./icons/icon-192.png?v=7.4" alt="Logo" class="brand-logo-img">
+          <img src="./icons/icon-192.png?v=1.3" alt="Logo" class="brand-logo-img">
         </div>
         <div class="brand-text-wrap">
           <span class="brand-title-text">Agricultural engineer</span>
-          <span class="version-tag">v7.5</span>
+          <span class="version-tag">v1.3</span>
         </div>
       </div>
 
@@ -87,7 +87,7 @@
           <!-- Clean App Header with Agricultural Engineer Emblem -->
           <div class="simple-brand-header">
             <div class="agri-eng-badge" title="Agricultural engineer" style="overflow: hidden; padding: 0;">
-              <img src="./icons/icon-192.png?v=7.5" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
+              <img src="./icons/icon-192.png?v=1.3" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
             </div>
             <h2 class="simple-app-title">Agricultural engineer</h2>
             <p class="simple-app-sub">منظومة الحضور والغياب الذكي بالـ QR Code</p>
@@ -114,18 +114,10 @@
             </button>
           </div>
 
-          <!-- Discrete Developer Link at the bottom -->
-          <div class="simple-dev-link-wrap">
-            <button type="button" id="btn-landing-dev-portal" class="simple-dev-link" aria-label="دخول مسؤول النظام والمطور">
-              <span>🔐</span>
-              <span>دخول مسؤول النظام والمطور</span>
-            </button>
-          </div>
-
           <!-- Subtle App Refresh Trigger -->
-          <div style="margin-top: 14px; text-align: center;">
+          <div style="margin-top: 18px; text-align: center;">
             <button id="btn-force-update-app" class="tool-btn" aria-label="تحديث التطبيق ومسح الكاش" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
-              <span>🔄 تحديث التطبيق ومسح الكاش (v7.5)</span>
+              <span>🔄 تحديث التطبيق ومسح الكاش (v1.3)</span>
             </button>
           </div>
 
@@ -452,9 +444,6 @@
           </button>
 
           <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 8px; align-items: center;">
-            <button id="btn-open-dev-login" type="button" class="tool-btn" style="background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.3); color: var(--cyan-light); font-size: 0.82rem; padding: 6px 14px; border-radius: 9999px;">
-              🛠️ لوحة المطور: تحديد الدكاترة وتغيير كلمات السر
-            </button>
             <button class="back-btn btn-back-landing">
               <span>العودة للرئيسية</span>
             </button>
@@ -893,22 +882,27 @@
               </div>
             </div>
 
-            <!-- Filter Chips / Departments (5 Horizontal Chips) -->
+            <!-- Filter Chips / Departments (5 Horizontal Boxes: Name on Top, Count Below) -->
             <div class="dept-filter-bar no-scrollbar" data-purpose="department-filter">
-              <button type="button" class="filter-dept-btn active" data-dept="all">
-                الكل (<span id="count-dir-all">0</span>)
+              <button type="button" class="filter-dept-btn active" data-dept="all" aria-label="عرض كل الأقسام">
+                <span class="dept-btn-name">الكل</span>
+                <span class="dept-btn-count" id="count-dir-all">0</span>
               </button>
-              <button type="button" class="filter-dept-btn" data-dept="آلات">
-                آلات (<span id="count-dir-alat">0</span>)
+              <button type="button" class="filter-dept-btn" data-dept="آلات" aria-label="عرض قسم آلات">
+                <span class="dept-btn-name">آلات</span>
+                <span class="dept-btn-count" id="count-dir-alat">0</span>
               </button>
-              <button type="button" class="filter-dept-btn" data-dept="نظم">
-                نظم (<span id="count-dir-nuzum">0</span>)
+              <button type="button" class="filter-dept-btn" data-dept="نظم" aria-label="عرض قسم نظم">
+                <span class="dept-btn-name">نظم</span>
+                <span class="dept-btn-count" id="count-dir-nuzum">0</span>
               </button>
-              <button type="button" class="filter-dept-btn" data-dept="ري">
-                ري (<span id="count-dir-ray">0</span>)
+              <button type="button" class="filter-dept-btn" data-dept="ري" aria-label="عرض قسم ري">
+                <span class="dept-btn-name">ري</span>
+                <span class="dept-btn-count" id="count-dir-ray">0</span>
               </button>
-              <button type="button" class="filter-dept-btn" data-dept="عام">
-                عام (<span id="count-dir-aam">0</span>)
+              <button type="button" class="filter-dept-btn" data-dept="عام" aria-label="عرض قسم عام">
+                <span class="dept-btn-name">عام</span>
+                <span class="dept-btn-count" id="count-dir-aam">0</span>
               </button>
             </div>
 
@@ -1524,12 +1518,20 @@
       </div>
     </div>
 
-    <!-- Fixed Glassmorphic Developer Bottom Bar (Slim, Fixed & Transparent) -->
+    <!-- Fixed Glassmorphic Developer Bottom Bar with WhatsApp Contact -->
     <footer class="app-bottom-bar" aria-label="شريط المطور المعتمد">
       <div class="bottom-bar-content">
-        <span class="bb-bolt">⚡</span>
-        <span class="bb-label">BY — ENG — GEORGE</span>
-        <span class="bb-bolt">⚡</span>
+        <div class="bb-watermark-row">
+          <span class="bb-bolt">⚡</span>
+          <span class="bb-label">BY — ENG — GEORGE</span>
+          <span class="bb-bolt">⚡</span>
+        </div>
+        <div class="bb-contact-row">
+          <a href="https://wa.me/201202074649" target="_blank" rel="noopener noreferrer" class="bb-developer-link" title="تواصل مع المطور عبر واتساب (01202074649)">
+            <span class="bb-wa-icon">💬</span>
+            <span class="bb-wa-text">تواصل مع المطور: <span dir="ltr">01202074649</span></span>
+          </a>
+        </div>
       </div>
     </footer>
 
@@ -1541,19 +1543,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=7.5"></script>
+  <script src="./js/firebase-app.js?v=1.3"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=7.5"></script>
-  <script src="./libs/html5-qrcode.min.js?v=7.5"></script>
-  <script src="./libs/xlsx.full.min.js?v=7.5"></script>
+  <script src="./libs/qrcode.js?v=1.3"></script>
+  <script src="./libs/html5-qrcode.min.js?v=1.3"></script>
+  <script src="./libs/xlsx.full.min.js?v=1.3"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=7.5"></script>
-  <script src="./js/sync.js?v=7.5"></script>
-  <script src="./js/qr-scanner.js?v=7.5"></script>
-  <script src="./js/excel.js?v=7.5"></script>
-  <script src="./js/app.js?v=7.5"></script>
+  <script src="./js/db.js?v=1.3"></script>
+  <script src="./js/sync.js?v=1.3"></script>
+  <script src="./js/qr-scanner.js?v=1.3"></script>
+  <script src="./js/excel.js?v=1.3"></script>
+  <script src="./js/app.js?v=1.3"></script>
 
 </body>
 </html>
