@@ -176,13 +176,16 @@ function setupSyncUI() {
 
     if (status.isSyncing) {
       syncPill.classList.add('syncing');
-      syncText.innerText = 'جاري المزامنة...';
+      syncText.innerText = 'مزامنة...';
+      syncPill.title = 'جاري مزامنة البيانات مع السحابة...';
     } else if (status.isOnline) {
       syncPill.classList.add('synced');
-      syncText.innerText = 'البيانات متزامنة ومأمنة';
+      syncText.innerText = 'متصل';
+      syncPill.title = 'البيانات متزامنة ومأمنة في السحابة';
     } else {
       syncPill.classList.add('offline');
-      syncText.innerText = 'أوفلاين (حفظ محلي)';
+      syncText.innerText = 'أوفلاين';
+      syncPill.title = 'الوضع أوفلاين: البيانات محفوظة محلياً في هاتفك';
     }
   });
 
