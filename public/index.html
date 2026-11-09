@@ -370,11 +370,13 @@
       </section>
 
       <!-- ===================================================================
-           4.5 DEVELOPER & INSTRUCTORS MANAGEMENT PORTAL
+           4.5 DEVELOPER MASTER CONTROL CENTER (مركز تحكم المطور الشامل)
            =================================================================== -->
       <section id="view-developer-admin" class="view-section">
-        <div class="developer-panel">
-          <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="developer-panel" style="max-width: 960px; margin: 0 auto;">
+
+          <!-- Top Navigation & Master Identity -->
+          <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
             <div style="display:flex; align-items:center; gap:12px;">
               <button id="btn-open-dev-settings" class="icon-circle-btn" title="تغيير كلمة سر المطور">
                 ⚙️
@@ -382,9 +384,9 @@
               <div>
                 <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
                   <span class="sync-status-dot" style="background:#10b981; box-shadow: 0 0 8px #10b981;"></span>
-                  <span style="font-size:0.75rem; color:var(--emerald-light); font-weight:600;">لوحة المطور نشطة</span>
+                  <span style="font-size:0.75rem; color:var(--emerald-light); font-weight:700;">لوحة تحكم وإدارة المطور الشاملة</span>
                 </div>
-                <h3 class="panel-title" style="margin:0; font-size:1.25rem;">إدارة الدكاترة وكلمات السر</h3>
+                <h3 class="panel-title" style="margin:0; font-size:1.25rem;">Agricultural Engineer — Master Dev Portal</h3>
               </div>
             </div>
             <button class="back-btn btn-back-landing">
@@ -393,89 +395,264 @@
             </button>
           </div>
 
-          <!-- Add New Instructor Card -->
-          <div class="glass-panel" style="padding: 24px; margin-bottom: 20px;">
-            <h4 style="font-size: 1.15rem; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-              <span class="icon-sq-badge">➕</span>
-              <span>إضافة دكتور أو معيد جديد للنظام</span>
-            </h4>
-            <form id="add-instructor-form">
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 14px;">
-                <div class="form-group" style="margin: 0;">
-                  <label class="form-label" for="new-doc-name"><span class="req">*</span> اسم الدكتور / المعيد:</label>
-                  <div class="input-with-icon">
-                    <span class="input-icon">👤</span>
-                    <input type="text" id="new-doc-name" class="form-input" placeholder="مثال: د. جورج سليمان" required>
-                  </div>
-                </div>
-                <div class="form-group" style="margin: 0;">
-                  <label class="form-label" for="new-doc-role">الصفة / الرتبة:</label>
-                  <div class="input-with-icon">
-                    <span class="input-icon">🎓</span>
-                    <select id="new-doc-role" class="form-input" style="background: #111827;">
-                      <option value="دكتور">دكتور (محاضرات نظري)</option>
-                      <option value="معيد">معيد (سكاشن عملي)</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group" style="margin: 0;">
-                  <label class="form-label" for="new-doc-dept">القسم التابع له:</label>
-                  <div class="input-with-icon">
-                    <span class="input-icon">🏛️</span>
-                    <select id="new-doc-dept" class="form-input" style="background: #111827;">
-                      <option value="الكل">جميع الأقسام</option>
-                      <option value="آلات">آلات</option>
-                      <option value="نظم">نظم</option>
-                      <option value="ري">ري</option>
-                      <option value="عام">عام</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group" style="margin: 0;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <label class="form-label" for="new-doc-pin" style="margin:0;"><span class="req">*</span> كلمة المرور / الرمز السري:</label>
-                    <button type="button" id="btn-gen-random-pin" class="link-btn-cyan" style="font-size:0.75rem; background:none; border:none; color:var(--cyan-light); cursor:pointer; font-weight:600;">🎲 توليد عشوائي</button>
-                  </div>
-                  <div class="input-with-icon" style="margin-top:6px;">
-                    <span class="input-icon">🔒</span>
-                    <input type="text" id="new-doc-pin" class="form-input" placeholder="مثال: 1234" required maxlength="12">
-                  </div>
-                </div>
-              </div>
-              <button type="submit" class="submit-btn" style="margin-top: 10px; padding: 12px 20px; font-size: 1rem; background: linear-gradient(135deg, #0284c7, #2563eb);">
-                <span>➕ حفظ وإضافة الدكتور للنظام</span>
-              </button>
-            </form>
+          <!-- Developer Section Navigation Tabs -->
+          <div class="nav-tabs-bar" style="margin-bottom: 20px;">
+            <button id="tab-btn-dev-instructors" class="nav-tab-btn active" data-target="dev-panel-instructors">
+              <span>👨‍🏫 الدكاترة والمحاضرين</span>
+            </button>
+            <button id="tab-btn-dev-students" class="nav-tab-btn" data-target="dev-panel-students">
+              <span>🎓 إدارة الطلاب</span>
+            </button>
+            <button id="tab-btn-dev-lectures" class="nav-tab-btn" data-target="dev-panel-lectures">
+              <span>📚 إدارة المحاضرات</span>
+            </button>
+            <button id="tab-btn-dev-control" class="nav-tab-btn" data-target="dev-panel-control">
+              <span>⚙️ التحكم بالنظام والإحصائيات</span>
+            </button>
           </div>
 
-          <!-- Instructors Directory & Password Manager -->
-          <div class="glass-panel" style="padding: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <h4 style="font-size: 1.15rem; color: #fff;">قائمة الدكاترة المسجلين وكلمات السر</h4>
-              <span id="instructors-count-badge" class="dept-badge" style="background: rgba(6,182,212,0.15); color: var(--cyan-light);">● 0 محاضر</span>
+          <!-- ==========================================
+               SUB-PANEL 1: INSTRUCTORS & PASSWORDS
+               ========================================== -->
+          <div id="dev-panel-instructors" class="dev-subpanel active">
+            <!-- Add New Instructor Card -->
+            <div class="glass-panel" style="padding: 22px; margin-bottom: 20px;">
+              <h4 style="font-size: 1.15rem; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                <span class="icon-sq-badge">➕</span>
+                <span>إضافة دكتور أو معيد جديد للنظام</span>
+              </h4>
+              <form id="add-instructor-form">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 14px;">
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label" for="new-doc-name"><span class="req">*</span> اسم الدكتور / المعيد:</label>
+                    <div class="input-with-icon">
+                      <span class="input-icon">👤</span>
+                      <input type="text" id="new-doc-name" class="form-input" placeholder="مثال: د. جورج سليمان" required>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label" for="new-doc-role">الصفة / الرتبة:</label>
+                    <div class="input-with-icon">
+                      <span class="input-icon">🎓</span>
+                      <select id="new-doc-role" class="form-input" style="background: #111827;">
+                        <option value="دكتور">دكتور (محاضرات نظري)</option>
+                        <option value="معيد">معيد (سكاشن عملي)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label" for="new-doc-dept">القسم التابع له:</label>
+                    <div class="input-with-icon">
+                      <span class="input-icon">🏛️</span>
+                      <select id="new-doc-dept" class="form-input" style="background: #111827;">
+                        <option value="الكل">جميع الأقسام</option>
+                        <option value="آلات">آلات</option>
+                        <option value="نظم">نظم</option>
+                        <option value="ري">ري</option>
+                        <option value="عام">عام</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <label class="form-label" for="new-doc-pin" style="margin:0;"><span class="req">*</span> كلمة المرور / الرمز السري:</label>
+                      <button type="button" id="btn-gen-random-pin" class="link-btn-cyan" style="font-size:0.75rem; background:none; border:none; color:var(--cyan-light); cursor:pointer; font-weight:600;">🎲 توليد عشوائي</button>
+                    </div>
+                    <div class="input-with-icon" style="margin-top:6px;">
+                      <span class="input-icon">🔒</span>
+                      <input type="text" id="new-doc-pin" class="form-input" placeholder="مثال: 1234" required maxlength="12">
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="submit-btn" style="margin-top: 10px; padding: 12px 20px; font-size: 1rem; background: linear-gradient(135deg, #0284c7, #2563eb);">
+                  <span>➕ حفظ وإضافة الدكتور للنظام</span>
+                </button>
+              </form>
             </div>
-            <div id="instructors-list-container">
-              <!-- Doctor cards injected here -->
+
+            <!-- Instructors Directory & Password Manager -->
+            <div class="glass-panel" style="padding: 22px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h4 style="font-size: 1.15rem; color: #fff;">قائمة الدكاترة المسجلين وكلمات السر</h4>
+                <span id="instructors-count-badge" class="dept-badge" style="background: rgba(6,182,212,0.15); color: var(--cyan-light);">● 0 محاضر</span>
+              </div>
+              <div id="instructors-list-container">
+                <!-- Doctor cards injected here -->
+              </div>
             </div>
           </div>
 
-          <!-- Factory Reset & Clear Data Card in Developer Panel -->
-          <div class="glass-panel" style="padding: 20px; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); margin-top: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-              <div>
-                <h4 style="font-size: 1.05rem; color: #f87171; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-                  <span>🧹</span>
-                  <span>تصفير ومسح البيانات التجريبية (إعادة ضبط المصنع)</span>
-                </h4>
-                <p style="font-size: 0.8rem; color: var(--text-dim); margin: 0;">
-                  مسح جميع الطلاب وسجل الحضور والمحاضرات التجريبية لبدء عام دراسي جديد نظيف تماماً.
-                </p>
+          <!-- ==========================================
+               SUB-PANEL 2: STUDENTS MANAGEMENT (إدارة الطلاب)
+               ========================================== -->
+          <div id="dev-panel-students" class="dev-subpanel" style="display: none;">
+            <!-- Developer Add Student Form -->
+            <div class="glass-panel" style="padding: 22px; margin-bottom: 20px;">
+              <h4 style="font-size: 1.15rem; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                <span class="icon-sq-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light);">➕</span>
+                <span>إضافة طالب جديد للنظام بواسطة المطور</span>
+              </h4>
+              <form id="dev-add-student-form">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 14px;">
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label" for="dev-student-name"><span class="req">*</span> الاسم ثلاثي بالعربي:</label>
+                    <div class="input-with-icon">
+                      <span class="input-icon">👤</span>
+                      <input type="text" id="dev-student-name" class="form-input" placeholder="مثال: أحمد محمد علي" required>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label" for="dev-student-nid"><span class="req">*</span> الرقم القومي (14 رقم):</label>
+                    <div class="input-with-icon">
+                      <span class="input-icon">🪪</span>
+                      <input type="text" id="dev-student-nid" class="form-input" placeholder="14 رقم قومي مصري" required maxlength="14" inputmode="numeric">
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label" for="dev-student-dept"><span class="req">*</span> القسم التابع له:</label>
+                    <div class="input-with-icon">
+                      <span class="input-icon">🏛️</span>
+                      <select id="dev-student-dept" class="form-input" style="background: #111827;">
+                        <option value="آلات">آلات</option>
+                        <option value="نظم">نظم</option>
+                        <option value="ري">ري</option>
+                        <option value="عام">عام</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="submit-btn" style="padding: 12px 20px; font-size: 1rem; background: linear-gradient(135deg, #10b981, #059669);">
+                  <span>➕ حفظ وتسجيل الطالب في السحابة</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Students Directory & Search -->
+            <div class="glass-panel" style="padding: 22px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                <h4 style="font-size: 1.15rem; color: #fff; margin: 0;">دليل الطلاب والتحكم الكامل</h4>
+                <span id="dev-students-count-badge" class="dept-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light);">● 0 طالب</span>
               </div>
-              <button type="button" id="btn-factory-reset-data" class="tool-btn" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700; cursor: pointer;">
-                <span>🗑️ مسح كافة البيانات الآن</span>
-              </button>
+              <!-- Search Bar -->
+              <div style="margin-bottom: 16px;">
+                <input type="text" id="dev-student-search-input" class="form-input" placeholder="🔍 ابحث بالاسم أو الرقم القومي أو القسم..." style="background: rgba(15,23,42,0.7);">
+              </div>
+              <div id="dev-students-list-container">
+                <!-- Injected via JavaScript -->
+              </div>
             </div>
           </div>
+
+          <!-- ==========================================
+               SUB-PANEL 3: LECTURES MANAGEMENT (إدارة المحاضرات)
+               ========================================== -->
+          <div id="dev-panel-lectures" class="dev-subpanel" style="display: none;">
+            <div class="glass-panel" style="padding: 22px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                <h4 style="font-size: 1.15rem; color: #fff; margin: 0;">جميع المحاضرات والسكاشن المسجلة</h4>
+                <span id="dev-lectures-count-badge" class="dept-badge" style="background: rgba(139,92,246,0.15); color: var(--purple-light);">● 0 محاضرة</span>
+              </div>
+              <!-- Search Bar -->
+              <div style="margin-bottom: 16px;">
+                <input type="text" id="dev-lecture-search-input" class="form-input" placeholder="🔍 ابحث باسم المحاضرة أو اسم المحاضر أو القسم..." style="background: rgba(15,23,42,0.7);">
+              </div>
+              <div id="dev-lectures-list-container">
+                <!-- Injected via JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- ==========================================
+               SUB-PANEL 4: SYSTEM CONTROL & KPIS (التحكم بالنظام)
+               ========================================== -->
+          <div id="dev-panel-control" class="dev-subpanel" style="display: none;">
+            <!-- Live System KPI Summary -->
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 22px;">
+              <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(16,185,129,0.15); color: var(--emerald-light);">🎓</div>
+                <div class="stat-info">
+                  <span class="stat-label">إجمالي الطلاب</span>
+                  <h4 id="kpi-dev-total-students" class="stat-value" style="color: var(--emerald-light);">0</h4>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(6,182,212,0.15); color: var(--cyan-light);">👨‍🏫</div>
+                <div class="stat-info">
+                  <span class="stat-label">المحاضرين المسجلين</span>
+                  <h4 id="kpi-dev-total-instructors" class="stat-value" style="color: var(--cyan-light);">0</h4>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(139,92,246,0.15); color: var(--purple-light);">📚</div>
+                <div class="stat-info">
+                  <span class="stat-label">المحاضرات والسكاشن</span>
+                  <h4 id="kpi-dev-total-lectures" class="stat-value" style="color: var(--purple-light);">0</h4>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(245,158,11,0.15); color: #fbbf24;">📊</div>
+                <div class="stat-info">
+                  <span class="stat-label">إجمالي رصد الحضور</span>
+                  <h4 id="kpi-dev-total-attendance" class="stat-value" style="color: #fbbf24;">0</h4>
+                </div>
+              </div>
+            </div>
+
+            <!-- Master Developer PIN Card -->
+            <div class="glass-panel" style="padding: 22px; margin-bottom: 20px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div>
+                  <h4 style="font-size:1.1rem; color:#fff; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+                    <span>🔐</span>
+                    <span>كلمة سر المطور الرئيسية (Master PIN)</span>
+                  </h4>
+                  <p style="font-size:0.8rem; color:var(--text-dim); margin:0;">
+                    تُستخدم للدخول إلى لوحة التحكم هذه والتحكم في صلاحيات النظام بالكامل.
+                  </p>
+                </div>
+                <button type="button" id="btn-dev-change-pin-action" class="tool-btn" style="background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.35); color: var(--cyan-light); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;">
+                  <span>🔑 تغيير كلمة سر المطور</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Full System Excel Export -->
+            <div class="glass-panel" style="padding: 22px; margin-bottom: 20px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div>
+                  <h4 style="font-size:1.1rem; color:#fff; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+                    <span>📊</span>
+                    <span>تصدير نسخة احتياطية كاملة للنظام (Excel)</span>
+                  </h4>
+                  <p style="font-size:0.8rem; color:var(--text-dim); margin:0;">
+                    تحميل كشف كامل يحتوي على كافة الطلاب والمحاضرات وسجلات الحضور في ملف Excel فوري.
+                  </p>
+                </div>
+                <button type="button" id="btn-dev-export-full-excel" class="tool-btn" style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); color: var(--emerald-light); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;">
+                  <span>📥 تصدير ملف Excel الشامل</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Factory Reset & Clear Data Card -->
+            <div class="glass-panel" style="padding: 22px; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05);">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <h4 style="font-size: 1.05rem; color: #f87171; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                    <span>🧹</span>
+                    <span>تصفير ومسح البيانات التجريبية (إعادة ضبط المصنع)</span>
+                  </h4>
+                  <p style="font-size: 0.8rem; color: var(--text-dim); margin: 0;">
+                    مسح جميع الطلاب وسجل الحضور والمحاضرات التجريبية لبدء عام دراسي جديد نظيف تماماً.
+                  </p>
+                </div>
+                <button type="button" id="btn-factory-reset-data" class="tool-btn" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700; cursor: pointer;">
+                  <span>🗑️ مسح كافة البيانات الآن</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 

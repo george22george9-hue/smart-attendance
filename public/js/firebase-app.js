@@ -71,6 +71,33 @@ const CloudDB = {
     }
   },
 
+  // 2.5 Delete Student and their associated attendance
+  async deleteStudent(nationalId) {
+    const nid = String(nationalId).trim();
+    if (cloudDb) {
+      try {
+        await cloudDb.collection('students').doc(nid).delete();
+        // Also delete attendance records for this student
+        const snap = await cloudDb.collection('attendance').where('national_id', '==', nid).get();
+        if (!snap.empty) {
+          const batch = cloudDb.batch();
+          snap.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+        }
+      } catch (err) {
+        console.warn('[Firebase] Delete student error:', err);
+      }
+    }
+    // Also remove from local storage if saved
+    try {
+      const saved = JSON.parse(localStorage.getItem('student_profile') || 'null');
+      if (saved && String(saved.national_id).trim() === nid) {
+        localStorage.removeItem('student_profile');
+      }
+    } catch (e) {}
+    return true;
+  },
+
   // 3. Save or sync lecture
   async saveLecture(lecture) {
     if (!cloudDb) return false;
@@ -90,6 +117,71 @@ const CloudDB = {
       console.warn('[Firebase] Save lecture error:', err);
       return false;
     }
+  },
+
+  // 3.5 Get all lectures from Cloud & Local
+  async getAllLectures() {
+    let list = [];
+    if (cloudDb) {
+      try {
+        const snap = await cloudDb.collection('lectures').get();
+        snap.forEach(doc => list.push(doc.data()));
+        list.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      } catch (err) {
+        console.warn('[Firebase] Get lectures error:', err);
+      }
+    }
+    if (list.length === 0) {
+      try {
+        const local = localStorage.getItem('app_lectures');
+        if (local) list = JSON.parse(local);
+      } catch (e) {}
+    }
+    return list;
+  },
+
+  // 3.6 Delete lecture and its attendance records
+  async deleteLecture(lectureId) {
+    if (cloudDb) {
+      try {
+        await cloudDb.collection('lectures').doc(lectureId).delete();
+        // Also delete attendance records for this lecture
+        const snap = await cloudDb.collection('attendance').where('lecture_id', '==', lectureId).get();
+        if (!snap.empty) {
+          const batch = cloudDb.batch();
+          snap.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+        }
+      } catch (err) {
+        console.warn('[Firebase] Delete lecture error:', err);
+      }
+    }
+    try {
+      const local = JSON.parse(localStorage.getItem('app_lectures') || '[]');
+      const filtered = local.filter(l => l.lecture_id !== lectureId);
+      localStorage.setItem('app_lectures', JSON.stringify(filtered));
+    } catch (e) {}
+    return true;
+  },
+
+  // 3.7 Get all attendance records for stats
+  async getAllAttendance() {
+    let list = [];
+    if (cloudDb) {
+      try {
+        const snap = await cloudDb.collection('attendance').get();
+        snap.forEach(doc => list.push(doc.data()));
+      } catch (err) {
+        console.warn('[Firebase] Get all attendance error:', err);
+      }
+    }
+    if (list.length === 0) {
+      try {
+        const local = localStorage.getItem('app_attendance');
+        if (local) list = JSON.parse(local);
+      } catch (e) {}
+    }
+    return list;
   },
 
   // 4. Record attendance in Cloud Firestore

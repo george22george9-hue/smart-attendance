@@ -829,13 +829,55 @@ async function handleDevPinSubmit() {
     closeModals();
     input.value = '';
     showToast('تم التحقق بنجاح! مرحباً بك في لوحة المطور 🛠️', 'success');
-    await loadDeveloperInstructors();
+    await initDeveloperPortal();
     showView('view-developer-admin');
   } else {
     showToast('كلمة سر المطور غير صحيحة', 'error');
     input.value = '';
     input.focus();
   }
+}
+
+// Master Developer Portal Orchestrator
+async function initDeveloperPortal() {
+  setupDeveloperPortalTabs();
+  setupDevAddStudentForm();
+  setupDevActionButtons();
+  await Promise.all([
+    loadDeveloperInstructors(),
+    loadDeveloperStudents(),
+    loadDeveloperLectures(),
+    loadDeveloperKPIs()
+  ]);
+}
+
+let devPortalTabsInitialized = false;
+function setupDeveloperPortalTabs() {
+  if (devPortalTabsInitialized) return;
+  devPortalTabsInitialized = true;
+
+  const tabBtns = document.querySelectorAll('.nav-tab-btn[data-target^="dev-panel-"]');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.dev-subpanel').forEach(p => p.style.display = 'none');
+
+      btn.classList.add('active');
+      const targetId = btn.getAttribute('data-target');
+      const panel = document.getElementById(targetId);
+      if (panel) panel.style.display = 'block';
+
+      if (targetId === 'dev-panel-students') {
+        loadDeveloperStudents();
+      } else if (targetId === 'dev-panel-lectures') {
+        loadDeveloperLectures();
+      } else if (targetId === 'dev-panel-control') {
+        loadDeveloperKPIs();
+      } else if (targetId === 'dev-panel-instructors') {
+        loadDeveloperInstructors();
+      }
+    });
+  });
 }
 
 // Developer Panel: Load, Render, Add, Edit & Delete Instructors
@@ -910,8 +952,451 @@ async function loadDeveloperInstructors() {
         }
         showToast('تم حذف المحاضر بنجاح', 'info');
         await loadDeveloperInstructors();
+        await loadDeveloperKPIs();
       }
     });
+  });
+}
+
+// ==========================================================================
+// Developer Students Management (Add, List, Search, Delete)
+// ==========================================================================
+let allDevStudentsCache = [];
+let allDevAttendanceCache = [];
+
+async function loadDeveloperStudents() {
+  const container = document.getElementById('dev-students-list-container');
+  const countBadge = document.getElementById('dev-students-count-badge');
+  if (!container) return;
+
+  container.innerHTML = '<p style="text-align:center; color:var(--text-dim); padding:16px;">جاري تحميل دليل الطلاب...</p>';
+
+  try {
+    if (window.CloudDB && window.CloudDB.getAllStudents) {
+      allDevStudentsCache = await window.CloudDB.getAllStudents();
+    } else {
+      allDevStudentsCache = [];
+    }
+
+    if (window.CloudDB && window.CloudDB.getAllAttendance) {
+      allDevAttendanceCache = await window.CloudDB.getAllAttendance();
+    } else {
+      allDevAttendanceCache = [];
+    }
+
+    if (countBadge) countBadge.innerText = `● ${allDevStudentsCache.length} طالب`;
+
+    renderDeveloperStudents(allDevStudentsCache);
+
+    // Setup live search once
+    const searchInput = document.getElementById('dev-student-search-input');
+    if (searchInput && !searchInput.dataset.bound) {
+      searchInput.dataset.bound = 'true';
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        if (!query) {
+          renderDeveloperStudents(allDevStudentsCache);
+          return;
+        }
+        const filtered = allDevStudentsCache.filter(s => {
+          return (
+            (s.full_name && s.full_name.toLowerCase().includes(query)) ||
+            (s.national_id && String(s.national_id).includes(query)) ||
+            (s.department && s.department.toLowerCase().includes(query))
+          );
+        });
+        renderDeveloperStudents(filtered);
+      });
+    }
+  } catch (err) {
+    console.error('Error loading dev students:', err);
+    container.innerHTML = '<p style="text-align:center; color:red; padding:16px;">فشل تحميل قائمة الطلاب</p>';
+  }
+}
+
+function renderDeveloperStudents(students) {
+  const container = document.getElementById('dev-students-list-container');
+  if (!container) return;
+
+  container.innerHTML = '';
+  if (!students || students.length === 0) {
+    container.innerHTML = '<p style="text-align:center; color:var(--text-dim); padding:24px;">لا يوجد طلاب مسجلين حالياً في النظام.</p>';
+    return;
+  }
+
+  // Pre-calculate attendance per student
+  const attendanceCounts = {};
+  allDevAttendanceCache.forEach(att => {
+    const nid = String(att.national_id).trim();
+    attendanceCounts[nid] = (attendanceCounts[nid] || 0) + 1;
+  });
+
+  students.forEach(student => {
+    const nid = String(student.national_id).trim();
+    const attendedCount = attendanceCounts[nid] || 0;
+    const card = document.createElement('div');
+    card.className = 'doctor-item-card';
+    card.style.background = 'rgba(15, 23, 42, 0.65)';
+    card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+
+    card.innerHTML = `
+      <div class="doctor-info-box" style="flex: 1;">
+        <div class="doctor-avatar-box" style="border-radius: 14px; width: 48px; height: 48px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); font-size: 1.25rem;">
+          🎓
+        </div>
+        <div style="flex: 1;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+            <h4 style="color:#fff; font-size:1.05rem; margin:0; font-weight:700;">${student.full_name}</h4>
+            <span class="doctor-role-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light); font-size: 0.75rem;">قسم ${student.department}</span>
+            <span class="dept-badge" style="background: rgba(6,182,212,0.15); color: var(--cyan-light); font-size: 0.72rem;">حضر ${attendedCount} محاضرة</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:0.78rem; color:var(--text-muted);">الرقم القومي:</span>
+            <code style="color:#fff; font-size:0.88rem; font-family:monospace; letter-spacing:1px;">${student.national_id}</code>
+          </div>
+        </div>
+      </div>
+      <div class="doctor-actions" style="margin-top: 6px;">
+        <button class="btn-delete-student" data-nid="${student.national_id}" data-name="${student.full_name}" style="border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); color: #f87171; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+          🗑️ حذف الطالب
+        </button>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  // Attach delete buttons
+  container.querySelectorAll('.btn-delete-student').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const nid = btn.getAttribute('data-nid');
+      const name = btn.getAttribute('data-name');
+      await handleDevDeleteStudent(nid, name);
+    });
+  });
+}
+
+async function handleDevDeleteStudent(nid, name) {
+  if (confirm(`هل أنت متأكد من حذف الطالب "${name}" (${nid})؟\nسيتم حذف بياناته بالكامل وسجل حضوره.`)) {
+    showToast('جاري حذف الطالب...', 'info', 1000);
+    if (window.CloudDB && window.CloudDB.deleteStudent) {
+      await window.CloudDB.deleteStudent(nid);
+    }
+    showToast(`تم حذف الطالب ${name} بنجاح`, 'info');
+    await loadDeveloperStudents();
+    await loadDeveloperKPIs();
+  }
+}
+
+let devAddStudentFormBound = false;
+function setupDevAddStudentForm() {
+  if (devAddStudentFormBound) return;
+  const form = document.getElementById('dev-add-student-form');
+  if (!form) return;
+  devAddStudentFormBound = true;
+
+  const nidInput = document.getElementById('dev-student-nid');
+  if (nidInput) {
+    nidInput.addEventListener('input', (e) => {
+      e.target.value = convertArabicDigitsToEnglish(e.target.value).replace(/\D/g, '').slice(0, 14);
+    });
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById('dev-student-name');
+    const deptSelect = document.getElementById('dev-student-dept');
+
+    const name = nameInput.value.trim();
+    const nid = nidInput.value.trim();
+    const dept = deptSelect.value;
+
+    const nameVal = validateArabicName(name);
+    if (!nameVal.valid) {
+      showToast(nameVal.message, 'error');
+      nameInput.focus();
+      return;
+    }
+
+    const nidVal = validateNationalId(nid);
+    if (!nidVal.valid) {
+      showToast(nidVal.message, 'error');
+      nidInput.focus();
+      return;
+    }
+
+    const newStudent = {
+      national_id: nidVal.nid,
+      full_name: name,
+      department: dept,
+      registered_at: new Date().toISOString()
+    };
+
+    showToast('جاري حفظ الطالب في النظام...', 'info', 1000);
+    if (window.CloudDB && window.CloudDB.saveStudent) {
+      await window.CloudDB.saveStudent(newStudent);
+    }
+    if (typeof saveLocalStudent === 'function') {
+      try { await saveLocalStudent(newStudent); } catch (e) {}
+    }
+
+    showToast(`تم تسجيل الطالب "${name}" بنجاح ✨`, 'success');
+    nameInput.value = '';
+    nidInput.value = '';
+    await loadDeveloperStudents();
+    await loadDeveloperKPIs();
+  });
+}
+
+// ==========================================================================
+// Developer Lectures Management (List, Search, Delete)
+// ==========================================================================
+let allDevLecturesCache = [];
+
+async function loadDeveloperLectures() {
+  const container = document.getElementById('dev-lectures-list-container');
+  const countBadge = document.getElementById('dev-lectures-count-badge');
+  if (!container) return;
+
+  container.innerHTML = '<p style="text-align:center; color:var(--text-dim); padding:16px;">جاري تحميل قائمة المحاضرات...</p>';
+
+  try {
+    if (window.CloudDB && window.CloudDB.getAllLectures) {
+      allDevLecturesCache = await window.CloudDB.getAllLectures();
+    } else {
+      allDevLecturesCache = [];
+    }
+
+    if (window.CloudDB && window.CloudDB.getAllAttendance) {
+      allDevAttendanceCache = await window.CloudDB.getAllAttendance();
+    } else {
+      allDevAttendanceCache = [];
+    }
+
+    if (countBadge) countBadge.innerText = `● ${allDevLecturesCache.length} محاضرة`;
+
+    renderDeveloperLectures(allDevLecturesCache);
+
+    // Setup live search once
+    const searchInput = document.getElementById('dev-lecture-search-input');
+    if (searchInput && !searchInput.dataset.bound) {
+      searchInput.dataset.bound = 'true';
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        if (!query) {
+          renderDeveloperLectures(allDevLecturesCache);
+          return;
+        }
+        const filtered = allDevLecturesCache.filter(l => {
+          return (
+            (l.title && l.title.toLowerCase().includes(query)) ||
+            (l.instructor_name && l.instructor_name.toLowerCase().includes(query)) ||
+            (l.target_dept && l.target_dept.toLowerCase().includes(query)) ||
+            (l.session_type && l.session_type.toLowerCase().includes(query))
+          );
+        });
+        renderDeveloperLectures(filtered);
+      });
+    }
+  } catch (err) {
+    console.error('Error loading dev lectures:', err);
+    container.innerHTML = '<p style="text-align:center; color:red; padding:16px;">فشل تحميل قائمة المحاضرات</p>';
+  }
+}
+
+function renderDeveloperLectures(lectures) {
+  const container = document.getElementById('dev-lectures-list-container');
+  if (!container) return;
+
+  container.innerHTML = '';
+  if (!lectures || lectures.length === 0) {
+    container.innerHTML = '<p style="text-align:center; color:var(--text-dim); padding:24px;">لا توجد محاضرات مسجلة حالياً في النظام.</p>';
+    return;
+  }
+
+  // Pre-calculate attendance per lecture
+  const attendanceCounts = {};
+  allDevAttendanceCache.forEach(att => {
+    const lid = att.lecture_id;
+    attendanceCounts[lid] = (attendanceCounts[lid] || 0) + 1;
+  });
+
+  lectures.forEach(lecture => {
+    const lid = lecture.lecture_id;
+    const attendedCount = attendanceCounts[lid] || 0;
+    const isLab = (lecture.session_type || '').includes('عملي');
+
+    const card = document.createElement('div');
+    card.className = 'doctor-item-card';
+    card.style.background = 'rgba(15, 23, 42, 0.65)';
+    card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+
+    card.innerHTML = `
+      <div class="doctor-info-box" style="flex: 1;">
+        <div class="doctor-avatar-box" style="border-radius: 14px; width: 48px; height: 48px; background: ${isLab ? 'rgba(168,85,247,0.15)' : 'rgba(6,182,212,0.15)'}; border: 1px solid ${isLab ? 'rgba(168,85,247,0.3)' : 'rgba(6,182,212,0.3)'}; font-size: 1.25rem;">
+          ${isLab ? '🔬' : '📚'}
+        </div>
+        <div style="flex: 1;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+            <h4 style="color:#fff; font-size:1.05rem; margin:0; font-weight:700;">${lecture.title}</h4>
+            <span class="doctor-role-badge ${isLab ? 'assistant' : 'prof'}" style="font-size:0.75rem;">${lecture.session_type || 'محاضرة نظري'}</span>
+            <span class="dept-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light); font-size: 0.72rem;">حضر ${attendedCount} طالب</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:0.8rem; color:var(--text-muted);">
+            <span>👨‍🏫 المحاضر: <strong>${lecture.instructor_name || 'غير محدد'}</strong></span>
+            <span>🏛️ القسم: <strong>${lecture.target_dept || 'الكل'}</strong></span>
+            <span>📅 التاريخ: <strong>${lecture.lecture_date || ''}</strong></span>
+          </div>
+        </div>
+      </div>
+      <div class="doctor-actions" style="margin-top: 6px;">
+        <button class="btn-delete-lecture" data-id="${lecture.lecture_id}" data-title="${lecture.title}" style="border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); color: #f87171; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+          🗑️ حذف المحاضرة
+        </button>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  // Attach delete buttons
+  container.querySelectorAll('.btn-delete-lecture').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const lid = btn.getAttribute('data-id');
+      const title = btn.getAttribute('data-title');
+      await handleDevDeleteLecture(lid, title);
+    });
+  });
+}
+
+async function handleDevDeleteLecture(lid, title) {
+  if (confirm(`هل أنت متأكد من حذف محاضرة "${title}"؟\nسيتم حذف المحاضرة وجميع سجلات الحضور الخاصة بها.`)) {
+    showToast('جاري حذف المحاضرة...', 'info', 1000);
+    if (window.CloudDB && window.CloudDB.deleteLecture) {
+      await window.CloudDB.deleteLecture(lid);
+    }
+    showToast(`تم حذف المحاضرة "${title}" بنجاح`, 'info');
+    await loadDeveloperLectures();
+    await loadDeveloperKPIs();
+  }
+}
+
+// ==========================================================================
+// Developer KPIs & Master Actions
+// ==========================================================================
+async function loadDeveloperKPIs() {
+  try {
+    let students = allDevStudentsCache;
+    if (students.length === 0 && window.CloudDB && window.CloudDB.getAllStudents) {
+      students = await window.CloudDB.getAllStudents();
+      allDevStudentsCache = students;
+    }
+    let instructors = state.instructors || [];
+    if (instructors.length === 0 && window.CloudDB && window.CloudDB.getAllInstructors) {
+      instructors = await window.CloudDB.getAllInstructors();
+      state.instructors = instructors;
+    }
+    let lectures = allDevLecturesCache;
+    if (lectures.length === 0 && window.CloudDB && window.CloudDB.getAllLectures) {
+      lectures = await window.CloudDB.getAllLectures();
+      allDevLecturesCache = lectures;
+    }
+    let attendance = allDevAttendanceCache;
+    if (attendance.length === 0 && window.CloudDB && window.CloudDB.getAllAttendance) {
+      attendance = await window.CloudDB.getAllAttendance();
+      allDevAttendanceCache = attendance;
+    }
+
+    const sElem = document.getElementById('kpi-dev-total-students');
+    const iElem = document.getElementById('kpi-dev-total-instructors');
+    const lElem = document.getElementById('kpi-dev-total-lectures');
+    const aElem = document.getElementById('kpi-dev-total-attendance');
+
+    if (sElem) sElem.innerText = students.length;
+    if (iElem) iElem.innerText = instructors.length;
+    if (lElem) lElem.innerText = lectures.length;
+    if (aElem) aElem.innerText = attendance.length;
+  } catch (err) {
+    console.warn('KPI calculation error:', err);
+  }
+}
+
+let devActionsBound = false;
+function setupDevActionButtons() {
+  if (devActionsBound) return;
+  devActionsBound = true;
+
+  // Change Master PIN button inside Control tab
+  document.getElementById('btn-dev-change-pin-action')?.addEventListener('click', openChangeDevMasterPinModal);
+
+  // Export Full System to Excel
+  document.getElementById('btn-dev-export-full-excel')?.addEventListener('click', async () => {
+    if (!window.XLSX) {
+      showToast('مكتبة تصدير الإكسيل غير متوفرة', 'error');
+      return;
+    }
+    showToast('جاري تجميع بيانات النظام وإنشاء ملف Excel...', 'info', 1200);
+
+    const [students, lectures, attendance] = await Promise.all([
+      window.CloudDB ? window.CloudDB.getAllStudents() : [],
+      window.CloudDB ? window.CloudDB.getAllLectures() : [],
+      window.CloudDB ? window.CloudDB.getAllAttendance() : []
+    ]);
+
+    const wb = XLSX.utils.book_new();
+
+    // Sheet 1: Students
+    const studentRows = [
+      ['دليل الطلاب المسجلين - Agricultural Engineer'],
+      ['تاريخ التصدير:', new Date().toLocaleDateString('ar-EG'), 'إجمالي الطلاب:', students.length],
+      [],
+      ['م', 'الاسم ثلاثي', 'الرقم القومي', 'القسم', 'تاريخ التسجيل']
+    ];
+    students.forEach((s, idx) => {
+      studentRows.push([idx + 1, s.full_name, String(s.national_id), s.department, s.registered_at || '']);
+    });
+    const wsStudents = XLSX.utils.aoa_to_sheet(studentRows);
+    XLSX.utils.book_append_sheet(wb, wsStudents, 'دليل الطلاب');
+
+    // Sheet 2: Lectures
+    const lectureRows = [
+      ['سجل المحاضرات والسكاشن - Agricultural Engineer'],
+      ['إجمالي المحاضرات:', lectures.length],
+      [],
+      ['م', 'عنوان المحاضرة', 'النوع', 'المحاضر', 'القسم', 'التاريخ']
+    ];
+    lectures.forEach((l, idx) => {
+      lectureRows.push([idx + 1, l.title, l.session_type || 'نظري', l.instructor_name || '', l.target_dept || 'الكل', l.lecture_date || '']);
+    });
+    const wsLectures = XLSX.utils.aoa_to_sheet(lectureRows);
+    XLSX.utils.book_append_sheet(wb, wsLectures, 'المحاضرات والسكاشن');
+
+    // Sheet 3: Attendance
+    const attRows = [
+      ['سجل الحضور الكامل - Agricultural Engineer'],
+      ['إجمالي عمليات الحضور:', attendance.length],
+      [],
+      ['م', 'المحاضرة', 'النوع', 'المحاضر', 'اسم الطالب', 'الرقم القومي', 'القسم', 'وقت التسجيل']
+    ];
+    attendance.forEach((a, idx) => {
+      attRows.push([
+        idx + 1,
+        a.lecture_title || a.lecture_id,
+        a.session_type || 'نظري',
+        a.instructor_name || '',
+        a.student_name || '',
+        String(a.national_id),
+        a.department || '',
+        a.scan_time || a.created_at || ''
+      ]);
+    });
+    const wsAttendance = XLSX.utils.aoa_to_sheet(attRows);
+    XLSX.utils.book_append_sheet(wb, wsAttendance, 'سجل الحضور الكامل');
+
+    // Download File
+    const filename = `Agricultural_Engineer_System_Backup_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(wb, filename);
+    showToast('تم تصدير ملف الإكسيل الشامل بنجاح 📊', 'success');
   });
 }
 
