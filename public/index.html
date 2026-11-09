@@ -6,16 +6,20 @@
   <meta name="theme-color" content="#f0fdf4">
   <meta name="description" content="نظام الحضور والغياب الذكي - يعمل بدون إنترنت مع مسح QR وتصدير إكسيل فوري">
 
+    <!-- Google Fonts: Cairo, Readex Pro, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Readex+Pro:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <title>Agricultural engineer</title>
 
   <!-- PWA Manifest & App Home Screen Icons (Agricultural Engineer) -->
-  <link rel="manifest" href="./manifest.json?v=7.1">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=7.1">
-  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=7.1">
-  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=7.1">
-  <link rel="shortcut icon" href="./icons/icon-192.png?v=7.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=7.1">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=7.1">
+  <link rel="manifest" href="./manifest.json?v=7.4">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=7.4">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=7.4">
+  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=7.4">
+  <link rel="shortcut icon" href="./icons/icon-192.png?v=7.4">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=7.4">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=7.4">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,12 +27,12 @@
   <meta name="application-name" content="Agricultural engineer">
 
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=7.1">
+  <link rel="stylesheet" href="./css/style.css?v=7.4">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v7.3) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v7.4) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v7.3-student-auth-grades';
+      const CURRENT_VERSION = 'v7.4-ui-ux-design';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
         // Clear cached assets to ensure fresh JS/CSS files without deleting student profile!
@@ -71,11 +75,11 @@
     <header class="app-header">
       <div class="brand-container btn-back-landing" title="الصفحة الرئيسية">
         <div class="brand-logo">
-          <img src="./icons/icon-192.png?v=7.1" alt="Logo" class="brand-logo-img">
+          <img src="./icons/icon-192.png?v=7.4" alt="Logo" class="brand-logo-img">
         </div>
         <div class="brand-text-wrap">
           <span class="brand-title-text">Agricultural engineer</span>
-          <span class="version-tag">v7.3</span>
+          <span class="version-tag">v7.4</span>
         </div>
       </div>
 
@@ -112,7 +116,7 @@
           <!-- Clean App Header with Agricultural Engineer Emblem -->
           <div class="simple-brand-header">
             <div class="agri-eng-badge" title="Agricultural engineer" style="overflow: hidden; padding: 0;">
-              <img src="./icons/icon-192.png?v=7.1" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
+              <img src="./icons/icon-192.png?v=7.4" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
             </div>
             <h2 class="simple-app-title">Agricultural engineer</h2>
             <p class="simple-app-sub">منظومة الحضور والغياب الذكي بالـ QR Code</p>
@@ -150,7 +154,7 @@
           <!-- Subtle App Refresh Trigger -->
           <div style="margin-top: 14px; text-align: center;">
             <button id="btn-force-update-app" class="tool-btn" onclick="window.forceUpdateApp && window.forceUpdateApp()" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
-              <span>🔄 تحديث التطبيق ومسح الكاش (v7.3)</span>
+              <span>🔄 تحديث التطبيق ومسح الكاش (v7.4)</span>
             </button>
           </div>
 
@@ -798,139 +802,161 @@
       </section>
 
       <!-- ===================================================================
-           5. INSTRUCTOR FLOW: DASHBOARD & MANAGEMENT PORTAL
+           5. INSTRUCTOR FLOW: DASHBOARD & MANAGEMENT PORTAL (UI-UX 1:1)
            =================================================================== -->
       <section id="view-instructor-dashboard" class="view-section">
-        <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div class="doctor-avatar-box" style="border-radius:12px; width:44px; height:44px; background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3); font-size:1.3rem;">👨‍🏫</div>
-            <div>
-              <h3 id="inst-dashboard-header-title" class="panel-title" style="margin:0; font-size:1.15rem; font-weight:800; color: var(--text-main);">لوحة تحكم المحاضر</h3>
-              <div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
-                <span id="inst-dashboard-header-dept" class="dept-badge" style="background:rgba(6,182,212,0.15); color:var(--cyan-light); font-size:0.75rem;">عضو هيئة تدريس</span>
+
+        <!-- Lecturer Identity Card (1:1 with ui-ux/_2) -->
+        <section class="lecturer-profile-section" data-purpose="lecturer-identity">
+          <div class="lecturer-profile-content">
+            <div class="lecturer-profile-info">
+              <div class="lecturer-avatar-box">
+                <div class="lecturer-avatar-emoji">👨‍🏫</div>
+              </div>
+              <div class="lecturer-details">
+                <div class="lecturer-title-row">
+                  <h1 class="lecturer-title-heading">لوحة المحاضر</h1>
+                  <span class="lecturer-name-label">: <span id="inst-dashboard-header-title">د. محمد صبري</span></span>
+                </div>
+                <div class="lecturer-meta-row">
+                  <span class="lecturer-dept-badge">
+                    <span class="badge-pulse-dot"></span>
+                    <span id="inst-dashboard-header-dept">معيد • قسم الكل</span>
+                  </span>
+                </div>
               </div>
             </div>
+            <!-- Logout Button -->
+            <button id="btn-inst-logout" class="btn-lecturer-logout" type="button" title="تسجيل الخروج">
+              <span>خروج</span>
+              <svg class="logout-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+              </svg>
+            </button>
           </div>
-          <button id="btn-inst-logout" class="back-btn" style="color:var(--rose-danger); border-color:rgba(244,63,94,0.3);" title="تسجيل خروج">
-            <span>خروج</span>
-            <span>🚪</span>
-          </button>
-        </div>
+        </section>
 
-        <!-- Instructor Navigation Tabs -->
-        <div class="nav-tabs-bar">
-          <button id="tab-btn-inst-lectures" class="nav-tab-btn active" data-target="panel-inst-lectures">
+        <!-- Navigation Tabs (4 Equal Tabs 1:1 with ui-ux/_1 and ui-ux/_2) -->
+        <nav class="nav-tabs-bar" data-purpose="dashboard-navigation-tabs">
+          <button id="tab-btn-inst-lectures" class="nav-tab-btn active" data-target="panel-inst-lectures" type="button">
             <span class="nav-tab-icon">📚</span>
             <span class="nav-tab-label">المحاضرات</span>
           </button>
-          <button id="tab-btn-inst-students" class="nav-tab-btn" data-target="panel-inst-students">
+          <button id="tab-btn-inst-students" class="nav-tab-btn" data-target="panel-inst-students" type="button">
             <span class="nav-tab-icon">👥</span>
-            <span class="nav-tab-label">الطلاب</span>
+            <span class="nav-tab-label">دليل الطلاب</span>
           </button>
-          <button id="tab-btn-inst-broadcast" class="nav-tab-btn" data-target="panel-inst-broadcast">
+          <button id="tab-btn-inst-broadcast" class="nav-tab-btn" data-target="panel-inst-broadcast" type="button">
             <span class="nav-tab-icon">📢</span>
             <span class="nav-tab-label">الرسائل</span>
           </button>
-          <button id="tab-btn-inst-settings" class="nav-tab-btn" data-target="panel-inst-settings">
+          <button id="tab-btn-inst-settings" class="nav-tab-btn" data-target="panel-inst-settings" type="button">
             <span class="nav-tab-icon">⚙️</span>
             <span class="nav-tab-label">الإعدادات</span>
           </button>
-        </div>
+        </nav>
 
-        <!-- Subpanel 1: Lectures & Active Sessions -->
+        <!-- Subpanel 1: Lectures & Active Sessions (1:1 with ui-ux/_2) -->
         <div id="panel-inst-lectures" class="instructor-subpanel">
-          <!-- Dashboard Metrics -->
-          <div class="dashboard-metrics">
-            <div class="metric-card">
-              <div class="metric-icon-box" style="background: rgba(6,182,212,0.15); color: var(--cyan-light);">📚</div>
-              <div class="metric-info">
-                <div id="metric-total-lectures" class="val">0</div>
-                <div class="label">إجمالي المحاضرات</div>
+          <!-- Overview Stats (2 Side-by-Side Cards) -->
+          <section class="overview-stats-grid" data-purpose="overview-statistics">
+            <div class="stat-counter-card">
+              <div class="stat-counter-content">
+                <span id="metric-total-lectures" class="stat-counter-num font-mono-numbers">0</span>
+                <span class="stat-counter-label">إجمالي المحاضرات</span>
+              </div>
+              <div class="stat-counter-icon cyan-icon-box">
+                📚
               </div>
             </div>
-            <div class="metric-card">
-              <div class="metric-icon-box" style="background: rgba(139,92,246,0.15); color: var(--purple-light);">👥</div>
-              <div class="metric-info">
-                <div id="metric-total-students" class="val">0</div>
-                <div class="label">الطلاب المسجلين</div>
+            <div class="stat-counter-card">
+              <div class="stat-counter-content">
+                <span id="metric-total-students" class="stat-counter-num font-mono-numbers">0</span>
+                <span class="stat-counter-label">الطلاب المسجلين</span>
+              </div>
+              <div class="stat-counter-icon purple-icon-box">
+                👥
               </div>
             </div>
-          </div>
+          </section>
 
-          <div class="glass-panel" style="padding: 20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
-              <h4 style="font-size:1.1rem; color: var(--text-main);">سجل المحاضرات والجلسات</h4>
-              <button id="btn-open-new-lecture-modal" class="tool-btn" style="background:linear-gradient(135deg, var(--cyan-primary), #2563eb); color:#fff; padding:10px 18px; font-size:0.95rem;">
-                <span>+ بدء محاضرة جديدة</span>
-              </button>
+          <!-- Lecture Sessions Container -->
+          <section class="lecture-sessions-container" data-purpose="lecture-sessions-container">
+            <div class="lecture-sessions-header">
+              <div class="lecture-sessions-title-wrap">
+                <span class="cyan-pulse-dot"></span>
+                <h2 class="lecture-sessions-title">سجل المحاضرات والجلسات</h2>
+              </div>
+              <span class="lecture-sessions-badge">جلسة نشطة</span>
             </div>
 
-            <div id="instructor-lectures-list" class="lectures-list">
-              <!-- Lectures injected here -->
+            <!-- Start New Lecture Button -->
+            <button id="btn-open-new-lecture-modal" class="btn-start-lecture-gradient" type="button" data-purpose="create-lecture-button">
+              <span class="plus-symbol">+</span>
+              <span>بدء محاضرة جديدة</span>
+            </button>
+
+            <!-- Dynamic Lecture Cards Stack -->
+            <div id="instructor-lectures-list" class="lecture-cards-stack">
+              <!-- Injected via JavaScript -->
             </div>
-          </div>
+          </section>
         </div>
 
-        <!-- Subpanel 2: Students Directory -->
+        <!-- Subpanel 2: Students Directory (1:1 with ui-ux/_1) -->
         <div id="panel-inst-students" class="instructor-subpanel" style="display: none;">
-          <div class="glass-panel" style="padding: 22px 18px;">
-            <div class="students-dir-header">
-              <div class="students-dir-title-wrap">
-                <h4 style="font-size:1.15rem; font-weight:800; color: var(--text-main); margin-bottom: 3px;">دليل وبيانات جميع الطلاب المسجلين</h4>
-                <p style="font-size:0.82rem; color:var(--text-muted);">استعراض بيانات الطلاب والبحث ومراسلتهم مباشرة</p>
-              </div>
-              <div class="search-input-box">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="students-directory-search" placeholder="بحث بالاسم أو الرقم القومي...">
+          <section class="students-dir-container" data-purpose="main-student-directory">
+            <!-- Header & Description -->
+            <div class="students-dir-head">
+              <h3 class="students-dir-title">دليل وبيانات جميع الطلاب المسجلين</h3>
+              <p class="students-dir-desc">استعراض بيانات الطلاب والبحث ومراسلتهم مباشرة</p>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="student-search-wrap" data-purpose="student-search">
+              <input type="search" id="students-directory-search" class="student-search-input" placeholder="بحث بالاسم أو الرقم القومي...">
+              <div class="student-search-icon">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
               </div>
             </div>
 
-            <!-- Dept Filter Chips -->
-            <div class="dept-filter-bar">
+            <!-- Filter Chips / Departments (5 Horizontal Chips) -->
+            <div class="dept-filter-bar no-scrollbar" data-purpose="department-filter">
               <button type="button" class="filter-dept-btn active" data-dept="all">
-                <span>الكل</span>
-                <span class="chip-count">(<span id="count-dir-all">0</span>)</span>
+                الكل (<span id="count-dir-all">0</span>)
               </button>
               <button type="button" class="filter-dept-btn" data-dept="آلات">
-                <span>آلات</span>
-                <span class="chip-count">(<span id="count-dir-alat">0</span>)</span>
+                آلات (<span id="count-dir-alat">0</span>)
               </button>
               <button type="button" class="filter-dept-btn" data-dept="نظم">
-                <span>نظم</span>
-                <span class="chip-count">(<span id="count-dir-nuzum">0</span>)</span>
+                نظم (<span id="count-dir-nuzum">0</span>)
               </button>
               <button type="button" class="filter-dept-btn" data-dept="ري">
-                <span>ري</span>
-                <span class="chip-count">(<span id="count-dir-ray">0</span>)</span>
+                ري (<span id="count-dir-ray">0</span>)
               </button>
               <button type="button" class="filter-dept-btn" data-dept="عام">
-                <span>عام</span>
-                <span class="chip-count">(<span id="count-dir-aam">0</span>)</span>
+                عام (<span id="count-dir-aam">0</span>)
               </button>
             </div>
 
-            <div class="table-scroll-hint">
-              <span>👈 مرر الجدول أفقياً لتصفح كامل البيانات 👉</span>
+            <!-- Interactive Info Note -->
+            <div class="students-dir-info-banner">
+              <span class="info-banner-text">
+                <span>👉</span>
+                <span>تصفح بيانات الطلاب المسجلين</span>
+              </span>
+              <span class="info-banner-badge">
+                إجمالي: <span id="count-dir-total">0</span> طالب
+              </span>
             </div>
 
-            <div class="table-responsive">
-              <table class="glass-table">
-                <thead>
-                  <tr>
-                    <th style="width: 44px; text-align: center;">#</th>
-                    <th>الاسم ثلاثي</th>
-                    <th>الرقم القومي</th>
-                    <th>القسم</th>
-                    <th>تاريخ التسجيل</th>
-                    <th style="text-align: center;">إجراء</th>
-                  </tr>
-                </thead>
-                <tbody id="students-directory-tbody">
-                  <!-- Injected dynamically -->
-                </tbody>
-              </table>
+            <!-- Student Cards List (Modern Mobile 2-line Card Alternative) -->
+            <div id="students-directory-list" class="students-cards-stack" data-purpose="students-card-list">
+              <!-- Dynamically injected via JavaScript -->
             </div>
-          </div>
+          </section>
         </div>
 
         <!-- Subpanel 3: Broadcast Messaging Center -->
@@ -1523,19 +1549,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=7.1"></script>
+  <script src="./js/firebase-app.js?v=7.4"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=7.1"></script>
-  <script src="./libs/html5-qrcode.min.js?v=7.1"></script>
-  <script src="./libs/xlsx.full.min.js?v=7.1"></script>
+  <script src="./libs/qrcode.js?v=7.4"></script>
+  <script src="./libs/html5-qrcode.min.js?v=7.4"></script>
+  <script src="./libs/xlsx.full.min.js?v=7.4"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=7.1"></script>
-  <script src="./js/sync.js?v=7.1"></script>
-  <script src="./js/qr-scanner.js?v=7.1"></script>
-  <script src="./js/excel.js?v=7.1"></script>
-  <script src="./js/app.js?v=7.1"></script>
+  <script src="./js/db.js?v=7.4"></script>
+  <script src="./js/sync.js?v=7.4"></script>
+  <script src="./js/qr-scanner.js?v=7.4"></script>
+  <script src="./js/excel.js?v=7.4"></script>
+  <script src="./js/app.js?v=7.4"></script>
 
 </body>
 </html>

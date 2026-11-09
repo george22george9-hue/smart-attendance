@@ -2229,46 +2229,67 @@ async function loadInstructorDashboard() {
         attCount = localAtt ? localAtt.length : 0;
       }
 
-      const card = document.createElement('div');
-      card.className = 'lecture-item-card';
+      const card = document.createElement('article');
+      card.className = 'lecture-item-card-modern';
+      card.setAttribute('data-purpose', 'lecture-item');
 
       const isLab = (lec.session_type || '').includes('عملي');
       card.innerHTML = `
-        <div class="lecture-card-header">
-          <div class="lecture-title-wrap">
-            <span class="lecture-type-badge ${isLab ? 'lab' : 'theory'}">${isLab ? '🔬 سكشن عملي' : '📚 محاضرة نظري'}</span>
-            <h4 class="lecture-card-title">${lec.title}</h4>
+        <!-- Card Header: Title & Subject -->
+        <div class="lecture-card-modern-header">
+          <div class="lecture-card-title-group">
+            <div class="lecture-card-icon-box ${isLab ? 'lab-icon' : 'theory-icon'}">
+              ${isLab ? '🔬' : '📚'}
+            </div>
+            <div class="lecture-card-headings">
+              <h3 class="lecture-card-title">${lec.title}</h3>
+              <span class="lecture-card-subtitle">${isLab ? 'الجلسة العملية الأسبوعية' : 'المحاضرة النظرية الأسبوعية'}</span>
+            </div>
           </div>
-          <button class="lecture-btn-delete-quick btn-del-inst-lecture" data-id="${lec.lecture_id}" data-title="${lec.title}" title="حذف المحاضرة">
-            🗑️
-          </button>
-        </div>
-
-        <div class="lecture-chips-grid">
-          <div class="lecture-chip">
+          <!-- Date Badge -->
+          <div class="lecture-card-date-badge font-mono-numbers">
             <span>📅</span>
-            <span>${lec.lecture_date || ''}</span>
-          </div>
-          <div class="lecture-chip">
-            <span>🏛️</span>
-            <span>قسم ${lec.target_dept || 'الكل'}</span>
-          </div>
-          ${lec.instructor_name ? `
-          <div class="lecture-chip">
-            <span>👨‍🏫</span>
-            <span>${lec.instructor_name}</span>
-          </div>` : ''}
-          <div class="lecture-chip highlight-chip">
-            <span>👥</span>
-            <span>الحضور: <strong>${attCount}</strong> طالب</span>
+            <span dir="ltr">${lec.lecture_date || ''}</span>
           </div>
         </div>
 
-        <div class="lecture-card-actions">
-          <button class="btn-open-lecture-cta btn-open-inst-lecture" data-id="${lec.lecture_id}">
-            <span>فتح ورصد المحاضرة</span>
-            <span>◀</span>
-          </button>
+        <!-- Metadata Rows Grid (2 Columns) -->
+        <div class="lecture-card-meta-grid">
+          <div class="lecture-meta-box">
+            <span class="meta-emoji">🏛️</span>
+            <div class="meta-details">
+              <span class="meta-sub">القسم:</span>
+              <span class="meta-main">قسم ${lec.target_dept || 'الكل'}</span>
+            </div>
+          </div>
+          <div class="lecture-meta-box">
+            <span class="meta-emoji">👨‍🏫</span>
+            <div class="meta-details">
+              <span class="meta-sub">المحاضر:</span>
+              <span class="meta-main">${lec.instructor_name || currentDocName || 'المحاضر'}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attendance Status & Actions Bar -->
+        <div class="lecture-card-bottom-bar">
+          <div class="lecture-att-pill">
+            <span>👥</span>
+            <span>الحضور: <strong class="att-count-num font-mono-numbers">${attCount}</strong> طالب</span>
+          </div>
+          <div class="lecture-card-controls">
+            <button class="btn-open-lecture-modern btn-open-inst-lecture" data-id="${lec.lecture_id}" type="button">
+              <span>فتح ورصد المحاضرة</span>
+              <svg class="arrow-svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.5 5.5l-7.5 6.5 7.5 6.5v-13z"></path>
+              </svg>
+            </button>
+            <button class="btn-del-lecture-modern btn-del-inst-lecture" data-id="${lec.lecture_id}" data-title="${lec.title}" aria-label="حذف المحاضرة" type="button">
+              <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       `;
 
@@ -3120,23 +3141,22 @@ function setupInstructorPortalTabs() {
   });
 }
 
-// Load and render all students in Instructor Directory
+// Load and render all students in Instructor Directory (1:1 with ui-ux/_1)
 let allDirectoryStudents = [];
 async function loadStudentsDirectory() {
-  const tbody = document.getElementById('students-directory-tbody');
-  if (!tbody) return;
-
   const container = document.getElementById('students-directory-list') || document.getElementById('students-directory-tbody');
-  if (container) {
-    container.innerHTML = '<div style="text-align:center; padding:28px; color:var(--text-dim); font-weight:700;">⏳ جاري جلب بيانات الطلاب...</div>';
-  }
+  if (!container) return;
+
+  container.innerHTML = '<div style="text-align:center; padding:32px; color:var(--text-dim); font-weight:700;">⏳ جاري جلب بيانات الطلاب...</div>';
 
   let students = [];
   if (window.CloudDB && window.CloudDB.getAllStudents) {
-    students = await window.CloudDB.getAllStudents();
+    try {
+      students = await window.CloudDB.getAllStudents();
+    } catch (e) {}
   }
 
-  if (students.length === 0) {
+  if (!students || students.length === 0) {
     students = await getAllLocalStudents();
   }
 
@@ -3152,11 +3172,12 @@ function updateDirectoryCounts(students) {
     else counts[st.department] = (counts[st.department] || 0) + 1;
   });
 
-  document.getElementById('count-dir-all').innerText = counts.all;
-  document.getElementById('count-dir-alat').innerText = counts['آلات'];
-  document.getElementById('count-dir-nuzum').innerText = counts['نظم'];
-  document.getElementById('count-dir-ray').innerText = counts['ري'];
-  document.getElementById('count-dir-aam').innerText = counts['عام'];
+  if (document.getElementById('count-dir-all')) document.getElementById('count-dir-all').innerText = counts.all;
+  if (document.getElementById('count-dir-alat')) document.getElementById('count-dir-alat').innerText = counts['آلات'];
+  if (document.getElementById('count-dir-nuzum')) document.getElementById('count-dir-nuzum').innerText = counts['نظم'];
+  if (document.getElementById('count-dir-ray')) document.getElementById('count-dir-ray').innerText = counts['ري'];
+  if (document.getElementById('count-dir-aam')) document.getElementById('count-dir-aam').innerText = counts['عام'];
+  if (document.getElementById('count-dir-total')) document.getElementById('count-dir-total').innerText = counts.all;
 }
 
 function renderStudentsDirectoryRows(students) {
@@ -3175,44 +3196,46 @@ function renderStudentsDirectoryRows(students) {
   }
 
   students.forEach((st, idx) => {
-    const card = document.createElement('div');
-    card.className = 'student-card-box';
-    const badgeClass = getDeptBadgeClass(st.department);
-    const dateStr = st.registered_at ? new Date(st.registered_at).toLocaleDateString('ar-EG') : '—';
-    const yearOrSection = st.academic_year || (st.department ? `قسم ${st.department}` : 'طالب');
+    const card = document.createElement('article');
+    card.className = 'student-dir-card';
+    card.setAttribute('data-purpose', 'student-card-item');
+
+    const dateStr = st.registered_at ? new Date(st.registered_at).toLocaleDateString('ar-EG') : '٢٠٢٦/١١/٩';
+    const dept = st.department || 'عام';
+    const year = st.academic_year || '';
 
     card.innerHTML = `
-      <!-- السطر الأول: الترقيم + الاسم ثلاثي + شارة القسم + زر المراسلة -->
-      <div class="student-card-line-1">
-        <div class="student-card-main-meta">
-          <span class="student-card-idx">#${idx + 1}</span>
-          <h4 class="student-card-name" title="${st.full_name}">${st.full_name}</h4>
-          <span class="table-dept-badge ${badgeClass}">${st.department || 'عام'}</span>
+      <div class="student-dir-card-body">
+        <div class="student-dir-info-side">
+          <!-- Index Badge -->
+          <div class="student-dir-index-badge">#${idx + 1}</div>
+          <div class="student-dir-details">
+            <!-- Row 1: Student Name + Dept Badge + Year Badge -->
+            <div class="student-dir-name-row">
+              <h4 class="student-dir-name">${st.full_name}</h4>
+              <span class="student-dir-dept-tag">${dept}</span>
+              ${year ? `<span class="student-dir-year-tag">${year}</span>` : ''}
+            </div>
+            <!-- Row 2: National ID + Register Date -->
+            <div class="student-dir-meta-row">
+              <div class="student-dir-meta-item">
+                <span class="meta-label">الرقم القومي:</span>
+                <span class="meta-nid font-mono-numbers">${st.national_id}</span>
+              </div>
+              <div class="student-dir-meta-item">
+                <span class="meta-label">تاريخ التسجيل:</span>
+                <span class="meta-date font-mono-numbers">${dateStr}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="student-card-actions">
-          <button type="button" class="btn-card-msg btn-direct-msg-student" data-nid="${st.national_id}" data-name="${st.full_name}">
-            <span>✉️</span>
-            <span>مراسلة</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- السطر الثاني: الرقم القومي + الفرقة/السكشن + تاريخ التسجيل -->
-      <div class="student-card-line-2">
-        <div class="student-meta-item">
-          <span class="meta-icon">🪪</span>
-          <span class="meta-label">الرقم القومي:</span>
-          <strong class="meta-val nid-text">${st.national_id}</strong>
-        </div>
-        <div class="student-meta-item">
-          <span class="meta-icon">🏛️</span>
-          <span class="meta-label">الفرقة:</span>
-          <strong class="meta-val">${yearOrSection}</strong>
-        </div>
-        <div class="student-meta-item meta-date">
-          <span class="meta-icon">📅</span>
-          <span class="meta-val">${dateStr}</span>
-        </div>
+        <!-- Message Button -->
+        <button type="button" class="student-dir-msg-action btn-direct-msg-student" aria-label="إرسال رسالة إلى ${st.full_name}" data-nid="${st.national_id}" data-name="${st.full_name}">
+          <svg class="msg-svg" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+          <span class="msg-label">رسالة</span>
+        </button>
       </div>
     `;
 
