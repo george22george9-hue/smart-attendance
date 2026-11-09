@@ -25,10 +25,10 @@
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
   <link rel="stylesheet" href="./css/style.css?v=7.1">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v7.1) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v7.2) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v7.1-student-auth-grades';
+      const CURRENT_VERSION = 'v7.2-student-auth-grades';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
         // Clear cached assets to ensure fresh JS/CSS files without deleting student profile!
@@ -75,7 +75,7 @@
         </div>
         <div class="brand-text-wrap">
           <span class="brand-title-text">Agricultural engineer</span>
-          <span class="version-tag">v7.1</span>
+          <span class="version-tag">v7.2</span>
         </div>
       </div>
 
@@ -150,7 +150,7 @@
           <!-- Subtle App Refresh Trigger -->
           <div style="margin-top: 14px; text-align: center;">
             <button id="btn-force-update-app" class="tool-btn" onclick="window.forceUpdateApp && window.forceUpdateApp()" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
-              <span>🔄 تحديث التطبيق ومسح الكاش (v7.1)</span>
+              <span>🔄 تحديث التطبيق ومسح الكاش (v7.2)</span>
             </button>
           </div>
 
@@ -873,37 +873,56 @@
 
         <!-- Subpanel 2: Students Directory -->
         <div id="panel-inst-students" class="instructor-subpanel" style="display: none;">
-          <div class="glass-panel" style="padding: 20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-              <div>
-                <h4 style="font-size:1.1rem; color: var(--text-main);">دليل وبيانات جميع الطلاب المسجلين</h4>
-                <p style="font-size:0.8rem; color:var(--text-muted);">يمكنك استعراض بيانات كل طالب وإرسال رسالة مباشرة إليه</p>
+          <div class="glass-panel" style="padding: 22px 18px;">
+            <div class="students-dir-header">
+              <div class="students-dir-title-wrap">
+                <h4 style="font-size:1.15rem; font-weight:800; color: var(--text-main); margin-bottom: 3px;">دليل وبيانات جميع الطلاب المسجلين</h4>
+                <p style="font-size:0.82rem; color:var(--text-muted);">استعراض بيانات الطلاب والبحث ومراسلتهم مباشرة</p>
               </div>
-              <div class="search-input-box" style="max-width: 300px;">
-                <input type="text" id="students-directory-search" placeholder="بحث بالاسم أو الرقم القومي...">
+              <div class="search-input-box">
                 <span class="search-icon">🔍</span>
+                <input type="text" id="students-directory-search" placeholder="بحث بالاسم أو الرقم القومي...">
               </div>
             </div>
 
             <!-- Dept Filter Chips -->
-            <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
-              <button class="tool-btn filter-dept-btn active" data-dept="all" style="background: rgba(6,182,212,0.15); color: var(--cyan-light);">الكل (<span id="count-dir-all">0</span>)</button>
-              <button class="tool-btn filter-dept-btn" data-dept="آلات" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">آلات (<span id="count-dir-alat">0</span>)</button>
-              <button class="tool-btn filter-dept-btn" data-dept="نظم" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">نظم (<span id="count-dir-nuzum">0</span>)</button>
-              <button class="tool-btn filter-dept-btn" data-dept="ري" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">ري (<span id="count-dir-ray">0</span>)</button>
-              <button class="tool-btn filter-dept-btn" data-dept="عام" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">عام (<span id="count-dir-aam">0</span>)</button>
+            <div class="dept-filter-bar">
+              <button type="button" class="filter-dept-btn active" data-dept="all">
+                <span>الكل</span>
+                <span class="chip-count">(<span id="count-dir-all">0</span>)</span>
+              </button>
+              <button type="button" class="filter-dept-btn" data-dept="آلات">
+                <span>آلات</span>
+                <span class="chip-count">(<span id="count-dir-alat">0</span>)</span>
+              </button>
+              <button type="button" class="filter-dept-btn" data-dept="نظم">
+                <span>نظم</span>
+                <span class="chip-count">(<span id="count-dir-nuzum">0</span>)</span>
+              </button>
+              <button type="button" class="filter-dept-btn" data-dept="ري">
+                <span>ري</span>
+                <span class="chip-count">(<span id="count-dir-ray">0</span>)</span>
+              </button>
+              <button type="button" class="filter-dept-btn" data-dept="عام">
+                <span>عام</span>
+                <span class="chip-count">(<span id="count-dir-aam">0</span>)</span>
+              </button>
+            </div>
+
+            <div class="table-scroll-hint">
+              <span>👈 مرر الجدول أفقياً لتصفح كامل البيانات 👉</span>
             </div>
 
             <div class="table-responsive">
               <table class="glass-table">
                 <thead>
                   <tr>
-                    <th>م</th>
+                    <th style="width: 44px; text-align: center;">#</th>
                     <th>الاسم ثلاثي</th>
                     <th>الرقم القومي</th>
                     <th>القسم</th>
                     <th>تاريخ التسجيل</th>
-                    <th>إجراء</th>
+                    <th style="text-align: center;">إجراء</th>
                   </tr>
                 </thead>
                 <tbody id="students-directory-tbody">

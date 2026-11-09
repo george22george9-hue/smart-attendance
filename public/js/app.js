@@ -2864,7 +2864,7 @@ function initApp() {
     setupInstructorPortalTabs();
     setupGlobalEvents();
     registerServiceWorker();
-    console.log('Agricultural engineer PWA v7.1 initialized successfully.');
+    console.log('Agricultural engineer PWA v7.2 initialized successfully.');
   } catch (e) {
     console.error('Error during initApp:', e);
   }
@@ -3107,12 +3107,12 @@ function setupInstructorPortalTabs() {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-dept-btn').forEach(b => {
         b.classList.remove('active');
-        b.style.background = 'rgba(255,255,255,0.06)';
-        b.style.color = 'var(--text-muted)';
+        b.style.background = '';
+        b.style.color = '';
       });
       btn.classList.add('active');
-      btn.style.background = 'rgba(6,182,212,0.15)';
-      btn.style.color = 'var(--cyan-light)';
+      btn.style.background = '';
+      btn.style.color = '';
 
       const dept = btn.getAttribute('data-dept');
       filterStudentsByDept(dept);
@@ -3171,14 +3171,14 @@ function renderStudentsDirectoryRows(students) {
     const dateStr = st.registered_at ? new Date(st.registered_at).toLocaleDateString('ar-EG') : '';
 
     tr.innerHTML = `
-      <td>${idx + 1}</td>
-      <td style="font-weight:700; color:var(--text-main);">${st.full_name}</td>
-      <td style="font-family:monospace; color:#cbd5e1;">${st.national_id}</td>
+      <td style="text-align:center; font-weight:700; color:var(--text-dim);">${idx + 1}</td>
+      <td style="font-weight:800; color:var(--text-main); font-size:0.95rem;">${st.full_name}</td>
+      <td style="font-family:monospace; font-weight:700; letter-spacing:0.5px; color:var(--text-dark);">${st.national_id}</td>
       <td><span class="table-dept-badge ${badgeClass}">${st.department}</span></td>
-      <td style="color:var(--text-muted); font-size:0.82rem;">${dateStr}</td>
-      <td>
-        <button class="tool-btn btn-direct-msg-student" data-nid="${st.national_id}" data-name="${st.full_name}" style="background:rgba(6,182,212,0.15); color:var(--cyan-light); padding:5px 10px; font-size:0.8rem;">
-          ✉️ رسالة
+      <td style="color:var(--text-muted); font-size:0.84rem;">${dateStr}</td>
+      <td style="text-align:center;">
+        <button class="tool-btn btn-direct-msg-student" data-nid="${st.national_id}" data-name="${st.full_name}" style="background:var(--bg-secondary); border-color:var(--card-border); color:var(--emerald-light); padding:6px 14px; font-size:0.82rem; border-radius:var(--radius-full); font-weight:700;">
+          ✉️ مراسلة
         </button>
       </td>
     `;
