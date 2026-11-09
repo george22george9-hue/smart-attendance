@@ -245,8 +245,21 @@ function resetStudentForm() {
   if (firstRadio) firstRadio.checked = true;
 }
 
-// Force Update and Clear Cache
+// Force Update and Clear All Local Data & Test Profiles
 async function forceUpdateApp() {
+  try {
+    localStorage.removeItem('student_profile');
+    localStorage.removeItem('app_lectures');
+    localStorage.removeItem('app_attendance');
+    localStorage.removeItem('app_messages');
+  } catch (e) {}
+
+  if ('indexedDB' in window) {
+    try {
+      window.indexedDB.deleteDatabase('SmartAttendanceDB');
+    } catch (e) {}
+  }
+
   if ('caches' in window) {
     try {
       const keys = await caches.keys();
@@ -262,7 +275,7 @@ async function forceUpdateApp() {
     } catch (e) {}
   }
   localStorage.removeItem('smart_attendance_build');
-  showToast('جاري تحديث التطبيق ومسح الكاش...', 'info');
+  showToast('تم مسح البيانات التجريبية والكاش بنجاح 🧹', 'success');
   setTimeout(() => {
     window.location.reload(true);
   }, 400);
@@ -1540,6 +1553,17 @@ function setupGlobalEvents() {
     });
   });
 
+  // Factory Reset All Data Button (Developer Portal)
+  document.getElementById('btn-factory-reset-data')?.addEventListener('click', async () => {
+    if (confirm('تحذير: هل أنت متأكد من تصفير ومسح كافة بيانات الطلاب وسجل الحضور والمحاضرات التجريبية؟')) {
+      showToast('جاري تصفير ومسح كافة البيانات...', 'info');
+      if (window.CloudDB && window.CloudDB.clearAllTestData) {
+        await window.CloudDB.clearAllTestData();
+      }
+      await forceUpdateApp();
+    }
+  });
+
   // Close modal when clicking outside dialog
   document.querySelectorAll('.modal-backdrop').forEach(modal => {
     modal.addEventListener('click', (e) => {
@@ -1615,7 +1639,7 @@ function initApp() {
     setupInstructorPortalTabs();
     setupGlobalEvents();
     registerServiceWorker();
-    console.log('Smart Attendance PWA v5.7 initialized successfully.');
+    console.log('Agricultural engineer PWA v5.9 initialized successfully.');
   } catch (e) {
     console.error('Error during initApp:', e);
   }

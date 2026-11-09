@@ -1,9 +1,9 @@
 {
-  "id": "/?v=5.7",
-  "name": "نظام الحضور والغياب الذكي",
-  "short_name": "حضور وغياب",
-  "description": "تطبيق تسجيل الحضور والغياب الذكي للطلاب والمحاضرين عبر QR Code بتقنية PWA مع دعم العمل دون إنترنت",
-  "start_url": "./index.html?v=5.7",
+  "id": "/?v=5.9",
+  "name": "Agricultural engineer",
+  "short_name": "Agricultural engineer",
+  "description": "Agricultural engineer - منظومة الحضور والغياب الذكي للطلاب والمحاضرين عبر QR Code بتقنية PWA مع دعم العمل دون إنترنت",
+  "start_url": "./index.html?v=5.9",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -13,25 +13,25 @@
   "dir": "rtl",
   "icons": [
     {
-      "src": "./icons/icon-192.png?v=5.7",
+      "src": "./icons/icon-192.png?v=5.9",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icons/icon-maskable-192.png?v=5.7",
+      "src": "./icons/icon-maskable-192.png?v=5.9",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "./icons/icon-512.png?v=5.7",
+      "src": "./icons/icon-512.png?v=5.9",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icons/icon-maskable-512.png?v=5.7",
+      "src": "./icons/icon-maskable-512.png?v=5.9",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

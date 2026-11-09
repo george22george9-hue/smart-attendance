@@ -366,6 +366,38 @@ const CloudDB = {
       } catch (e) {}
     }
     return localStorage.getItem(key) || defaultVal;
+  },
+
+  // 13. Factory Reset / Clear All Test Data (preserves settings/admin & developer PIN)
+  async clearAllTestData() {
+    if (cloudDb) {
+      try {
+        const collections = ['attendance', 'lectures', 'students', 'announcements'];
+        for (const col of collections) {
+          const snap = await cloudDb.collection(col).get();
+          if (!snap.empty) {
+            const batch = cloudDb.batch();
+            snap.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+          }
+        }
+      } catch (err) {
+        console.warn('[Firebase] Clear test data error:', err);
+      }
+    }
+    try {
+      localStorage.removeItem('student_profile');
+      localStorage.removeItem('app_lectures');
+      localStorage.removeItem('app_attendance');
+      localStorage.removeItem('app_messages');
+    } catch (e) {}
+
+    if ('indexedDB' in window) {
+      try {
+        window.indexedDB.deleteDatabase('SmartAttendanceDB');
+      } catch (e) {}
+    }
+    return true;
   }
 };
 
