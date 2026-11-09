@@ -850,6 +850,17 @@ function setupInstructorFlow() {
     });
   }
 
+  // Instructor Logout button
+  document.getElementById('btn-inst-logout')?.addEventListener('click', () => {
+    state.currentInstructor = null;
+    if (instMsgUnsubscribe) {
+      instMsgUnsubscribe();
+      instMsgUnsubscribe = null;
+    }
+    showToast('تم تسجيل الخروج من حساب المحاضر بنجاح 👋', 'info');
+    showView('view-landing');
+  });
+
   // "بدء محاضرة جديدة" button
   const newLecBtn = document.getElementById('btn-open-new-lecture-modal');
   if (newLecBtn) {
@@ -2082,9 +2093,23 @@ async function handleChangeDevMasterPinSubmit() {
   showToast('تم تغيير وحفظ كلمة سر المطور الجديدة بنجاح 🔒', 'success');
 }
 
-// Load Instructor Dashboard & Lectures
+// Load Instructor Dashboard & Lectures (Strictly isolated per doctor)
 async function loadInstructorDashboard() {
   try {
+    const currentDoc = state.currentInstructor;
+    const currentDocId = currentDoc ? String(currentDoc.id || '').trim() : '';
+    const currentDocName = currentDoc ? String(currentDoc.name || '').trim() : '';
+
+    // Update Header with active doctor info
+    const headerTitle = document.getElementById('inst-dashboard-header-title');
+    if (headerTitle) {
+      headerTitle.innerText = currentDocName ? `لوحة المحاضر: ${currentDocName}` : 'لوحة تحكم المحاضر';
+    }
+    const headerDept = document.getElementById('inst-dashboard-header-dept');
+    if (headerDept && currentDoc) {
+      headerDept.innerText = `${currentDoc.role || 'عضو هيئة تدريس'} • قسم ${currentDoc.department || 'عام'}`;
+    }
+
     let lectures = [];
     if (window.CloudDB && window.CloudDB.getAllLectures) {
       try {
@@ -2096,6 +2121,17 @@ async function loadInstructorDashboard() {
     if (!lectures || lectures.length === 0) {
       lectures = await getAllLocalLectures();
     }
+
+    // Strictly filter lectures to only those created by this doctor
+    const myLectures = lectures.filter(lec => {
+      if (currentDocId && lec.instructor_id) {
+        return String(lec.instructor_id).trim() === currentDocId;
+      }
+      if (currentDocName && lec.instructor_name) {
+        return String(lec.instructor_name).trim() === currentDocName;
+      }
+      return false;
+    });
 
     let students = [];
     if (window.CloudDB && window.CloudDB.getAllStudents) {
@@ -2116,24 +2152,24 @@ async function loadInstructorDashboard() {
       } catch (e) {}
     }
 
-    document.getElementById('metric-total-lectures').innerText = lectures.length;
+    document.getElementById('metric-total-lectures').innerText = myLectures.length;
     document.getElementById('metric-total-students').innerText = students.length;
 
     const listContainer = document.getElementById('instructor-lectures-list');
     listContainer.innerHTML = '';
 
-    if (lectures.length === 0) {
+    if (myLectures.length === 0) {
       listContainer.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">📋</div>
-          <p>لا توجد جلسات أو محاضرات سابقة مسجلة على هذا الجهاز</p>
-          <p style="font-size:0.85rem; margin-top:4px;">اضغط على "بدء محاضرة جديدة" لأخذ الغياب الآن</p>
+          <p>لا توجد محاضرات أو جلسات خاصة بك (${currentDocName || 'المحاضر'}) مسجلة حتى الآن</p>
+          <p style="font-size:0.85rem; margin-top:4px;">اضغط على "+ بدء محاضرة جديدة" لأخذ الغياب لطلابك الآن</p>
         </div>
       `;
       return;
     }
 
-    for (const lec of lectures) {
+    for (const lec of myLectures) {
       let attCount = 0;
       if (allAtt && allAtt.length > 0) {
         attCount = allAtt.filter(a => a.lecture_id === lec.lecture_id).length;
@@ -2235,6 +2271,8 @@ function openNewLectureModal() {
   if (titleInput) titleInput.value = '';
   if (instructorInput) {
     instructorInput.value = state.currentInstructor ? state.currentInstructor.name : '';
+    instructorInput.readOnly = true;
+    instructorInput.style.opacity = '0.85';
   }
   const defaultRadio = document.querySelector('input[name="session_type"][value="محاضرة نظري"]');
   if (defaultRadio) defaultRadio.checked = true;
@@ -2255,7 +2293,9 @@ async function handleCreateLecture() {
   const title = titleInput.value.trim();
   const targetDept = targetDeptSelect.value;
   const sessionType = sessionTypeRadio ? sessionTypeRadio.value : 'محاضرة نظري';
-  const instructorName = instructorInput ? instructorInput.value.trim() : (state.currentInstructor ? state.currentInstructor.name : '');
+  const currentDoc = state.currentInstructor;
+  const instructorId = currentDoc ? String(currentDoc.id || '').trim() : '';
+  const instructorName = currentDoc ? currentDoc.name : (instructorInput ? instructorInput.value.trim() : '');
 
   if (!title) {
     showToast('يرجى إدخال اسم المحاضرة أو الموضوع', 'warning');
@@ -2268,6 +2308,7 @@ async function handleCreateLecture() {
     lecture_id: lectureId,
     title: title,
     session_type: sessionType,
+    instructor_id: instructorId,
     instructor_name: instructorName,
     target_dept: targetDept,
     lecture_date: new Date().toLocaleDateString('ar-EG'),
@@ -2304,6 +2345,18 @@ async function loadLectureSession(lectureId) {
     if (!lecture) {
       showToast('المحاضرة غير موجودة', 'error');
       return;
+    }
+
+    // Security isolation check: ensure doctor cannot open another doctor's lecture!
+    if (state.currentInstructor && !state.isDeveloper) {
+      const docId = String(state.currentInstructor.id || '').trim();
+      const docName = String(state.currentInstructor.name || '').trim();
+      const isOwner = (lecture.instructor_id && String(lecture.instructor_id).trim() === docId) ||
+                      (lecture.instructor_name && String(lecture.instructor_name).trim() === docName);
+      if (!isOwner) {
+        showToast('عفواً، هذه المحاضرة تابعة لدكتور آخر ولا يمكنك فتحها 🔒', 'error', 3500);
+        return;
+      }
     }
 
     state.currentLecture = lecture;
@@ -3161,9 +3214,11 @@ async function handleBroadcastSubmit() {
   }
 
   const senderDocName = state.currentInstructor ? state.currentInstructor.name : 'المحاضر';
+  const senderDocId = state.currentInstructor ? String(state.currentInstructor.id || '').trim() : '';
   const message = {
     sender: senderDocName,
     sender_name: senderDocName,
+    sender_id: senderDocId,
     target_type: targetType,
     target_value: targetValue,
     title: title,
@@ -3187,10 +3242,13 @@ async function handleBroadcastSubmit() {
   }
 }
 
-// Listen to all sent messages in Instructor Broadcast Center
+// Listen to sent messages in Instructor Broadcast Center (Isolated per doctor)
 let instMsgUnsubscribe = null;
 function initInstructorBroadcast() {
-  if (instMsgUnsubscribe) return;
+  if (instMsgUnsubscribe) {
+    instMsgUnsubscribe();
+    instMsgUnsubscribe = null;
+  }
 
   if (window.CloudDB && window.CloudDB.listenToAllMessages) {
     instMsgUnsubscribe = window.CloudDB.listenToAllMessages((messages) => {
@@ -3203,13 +3261,29 @@ function renderInstructorSentMessages(messages) {
   const container = document.getElementById('sent-messages-list');
   if (!container) return;
 
+  const currentDoc = state.currentInstructor;
+  const currentDocId = currentDoc ? String(currentDoc.id || '').trim() : '';
+  const currentDocName = currentDoc ? String(currentDoc.name || '').trim() : '';
+
+  // Strictly filter messages belonging ONLY to this instructor
+  const myMessages = messages.filter(msg => {
+    if (currentDocId && msg.sender_id) {
+      return String(msg.sender_id).trim() === currentDocId;
+    }
+    if (currentDocName) {
+      return (String(msg.sender_name || '').trim() === currentDocName) ||
+             (String(msg.sender || '').trim() === currentDocName);
+    }
+    return false;
+  });
+
   container.innerHTML = '';
-  if (messages.length === 0) {
-    container.innerHTML = '<p style="text-align:center; color:var(--text-dim); padding:20px;">لم يتم إرسال أي رسائل بعد.</p>';
+  if (myMessages.length === 0) {
+    container.innerHTML = `<p style="text-align:center; color:var(--text-dim); padding:20px;">لم ترسل أي رسائل أو تنبيهات بعد (${currentDocName || 'المحاضر'}).</p>`;
     return;
   }
 
-  messages.forEach(msg => {
+  myMessages.forEach(msg => {
     const card = document.createElement('div');
     card.className = 'message-card';
 

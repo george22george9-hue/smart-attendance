@@ -9,13 +9,13 @@
   <title>Agricultural engineer</title>
 
   <!-- PWA Manifest & App Home Screen Icons (Agricultural Engineer) -->
-  <link rel="manifest" href="./manifest.json?v=6.2">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=6.2">
-  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=6.2">
-  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=6.2">
-  <link rel="shortcut icon" href="./icons/icon-192.png?v=6.2">
-  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=6.2">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=6.2">
+  <link rel="manifest" href="./manifest.json?v=6.4">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=6.4">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=6.4">
+  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=6.4">
+  <link rel="shortcut icon" href="./icons/icon-192.png?v=6.4">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=6.4">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=6.4">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,12 +23,12 @@
   <meta name="application-name" content="Agricultural engineer">
 
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=6.2">
+  <link rel="stylesheet" href="./css/style.css?v=6.4">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v6.3) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v6.4) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v6.3-student-auth-grades';
+      const CURRENT_VERSION = 'v6.4-student-auth-grades';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
         // Clear cached assets to ensure fresh JS/CSS files without deleting student profile!
@@ -62,11 +62,11 @@
     <header class="app-header">
       <div class="brand-container btn-back-landing" title="الصفحة الرئيسية">
         <div class="brand-logo">
-          <img src="./icons/icon-192.png?v=6.2" alt="Logo" class="brand-logo-img">
+          <img src="./icons/icon-192.png?v=6.4" alt="Logo" class="brand-logo-img">
         </div>
         <div class="brand-text-wrap">
           <span class="brand-title-text">Agricultural engineer</span>
-          <span class="version-tag">v6.3</span>
+          <span class="version-tag">v6.4</span>
         </div>
       </div>
 
@@ -95,7 +95,7 @@
           <!-- Clean App Header with Agricultural Engineer Emblem -->
           <div class="simple-brand-header">
             <div class="agri-eng-badge" title="Agricultural engineer" style="overflow: hidden; padding: 0;">
-              <img src="./icons/icon-192.png?v=6.2" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
+              <img src="./icons/icon-192.png?v=6.4" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
             </div>
             <h2 class="simple-app-title">Agricultural engineer</h2>
             <p class="simple-app-sub">منظومة الحضور والغياب الذكي بالـ QR Code</p>
@@ -133,7 +133,7 @@
           <!-- Subtle App Refresh Trigger -->
           <div style="margin-top: 14px; text-align: center;">
             <button id="btn-force-update-app" class="tool-btn" onclick="window.forceUpdateApp && window.forceUpdateApp()" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
-              <span>🔄 تحديث التطبيق ومسح الكاش (v6.3)</span>
+              <span>🔄 تحديث التطبيق ومسح الكاش (v6.4)</span>
             </button>
           </div>
 
@@ -784,12 +784,17 @@
            5. INSTRUCTOR FLOW: DASHBOARD & MANAGEMENT PORTAL
            =================================================================== -->
       <section id="view-instructor-dashboard" class="view-section">
-        <div class="panel-header">
-          <h3 class="panel-title">
-            <span>👨‍🏫</span>
-            <span>لوحة تحكم المحاضر</span>
-          </h3>
-          <button class="back-btn btn-back-landing">
+        <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="doctor-avatar-box" style="border-radius:12px; width:44px; height:44px; background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3); font-size:1.3rem;">👨‍🏫</div>
+            <div>
+              <h3 id="inst-dashboard-header-title" class="panel-title" style="margin:0; font-size:1.15rem; font-weight:800; color:#fff;">لوحة تحكم المحاضر</h3>
+              <div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
+                <span id="inst-dashboard-header-dept" class="dept-badge" style="background:rgba(6,182,212,0.15); color:var(--cyan-light); font-size:0.75rem;">عضو هيئة تدريس</span>
+              </div>
+            </div>
+          </div>
+          <button id="btn-inst-logout" class="back-btn" style="color:var(--rose-danger); border-color:rgba(244,63,94,0.3);" title="تسجيل خروج">
             <span>خروج</span>
             <span>🚪</span>
           </button>
@@ -1482,19 +1487,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=6.2"></script>
+  <script src="./js/firebase-app.js?v=6.4"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=6.2"></script>
-  <script src="./libs/html5-qrcode.min.js?v=6.2"></script>
-  <script src="./libs/xlsx.full.min.js?v=6.2"></script>
+  <script src="./libs/qrcode.js?v=6.4"></script>
+  <script src="./libs/html5-qrcode.min.js?v=6.4"></script>
+  <script src="./libs/xlsx.full.min.js?v=6.4"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=6.2"></script>
-  <script src="./js/sync.js?v=6.2"></script>
-  <script src="./js/qr-scanner.js?v=6.2"></script>
-  <script src="./js/excel.js?v=6.2"></script>
-  <script src="./js/app.js?v=6.2"></script>
+  <script src="./js/db.js?v=6.4"></script>
+  <script src="./js/sync.js?v=6.4"></script>
+  <script src="./js/qr-scanner.js?v=6.4"></script>
+  <script src="./js/excel.js?v=6.4"></script>
+  <script src="./js/app.js?v=6.4"></script>
 
 </body>
 </html>

@@ -108,6 +108,7 @@ async function saveLocalLecture(lecture) {
       lecture_id: lecture.lecture_id,
       title: lecture.title,
       session_type: lecture.session_type || 'محاضرة نظري',
+      instructor_id: lecture.instructor_id || '',
       instructor_name: lecture.instructor_name || '',
       target_dept: lecture.target_dept || 'الكل',
       lecture_date: lecture.lecture_date || new Date().toLocaleDateString('ar-EG'),

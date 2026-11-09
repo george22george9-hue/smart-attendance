@@ -135,6 +135,7 @@ const CloudDB = {
         lecture_id: lecId,
         title: lecture.title,
         session_type: lecture.session_type || 'محاضرة نظري',
+        instructor_id: lecture.instructor_id || '',
         instructor_name: lecture.instructor_name || '',
         target_dept: lecture.target_dept || 'الكل',
         lecture_date: lecture.lecture_date,
@@ -283,6 +284,7 @@ const CloudDB = {
       const payload = {
         id: docRef.id,
         sender: message.sender || 'المحاضر',
+        sender_id: message.sender_id || '',
         sender_name: message.sender_name || 'دكتور المحاضرة',
         target_type: message.target_type || 'all', // 'all' | 'dept' | 'student'
         target_value: message.target_value || '',  // dept name or national_id
