@@ -212,7 +212,7 @@ function setupSyncUI() {
 }
 
 // ==========================================================================
-// 2. Student Flow (Form & QR Code Generation)
+// 2. Student Flow (Auth, Persistent Sessions, Year/Section & QR Card)
 // ==========================================================================
 function initStudentFlow() {
   try {
@@ -220,32 +220,62 @@ function initStudentFlow() {
     if (localData) {
       try {
         state.currentStudent = JSON.parse(localData);
-        renderStudentQrCard(state.currentStudent);
-        initStudentInboxListener(state.currentStudent);
-        showView('view-student-card');
-        return;
+        if (state.currentStudent && state.currentStudent.national_id) {
+          renderStudentQrCard(state.currentStudent);
+          initStudentInboxListener(state.currentStudent);
+          showView('view-student-card');
+          return;
+        }
       } catch (e) {
         console.warn('Error reading saved student profile:', e);
       }
     }
 
-    // Not registered yet, show registration form
-    resetStudentForm();
+    // No active session: show login/register portal
+    switchStudentAuthTab('login');
     showView('view-student-form');
   } catch (err) {
     console.error('initStudentFlow error:', err);
+    switchStudentAuthTab('login');
     showView('view-student-form');
   }
 }
 window.initStudentFlow = initStudentFlow;
 
+function switchStudentAuthTab(mode) {
+  const loginBtn = document.getElementById('tab-btn-student-login');
+  const regBtn = document.getElementById('tab-btn-student-register');
+  const loginForm = document.getElementById('student-login-form');
+  const regForm = document.getElementById('student-reg-form');
+
+  if (mode === 'register') {
+    if (regBtn) regBtn.classList.add('active');
+    if (loginBtn) loginBtn.classList.remove('active');
+    if (regForm) regForm.style.display = 'block';
+    if (loginForm) loginForm.style.display = 'none';
+  } else {
+    if (loginBtn) loginBtn.classList.add('active');
+    if (regBtn) regBtn.classList.remove('active');
+    if (loginForm) loginForm.style.display = 'block';
+    if (regForm) regForm.style.display = 'none';
+  }
+}
+window.switchStudentAuthTab = switchStudentAuthTab;
+
 function resetStudentForm() {
   const nameInput = document.getElementById('student-name-input');
   const nidInput = document.getElementById('student-nid-input');
+  const passInput = document.getElementById('student-password-input');
+  const secInput = document.getElementById('student-section-input');
   if (nameInput) nameInput.value = '';
   if (nidInput) nidInput.value = '';
-  const firstRadio = document.querySelector('input[name="student_dept"][value="آلات"]');
-  if (firstRadio) firstRadio.checked = true;
+  if (passInput) passInput.value = '';
+  if (secInput) secInput.value = '';
+  const firstYearRadio = document.querySelector('input[name="student_year"][value="الفرقة الأولى"]');
+  if (firstYearRadio) {
+    firstYearRadio.checked = true;
+    firstYearRadio.dispatchEvent(new Event('change'));
+  }
 }
 
 // Force Update and Clear All Local Data & Test Profiles
@@ -286,22 +316,56 @@ async function forceUpdateApp() {
 window.forceUpdateApp = forceUpdateApp;
 
 function setupStudentFormEvents() {
-  const nidInput = document.getElementById('student-nid-input');
-  const nameInput = document.getElementById('student-name-input');
-  const form = document.getElementById('student-reg-form');
+  // 1. Tab Switchers
+  const tabLoginBtn = document.getElementById('tab-btn-student-login');
+  const tabRegBtn = document.getElementById('tab-btn-student-register');
+  const switchToRegBtn = document.getElementById('btn-switch-to-register');
+  const switchToLoginBtn = document.getElementById('btn-switch-to-login');
 
-  // Auto-convert Arabic numerals to English digits in real-time
-  if (nidInput) {
-    nidInput.addEventListener('input', (e) => {
-      const converted = convertArabicDigitsToEnglish(e.target.value).replace(/\D/g, '');
-      e.target.value = converted.slice(0, 14);
+  if (tabLoginBtn) tabLoginBtn.addEventListener('click', () => switchStudentAuthTab('login'));
+  if (tabRegBtn) tabRegBtn.addEventListener('click', () => switchStudentAuthTab('register'));
+  if (switchToRegBtn) switchToRegBtn.addEventListener('click', () => switchStudentAuthTab('register'));
+  if (switchToLoginBtn) switchToLoginBtn.addEventListener('click', () => switchStudentAuthTab('login'));
+
+  // 2. Password Visibility Toggles
+  const btnToggleLoginPass = document.getElementById('btn-toggle-student-login-pass');
+  const loginPassInput = document.getElementById('login-student-pass');
+  if (btnToggleLoginPass && loginPassInput) {
+    btnToggleLoginPass.addEventListener('click', () => {
+      const isPass = loginPassInput.type === 'password';
+      loginPassInput.type = isPass ? 'text' : 'password';
+      btnToggleLoginPass.innerText = isPass ? '🙈' : '👁️';
     });
   }
 
-  // Reject non-Arabic characters in name
+  const btnToggleRegPass = document.getElementById('btn-toggle-student-reg-pass');
+  const regPassInput = document.getElementById('student-password-input');
+  if (btnToggleRegPass && regPassInput) {
+    btnToggleRegPass.addEventListener('click', () => {
+      const isPass = regPassInput.type === 'password';
+      regPassInput.type = isPass ? 'text' : 'password';
+      btnToggleRegPass.innerText = isPass ? '🙈' : '👁️';
+    });
+  }
+
+  // 3. Real-time digit normalization
+  const loginNidInput = document.getElementById('login-student-nid');
+  if (loginNidInput) {
+    loginNidInput.addEventListener('input', (e) => {
+      e.target.value = convertArabicDigitsToEnglish(e.target.value).replace(/\D/g, '').slice(0, 14);
+    });
+  }
+
+  const regNidInput = document.getElementById('student-nid-input');
+  if (regNidInput) {
+    regNidInput.addEventListener('input', (e) => {
+      e.target.value = convertArabicDigitsToEnglish(e.target.value).replace(/\D/g, '').slice(0, 14);
+    });
+  }
+
+  const nameInput = document.getElementById('student-name-input');
   if (nameInput) {
     nameInput.addEventListener('input', (e) => {
-      // Clean leading numbers or English letters if pasted
       const cleaned = e.target.value.replace(/[^ \u0600-\u06FF]/g, '');
       if (cleaned !== e.target.value) {
         e.target.value = cleaned;
@@ -309,64 +373,201 @@ function setupStudentFormEvents() {
     });
   }
 
-  if (form) {
-    form.addEventListener('submit', async (e) => {
+  // 4. Dynamic Academic Year & Department / Section Switching
+  const yearRadios = document.querySelectorAll('input[name="student_year"]');
+  const sectionInputGroup = document.getElementById('section-input-group');
+  const deptRadiosGroup = document.getElementById('dept-radios-group');
+  const sectionInput = document.getElementById('student-section-input');
+
+  yearRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const isYear4 = e.target.value === 'الفرقة الرابعة';
+      if (isYear4) {
+        if (sectionInputGroup) sectionInputGroup.style.display = 'none';
+        if (deptRadiosGroup) deptRadiosGroup.style.display = 'block';
+        if (sectionInput) sectionInput.required = false;
+      } else {
+        if (sectionInputGroup) sectionInputGroup.style.display = 'block';
+        if (deptRadiosGroup) deptRadiosGroup.style.display = 'none';
+        if (sectionInput) sectionInput.required = true;
+      }
+    });
+  });
+
+  // 5. SUBMIT: Student Login Form
+  const loginForm = document.getElementById('student-login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nidVal = loginNidInput ? loginNidInput.value.trim() : '';
+      const passVal = loginPassInput ? loginPassInput.value.trim() : '';
+
+      const nidCheck = validateNationalId(nidVal);
+      if (!nidCheck.valid) {
+        showToast(nidCheck.message, 'error');
+        loginNidInput?.focus();
+        return;
+      }
+
+      if (!passVal) {
+        showToast('يرجى إدخال كلمة المرور الخاصة بحسابك 🔒', 'error');
+        loginPassInput?.focus();
+        return;
+      }
+
+      showToast('جاري التحقق من بيانات الدخول...', 'info', 1000);
+
+      try {
+        let student = null;
+        if (window.CloudDB && window.CloudDB.getStudent) {
+          student = await window.CloudDB.getStudent(nidVal);
+        }
+        if (!student && typeof getLocalStudent === 'function') {
+          student = await getLocalStudent(nidVal);
+        }
+
+        if (!student) {
+          showToast(`عفواً، لا يوجد حساب مسجل بالرقم القومي (${nidVal})! يرجى إنشاء حساب جديد أولاً 📝`, 'error', 3500);
+          switchStudentAuthTab('register');
+          if (regNidInput) regNidInput.value = nidVal;
+          return;
+        }
+
+        // Verify password
+        if (student.password) {
+          if (String(student.password).trim() !== passVal) {
+            showToast('كلمة المرور غير صحيحة! يرجى التأكد وإعادة المحاولة 🔒', 'error', 3000);
+            loginPassInput?.focus();
+            return;
+          }
+        } else {
+          // Legacy account without password - set this password as their master password
+          student.password = passVal;
+          if (window.CloudDB && window.CloudDB.saveStudent) {
+            await window.CloudDB.saveStudent(student);
+          }
+          if (typeof saveLocalStudent === 'function') {
+            await saveLocalStudent(student);
+          }
+        }
+
+        // Persistent save to LocalStorage & memory state
+        localStorage.setItem('student_profile', JSON.stringify(student));
+        state.currentStudent = student;
+
+        renderStudentQrCard(student);
+        initStudentInboxListener(student);
+        showToast(`أهلاً بك يا ${student.full_name} 👋 تم تسجيل الدخول بنجاح`, 'success');
+        showView('view-student-card');
+      } catch (err) {
+        console.error('Login error:', err);
+        showToast('حدث خطأ أثناء تسجيل الدخول: ' + (err.message || ''), 'error');
+      }
+    });
+  }
+
+  // 6. SUBMIT: Student Registration Form
+  const regForm = document.getElementById('student-reg-form');
+  if (regForm) {
+    regForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const nameVal = nameInput.value.trim();
-      const nidVal = nidInput.value.trim();
-      const deptEl = document.querySelector('input[name="student_dept"]:checked');
-      const deptVal = deptEl ? deptEl.value : 'آلات';
+      const nameVal = nameInput ? nameInput.value.trim() : '';
+      const nidVal = regNidInput ? regNidInput.value.trim() : '';
+      const passVal = regPassInput ? regPassInput.value.trim() : '';
+
+      const selectedYearRadio = document.querySelector('input[name="student_year"]:checked');
+      const selectedYear = selectedYearRadio ? selectedYearRadio.value : 'الفرقة الأولى';
+
+      let deptVal = '';
+      if (selectedYear === 'الفرقة الرابعة') {
+        const specRadio = document.querySelector('input[name="student_dept_specialty"]:checked');
+        deptVal = specRadio ? specRadio.value : 'عام';
+      } else {
+        deptVal = sectionInput ? sectionInput.value.trim() : '';
+        if (!deptVal) {
+          showToast('يرجى كتابة رقم السكشن أو القسم التابع له 🏛️', 'error');
+          sectionInput?.focus();
+          return;
+        }
+      }
 
       // Validations
       const nameCheck = validateArabicFullName(nameVal);
       if (!nameCheck.valid) {
         showToast(nameCheck.message, 'error');
-        nameInput.focus();
+        nameInput?.focus();
         return;
       }
 
       const nidCheck = validateNationalId(nidVal);
       if (!nidCheck.valid) {
         showToast(nidCheck.message, 'error');
-        nidInput.focus();
+        regNidInput?.focus();
         return;
       }
 
-      const studentData = {
-        national_id: nidCheck.nid,
-        full_name: nameVal,
-        department: deptVal,
-        registered_at: new Date().toISOString()
-      };
+      if (!passVal || passVal.length < 4) {
+        showToast('يرجى إدخال كلمة مرور سهلة الحفظ لا تقل عن 4 أحرف أو أرقام 🔒', 'error');
+        regPassInput?.focus();
+        return;
+      }
+
+      showToast('جاري التحقق وإنشاء الحساب...', 'info', 1000);
 
       try {
+        // Check for duplicate National ID
+        let existing = null;
+        if (window.CloudDB && window.CloudDB.getStudent) {
+          existing = await window.CloudDB.getStudent(nidVal);
+        }
+        if (!existing && typeof getLocalStudent === 'function') {
+          existing = await getLocalStudent(nidVal);
+        }
+
+        if (existing) {
+          showToast('هذا الرقم القومي مسجل بالفعل مسبقاً! يرجى تسجيل الدخول مباشرة 🔑', 'warning', 3500);
+          switchStudentAuthTab('login');
+          if (loginNidInput) loginNidInput.value = nidVal;
+          if (loginPassInput) loginPassInput.focus();
+          return;
+        }
+
+        const studentData = {
+          national_id: nidCheck.nid,
+          full_name: nameVal,
+          academic_year: selectedYear,
+          department: deptVal,
+          password: passVal,
+          registered_at: new Date().toISOString()
+        };
+
         // Dual Save:
-        // 1. Save in LocalStorage immediately
+        // 1. Save in LocalStorage (Permanent offline session)
         localStorage.setItem('student_profile', JSON.stringify(studentData));
         state.currentStudent = studentData;
 
-        // 2. Save in IndexedDB (Safe attempt)
+        // 2. Save in IndexedDB
         try {
           await saveLocalStudent(studentData);
         } catch (dbErr) {
           console.warn('IndexedDB save warning (non-fatal):', dbErr);
         }
 
-        // 3. Trigger background sync to server
+        // 3. Trigger background sync
         if (window.syncManager) {
           try { window.syncManager.syncNow(true); } catch (e) {}
         }
 
-        // 4. Save to Firebase Cloud Firestore
+        // 4. Save to Cloud Firestore
         if (window.CloudDB) {
-          try { window.CloudDB.saveStudent(studentData); } catch (e) {}
+          try { await window.CloudDB.saveStudent(studentData); } catch (e) {}
         }
 
         // 5. Generate and show Smart QR Card
         renderStudentQrCard(studentData);
         initStudentInboxListener(studentData);
-        showToast('تم تسجيل بياناتك وتوليد بطاقة الحضور بنجاح ✨', 'success');
+        showToast('تم إنشاء حسابك وتوليد بطاقة الحضور بنجاح ✨', 'success');
         showView('view-student-card');
       } catch (err) {
         console.error('Error saving student:', err);
@@ -375,7 +576,7 @@ function setupStudentFormEvents() {
     });
   }
 
-  // Download QR Code Button
+  // 7. Download QR Code Button
   const downloadBtn = document.getElementById('btn-download-qr');
   if (downloadBtn) {
     downloadBtn.addEventListener('click', () => {
@@ -383,7 +584,7 @@ function setupStudentFormEvents() {
     });
   }
 
-  // Regenerate QR Code Button
+  // 8. Regenerate QR Code Button
   const refreshQrBtn = document.getElementById('btn-regenerate-qr');
   if (refreshQrBtn) {
     refreshQrBtn.addEventListener('click', () => {
@@ -394,23 +595,51 @@ function setupStudentFormEvents() {
     });
   }
 
-  // Quick App Cache Refresh & Force Update Button
+  // 9. Quick App Cache Refresh & Force Update Button
   const forceUpdateBtn = document.getElementById('btn-force-update-app');
   if (forceUpdateBtn) {
     forceUpdateBtn.addEventListener('click', forceUpdateApp);
   }
 
-  // Edit Profile Button
+  // 10. Student Logout Button
+  const logoutBtn = document.getElementById('btn-student-logout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      if (confirm('هل ترغب في تسجيل الخروج من حسابك؟\nيمكنك تسجيل الدخول مرة أخرى في أي وقت باستخدام الرقم القومي وكلمة المرور.')) {
+        localStorage.removeItem('student_profile');
+        state.currentStudent = null;
+        switchStudentAuthTab('login');
+        showView('view-student-form');
+        showToast('تم تسجيل الخروج بنجاح 👋 يمكنك تسجيل الدخول في أي وقت', 'info');
+      }
+    });
+  }
+
+  // 11. Edit Profile Button
   const editBtn = document.getElementById('btn-edit-student');
   if (editBtn) {
     editBtn.addEventListener('click', () => {
-      if (confirm('هل ترغب في تعديل بياناتك المسجلة؟')) {
-        if (state.currentStudent) {
-          nameInput.value = state.currentStudent.full_name;
-          nidInput.value = state.currentStudent.national_id;
-          const radio = document.querySelector(`input[name="student_dept"][value="${state.currentStudent.department}"]`);
-          if (radio) radio.checked = true;
+      if (!state.currentStudent) return;
+      if (confirm('هل ترغب في تعديل بيانات حسابك المسجلة؟')) {
+        switchStudentAuthTab('register');
+        if (nameInput) nameInput.value = state.currentStudent.full_name || '';
+        if (regNidInput) regNidInput.value = state.currentStudent.national_id || '';
+        if (regPassInput) regPassInput.value = state.currentStudent.password || '';
+
+        const curYear = state.currentStudent.academic_year || 'الفرقة الأولى';
+        const targetYearRadio = document.querySelector(`input[name="student_year"][value="${curYear}"]`);
+        if (targetYearRadio) {
+          targetYearRadio.checked = true;
+          targetYearRadio.dispatchEvent(new Event('change'));
         }
+
+        if (curYear === 'الفرقة الرابعة') {
+          const specRadio = document.querySelector(`input[name="student_dept_specialty"][value="${state.currentStudent.department}"]`);
+          if (specRadio) specRadio.checked = true;
+        } else {
+          if (sectionInput) sectionInput.value = state.currentStudent.department || '';
+        }
+
         showView('view-student-form');
       }
     });
@@ -419,18 +648,31 @@ function setupStudentFormEvents() {
 
 // Generate & Render QR Code on the Smart Card
 function renderStudentQrCard(student) {
-  document.getElementById('card-student-name').innerText = student.full_name;
-  document.getElementById('card-student-dept').innerText = 'قسم ' + student.department;
-  document.getElementById('card-student-nid').innerText = student.national_id;
+  const nameEl = document.getElementById('card-student-name');
+  if (nameEl) nameEl.innerText = student.full_name || '';
+
+  const yearEl = document.getElementById('card-student-year');
+  if (yearEl) yearEl.innerText = student.academic_year || 'الفرقة الأولى';
+
+  const deptEl = document.getElementById('card-student-dept');
+  if (deptEl) {
+    const rawDept = student.department || 'عام';
+    deptEl.innerText = (rawDept.startsWith('سكشن') || rawDept.startsWith('قسم')) ? rawDept : ('قسم ' + rawDept);
+  }
+
+  const nidEl = document.getElementById('card-student-nid');
+  if (nidEl) nidEl.innerText = student.national_id || '';
 
   const qrContainer = document.getElementById('qr-code-canvas-container');
+  if (!qrContainer) return;
   qrContainer.innerHTML = '';
 
-  // Compact payload specification
+  // Compact payload specification with academic year support
   const payload = JSON.stringify({
     nid: String(student.national_id).trim(),
     name: String(student.full_name).trim(),
-    dept: String(student.department).trim()
+    year: String(student.academic_year || 'الفرقة الأولى').trim(),
+    dept: String(student.department || 'عام').trim()
   });
 
   try {
@@ -495,10 +737,12 @@ function downloadQrAsImage() {
   ctx.font = 'bold 36px sans-serif';
   ctx.fillText(state.currentStudent.full_name, 300, 130);
 
-  // Department
+  // Academic Year & Department
   ctx.fillStyle = '#a78bfa';
   ctx.font = '26px sans-serif';
-  ctx.fillText('قسم ' + state.currentStudent.department, 300, 175);
+  const displayDept = state.currentStudent.department || 'عام';
+  const deptFormatted = (displayDept.startsWith('سكشن') || displayDept.startsWith('قسم')) ? displayDept : ('قسم ' + displayDept);
+  ctx.fillText((state.currentStudent.academic_year || 'الفرقة الأولى') + ' - ' + deptFormatted, 300, 175);
 
   // White box for QR
   ctx.fillStyle = '#ffffff';
@@ -1061,7 +1305,8 @@ function renderDeveloperStudents(students) {
         <div style="flex: 1;">
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
             <h4 style="color:#fff; font-size:1.05rem; margin:0; font-weight:700;">${student.full_name}</h4>
-            <span class="doctor-role-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light); font-size: 0.75rem;">قسم ${student.department}</span>
+            <span class="doctor-role-badge" style="background: rgba(139,92,246,0.18); color: var(--purple-light); font-size: 0.72rem; border: 1px solid rgba(139,92,246,0.3);">${student.academic_year || 'الفرقة الأولى'}</span>
+            <span class="doctor-role-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light); font-size: 0.72rem;">${(student.department && (student.department.startsWith('سكشن') || student.department.startsWith('قسم'))) ? student.department : ('قسم ' + (student.department || 'عام'))}</span>
             <span class="dept-badge" style="background: rgba(6,182,212,0.15); color: var(--cyan-light); font-size: 0.72rem;">حضر ${attendedCount} محاضرة</span>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
@@ -1129,7 +1374,24 @@ async function openOwnerStudentProfile(student) {
 
   const nidStr = String(student.national_id || '').trim();
   document.getElementById('owner-student-prof-name').innerText = student.full_name || 'طالب';
-  document.getElementById('owner-student-prof-dept').innerText = `قسم ${student.department || 'عام'}`;
+  const deptTxt = (student.department && (student.department.startsWith('سكشن') || student.department.startsWith('قسم'))) ? student.department : ('قسم ' + (student.department || 'عام'));
+  document.getElementById('owner-student-prof-dept').innerText = `${student.academic_year || 'الفرقة الأولى'} - ${deptTxt}`;
+
+  const passEl = document.getElementById('owner-student-prof-pass');
+  if (passEl) {
+    passEl.innerText = student.password ? student.password : '(لم يحدد بعد)';
+  }
+  const copyPassBtn = document.getElementById('btn-copy-student-pass');
+  if (copyPassBtn) {
+    copyPassBtn.onclick = () => {
+      if (student.password) {
+        navigator.clipboard.writeText(student.password);
+        showToast('تم نسخ كلمة المرور بنجاح 📋', 'info');
+      } else {
+        showToast('لا توجد كلمة مرور مسجلة لهذا الحساب بعد', 'warning');
+      }
+    };
+  }
 
   const regDate = student.registered_at ? new Date(student.registered_at).toLocaleDateString('ar-EG') : 'غير محدد';
   document.getElementById('owner-student-prof-date').innerText = `انضم: ${regDate}`;
@@ -1380,10 +1642,14 @@ function setupDevAddStudentForm() {
     e.preventDefault();
     const nameInput = document.getElementById('dev-student-name');
     const deptSelect = document.getElementById('dev-student-dept');
+    const yearSelect = document.getElementById('dev-student-year');
+    const passInput = document.getElementById('dev-student-pass');
 
     const name = nameInput.value.trim();
     const nid = nidInput.value.trim();
-    const dept = deptSelect.value;
+    const dept = deptSelect ? deptSelect.value : 'عام';
+    const year = yearSelect ? yearSelect.value : 'الفرقة الأولى';
+    const pass = passInput ? passInput.value.trim() : '123456';
 
     const nameVal = validateArabicName(name);
     if (!nameVal.valid) {
@@ -1402,7 +1668,9 @@ function setupDevAddStudentForm() {
     const newStudent = {
       national_id: nidVal.nid,
       full_name: name,
+      academic_year: year,
       department: dept,
+      password: pass,
       registered_at: new Date().toISOString()
     };
 
@@ -2120,6 +2388,7 @@ async function handleScannedStudent(data) {
     instructor_name: state.currentLecture.instructor_name || '',
     national_id: data.national_id,
     student_name: data.student_name,
+    academic_year: data.academic_year || 'الفرقة الأولى',
     department: data.department,
     scan_time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
     created_at: new Date().toISOString()

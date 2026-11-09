@@ -43,17 +43,45 @@ const CloudDB = {
     if (!cloudDb) return false;
     try {
       const nid = String(student.national_id).trim();
-      await cloudDb.collection('students').doc(nid).set({
+      const payload = {
         national_id: nid,
         full_name: student.full_name.trim(),
+        academic_year: student.academic_year || 'الفرقة الأولى',
         department: student.department.trim(),
         registered_at: student.registered_at || new Date().toISOString()
-      }, { merge: true });
+      };
+      if (student.password) {
+        payload.password = String(student.password).trim();
+      }
+      await cloudDb.collection('students').doc(nid).set(payload, { merge: true });
       return true;
     } catch (err) {
       console.warn('[Firebase] Save student error:', err);
       return false;
     }
+  },
+
+  // 1.5 Get single student by National ID (For login and profile retrieval)
+  async getStudent(nationalId) {
+    const nid = String(nationalId).trim();
+    if (cloudDb) {
+      try {
+        const doc = await cloudDb.collection('students').doc(nid).get();
+        if (doc.exists) {
+          return doc.data();
+        }
+      } catch (err) {
+        console.warn('[Firebase] Get student error:', err);
+      }
+    }
+    // Fallback to local
+    if (typeof getLocalStudent === 'function') {
+      try {
+        const localSt = await getLocalStudent(nid);
+        if (localSt) return localSt;
+      } catch (e) {}
+    }
+    return null;
   },
 
   // 2. Fetch all registered students

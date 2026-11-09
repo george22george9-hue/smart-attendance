@@ -25,26 +25,13 @@
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
   <link rel="stylesheet" href="./css/style.css?v=6.2">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v6.2) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v6.3) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v6.2-agri-engineer';
+      const CURRENT_VERSION = 'v6.3-student-auth-grades';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
-        // Clear local test session & test profiles
-        try {
-          localStorage.removeItem('student_profile');
-          localStorage.removeItem('app_lectures');
-          localStorage.removeItem('app_attendance');
-          localStorage.removeItem('app_messages');
-        } catch (e) {}
-
-        if ('indexedDB' in window) {
-          try {
-            window.indexedDB.deleteDatabase('SmartAttendanceDB');
-          } catch (e) {}
-        }
-
+        // Clear cached assets to ensure fresh JS/CSS files without deleting student profile!
         if ('caches' in window) {
           caches.keys().then(function(names) {
             names.forEach(function(name) {
@@ -79,7 +66,7 @@
         </div>
         <div class="brand-text-wrap">
           <span class="brand-title-text">Agricultural engineer</span>
-          <span class="version-tag">v6.2</span>
+          <span class="version-tag">v6.3</span>
         </div>
       </div>
 
@@ -146,7 +133,7 @@
           <!-- Subtle App Refresh Trigger -->
           <div style="margin-top: 14px; text-align: center;">
             <button id="btn-force-update-app" class="tool-btn" onclick="window.forceUpdateApp && window.forceUpdateApp()" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
-              <span>🔄 تحديث التطبيق ومسح الكاش (v6.2)</span>
+              <span>🔄 تحديث التطبيق ومسح الكاش (v6.3)</span>
             </button>
           </div>
 
@@ -154,14 +141,14 @@
       </section>
 
       <!-- ===================================================================
-           2. STUDENT FLOW: REGISTRATION FORM
+           2. STUDENT FLOW: AUTHENTICATION (LOGIN OR REGISTRATION)
            =================================================================== -->
       <section id="view-student-form" class="view-section">
         <div class="glass-panel" style="max-width: 520px; margin: 0 auto;">
           <div class="panel-header">
             <h3 class="panel-title">
-              <span>📝</span>
-              <span>تسجيل بيانات الطالب</span>
+              <span>🎓</span>
+              <span>بوابة حساب الطالب</span>
             </h3>
             <button class="back-btn btn-back-landing">
               <span>الرئيسية</span>
@@ -169,13 +156,62 @@
             </button>
           </div>
 
-          <form id="student-reg-form">
+          <!-- Auth Switcher Tabs: [تسجيل الدخول] / [حساب جديد] -->
+          <div class="auth-tabs-bar" style="margin-bottom: 20px;">
+            <button type="button" id="tab-btn-student-login" class="auth-tab-btn active">
+              <span>🔑 تسجيل الدخول</span>
+            </button>
+            <button type="button" id="tab-btn-student-register" class="auth-tab-btn">
+              <span>📝 إنشاء حساب جديد</span>
+            </button>
+          </div>
+
+          <!-- SUB-FORM 1: LOGIN (تسجيل دخول بالرقم القومي وكلمة المرور) -->
+          <form id="student-login-form">
+            <div class="form-group">
+              <label class="form-label" for="login-student-nid">
+                <span class="req">*</span> الرقم القومي (14 رقم):
+              </label>
+              <div class="input-with-icon">
+                <span class="input-icon">🪪</span>
+                <input type="tel" id="login-student-nid" class="form-input" placeholder="14 رقماً مصرياً" maxlength="14" required autocomplete="username">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-student-pass">
+                <span class="req">*</span> كلمة المرور:
+              </label>
+              <div class="input-with-icon" style="position: relative;">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="login-student-pass" class="form-input" placeholder="أدخل كلمة المرور الخاصة بحسابك" required autocomplete="current-password" style="padding-left: 42px;">
+                <button type="button" id="btn-toggle-student-login-pass" class="pass-toggle-btn" title="إظهار / إخفاء">👁️</button>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-btn" style="margin-top: 10px;">
+              <span>تسجيل الدخول إلى حسابي</span>
+              <span>⚡</span>
+            </button>
+
+            <div style="text-align: center; margin-top: 14px;">
+              <button type="button" id="btn-switch-to-register" class="link-btn-cyan" style="background: none; border: none; color: var(--cyan-light); font-size: 0.85rem; cursor: pointer; font-weight: 600;">
+                ليس لديك حساب؟ اضغط هنا لإنشاء حساب طالب جديد 📝
+              </button>
+            </div>
+          </form>
+
+          <!-- SUB-FORM 2: REGISTRATION (تسجيل طالب جديد بكلمة مرور وفرقة وقسم) -->
+          <form id="student-reg-form" style="display: none;">
             <!-- Full Name (Arabic 3 words minimum) -->
             <div class="form-group">
               <label class="form-label" for="student-name-input">
                 <span class="req">*</span> الاسم ثلاثي بالعربي:
               </label>
-              <input type="text" id="student-name-input" class="form-input" placeholder="مثال: أحمد محمد علي" required autocomplete="name">
+              <div class="input-with-icon">
+                <span class="input-icon">👤</span>
+                <input type="text" id="student-name-input" class="form-input" placeholder="مثال: أحمد محمد علي" required autocomplete="name">
+              </div>
               <p class="form-hint">حروف عربية فقط مع مسافتين على الأقل (بدون إنجليزي أو أرقام)</p>
             </div>
 
@@ -184,39 +220,99 @@
               <label class="form-label" for="student-nid-input">
                 <span class="req">*</span> الرقم القومي:
               </label>
-              <input type="tel" id="student-nid-input" class="form-input" placeholder="14 رقماً بالضبط" maxlength="14" required autocomplete="off">
+              <div class="input-with-icon">
+                <span class="input-icon">🪪</span>
+                <input type="tel" id="student-nid-input" class="form-input" placeholder="14 رقماً بالضبط" maxlength="14" required autocomplete="off">
+              </div>
               <p class="form-hint">سيتم تحويل الأرقام العربية إلى الإنجليزية تلقائياً</p>
             </div>
 
-            <!-- Department (4 Options Only) -->
+            <!-- Password -->
+            <div class="form-group">
+              <label class="form-label" for="student-password-input">
+                <span class="req">*</span> كلمة المرور لحسابك:
+              </label>
+              <div class="input-with-icon" style="position: relative;">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="student-password-input" class="form-input" placeholder="اكتب كلمة مرور تحفظها (مثال: 123456)" required minlength="4" maxlength="30" autocomplete="new-password" style="padding-left: 42px;">
+                <button type="button" id="btn-toggle-student-reg-pass" class="pass-toggle-btn" title="إظهار / إخفاء">👁️</button>
+              </div>
+              <p class="form-hint">ستحتاجها للرجوع لحسابك والغياب في أي وقت ومن أي جهاز</p>
+            </div>
+
+            <!-- Academic Year (الفرقة الدراسية) -->
             <div class="form-group">
               <label class="form-label">
-                <span class="req">*</span> القسم الدراسي:
+                <span class="req">*</span> الفرقة الدراسية:
+              </label>
+              <div class="year-grid">
+                <label class="year-radio-label">
+                  <input type="radio" name="student_year" value="الفرقة الأولى" checked>
+                  <div class="year-radio-card">الفرقة الأولى</div>
+                </label>
+                <label class="year-radio-label">
+                  <input type="radio" name="student_year" value="الفرقة الثانية">
+                  <div class="year-radio-card">الفرقة الثانية</div>
+                </label>
+                <label class="year-radio-label">
+                  <input type="radio" name="student_year" value="الفرقة الثالثة">
+                  <div class="year-radio-card">الفرقة الثالثة</div>
+                </label>
+                <label class="year-radio-label">
+                  <input type="radio" name="student_year" value="الفرقة الرابعة">
+                  <div class="year-radio-card">الفرقة الرابعة</div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Department Section - Dynamic Based on Year: -->
+            <!-- Option A: For Years 1, 2, 3 -> Text/Section Number Input -->
+            <div id="section-input-group" class="form-group">
+              <label class="form-label" for="student-section-input">
+                <span class="req">*</span> رقم السكشن / القسم:
+              </label>
+              <div class="input-with-icon">
+                <span class="input-icon">🏛️</span>
+                <input type="text" id="student-section-input" class="form-input" placeholder="مثال: سكشن 3 أو قسم 2" required>
+              </div>
+              <p class="form-hint">اكتب رقم السكشن أو رقم القسم التابع له في كليتك</p>
+            </div>
+
+            <!-- Option B: For Year 4 -> 4 Specialization Cards (آلات - نظم - ري - عام) -->
+            <div id="dept-radios-group" class="form-group" style="display: none;">
+              <label class="form-label">
+                <span class="req">*</span> التخصص الدراسي (سنة رابعة):
               </label>
               <div class="dept-grid">
                 <label class="dept-radio-label">
-                  <input type="radio" name="student_dept" value="آلات" checked>
+                  <input type="radio" name="student_dept_specialty" value="آلات" checked>
                   <div class="dept-radio-card">آلات</div>
                 </label>
                 <label class="dept-radio-label">
-                  <input type="radio" name="student_dept" value="نظم">
+                  <input type="radio" name="student_dept_specialty" value="نظم">
                   <div class="dept-radio-card">نظم</div>
                 </label>
                 <label class="dept-radio-label">
-                  <input type="radio" name="student_dept" value="ري">
+                  <input type="radio" name="student_dept_specialty" value="ري">
                   <div class="dept-radio-card">ري</div>
                 </label>
                 <label class="dept-radio-label">
-                  <input type="radio" name="student_dept" value="عام">
+                  <input type="radio" name="student_dept_specialty" value="عام">
                   <div class="dept-radio-card">عام</div>
                 </label>
               </div>
             </div>
 
-            <button type="submit" class="submit-btn">
-              <span>حفظ وتوليد الكود</span>
+            <button type="submit" class="submit-btn" style="margin-top: 10px;">
+              <span>إنشاء الحساب وتوليد الكود</span>
               <span>⚡</span>
             </button>
+
+            <div style="text-align: center; margin-top: 14px;">
+              <button type="button" id="btn-switch-to-login" class="link-btn-cyan" style="background: none; border: none; color: var(--cyan-light); font-size: 0.85rem; cursor: pointer; font-weight: 600;">
+                لديك حساب بالفعل؟ اضغط هنا لتسجيل الدخول 🔑
+              </button>
+            </div>
           </form>
         </div>
       </section>
@@ -232,7 +328,8 @@
             <div>
               <h2 id="card-student-name" style="font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 4px;">اسم الطالب</h2>
               <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                <span id="card-student-dept" class="table-dept-badge badge-alat" style="font-size: 0.85rem;">القسم</span>
+                <span id="card-student-year" class="table-dept-badge badge-alat" style="font-size: 0.82rem; background: rgba(139,92,246,0.2); color: var(--purple-light); border: 1px solid rgba(139,92,246,0.35);">الفرقة الأولى</span>
+                <span id="card-student-dept" class="table-dept-badge badge-alat" style="font-size: 0.82rem;">القسم</span>
                 <span style="font-size: 0.82rem; color: var(--text-dim);">|</span>
                 <span style="font-family: monospace; font-size: 0.85rem; color: #cbd5e1;">الرقم القومي: <span id="card-student-nid">00000000000000</span></span>
               </div>
@@ -517,6 +614,18 @@
                     </div>
                   </div>
                   <div class="form-group" style="margin: 0;">
+                    <label class="form-label" for="dev-student-year"><span class="req">*</span> الفرقة الدراسية:</label>
+                    <div class="input-with-icon">
+                      <span class="input-icon">🎓</span>
+                      <select id="dev-student-year" class="form-input" style="background: #111827;">
+                        <option value="الفرقة الأولى">الفرقة الأولى</option>
+                        <option value="الفرقة الثانية">الفرقة الثانية</option>
+                        <option value="الفرقة الثالثة">الفرقة الثالثة</option>
+                        <option value="الفرقة الرابعة">الفرقة الرابعة</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
                     <label class="form-label" for="dev-student-dept"><span class="req">*</span> القسم التابع له:</label>
                     <div class="input-with-icon">
                       <span class="input-icon">🏛️</span>
@@ -526,6 +635,13 @@
                         <option value="ري">ري</option>
                         <option value="عام">عام</option>
                       </select>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label" for="dev-student-pass"><span class="req">*</span> كلمة المرور:</label>
+                    <div class="input-with-icon">
+                      <span class="input-icon">🔒</span>
+                      <input type="text" id="dev-student-pass" class="form-input" placeholder="كلمة المرور" value="123456" required>
                     </div>
                   </div>
                 </div>
@@ -1233,6 +1349,17 @@
             <code id="owner-student-prof-nid" style="font-size:1.05rem; color:var(--cyan-light); font-family:monospace; font-weight:700; letter-spacing:1px;">00000000000000</code>
           </div>
           <button type="button" id="btn-copy-student-nid" class="tool-btn" style="padding:6px 12px; font-size:0.78rem;" title="نسخ الرقم">
+            📋 نسخ
+          </button>
+        </div>
+
+        <!-- Password Info Card -->
+        <div style="background:rgba(15,23,42,0.7); border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span style="font-size:0.75rem; color:var(--text-muted); display:block;">كلمة المرور المسجلة:</span>
+            <code id="owner-student-prof-pass" style="font-size:1.05rem; color:var(--purple-light); font-family:monospace; font-weight:700;">******</code>
+          </div>
+          <button type="button" id="btn-copy-student-pass" class="tool-btn" style="padding:6px 12px; font-size:0.78rem;" title="نسخ كلمة المرور">
             📋 نسخ
           </button>
         </div>

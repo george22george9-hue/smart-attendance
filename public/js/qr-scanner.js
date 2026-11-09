@@ -245,6 +245,7 @@ class QRScannerController {
         this.onScanCallback({
           national_id: String(data.nid).trim(),
           student_name: String(data.name || 'طالب مسجل').trim(),
+          academic_year: String(data.year || data.academic_year || 'الفرقة الأولى').trim(),
           department: String(data.dept || 'عام').trim()
         });
       }

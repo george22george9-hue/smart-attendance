@@ -63,7 +63,9 @@ async function saveLocalStudent(student) {
     const record = {
       national_id: String(student.national_id).trim(),
       full_name: String(student.full_name).trim(),
+      academic_year: student.academic_year || 'الفرقة الأولى',
       department: String(student.department).trim(),
+      password: student.password ? String(student.password).trim() : '',
       registered_at: student.registered_at || new Date().toISOString(),
       is_synced: student.is_synced !== undefined ? student.is_synced : 0
     };
