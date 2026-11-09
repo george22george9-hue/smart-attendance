@@ -9,13 +9,13 @@
   <title>Agricultural engineer</title>
 
   <!-- PWA Manifest & App Home Screen Icons (Agricultural Engineer) -->
-  <link rel="manifest" href="./manifest.json?v=6.1">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=6.1">
-  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=6.1">
-  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=6.1">
-  <link rel="shortcut icon" href="./icons/icon-192.png?v=6.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=6.1">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=6.1">
+  <link rel="manifest" href="./manifest.json?v=6.2">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=6.2">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=6.2">
+  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=6.2">
+  <link rel="shortcut icon" href="./icons/icon-192.png?v=6.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=6.2">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=6.2">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,12 +23,12 @@
   <meta name="application-name" content="Agricultural engineer">
 
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=6.1">
+  <link rel="stylesheet" href="./css/style.css?v=6.2">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v6.1) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v6.2) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v6.1-agri-engineer';
+      const CURRENT_VERSION = 'v6.2-agri-engineer';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
         // Clear local test session & test profiles
@@ -75,11 +75,11 @@
     <header class="app-header">
       <div class="brand-container btn-back-landing" title="الصفحة الرئيسية">
         <div class="brand-logo">
-          <img src="./icons/icon-192.png?v=6.1" alt="Logo" class="brand-logo-img">
+          <img src="./icons/icon-192.png?v=6.2" alt="Logo" class="brand-logo-img">
         </div>
         <div class="brand-text-wrap">
           <span class="brand-title-text">Agricultural engineer</span>
-          <span class="version-tag">v6.1</span>
+          <span class="version-tag">v6.2</span>
         </div>
       </div>
 
@@ -108,7 +108,7 @@
           <!-- Clean App Header with Agricultural Engineer Emblem -->
           <div class="simple-brand-header">
             <div class="agri-eng-badge" title="Agricultural engineer" style="overflow: hidden; padding: 0;">
-              <img src="./icons/icon-192.png?v=6.1" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
+              <img src="./icons/icon-192.png?v=6.2" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
             </div>
             <h2 class="simple-app-title">Agricultural engineer</h2>
             <p class="simple-app-sub">منظومة الحضور والغياب الذكي بالـ QR Code</p>
@@ -146,7 +146,7 @@
           <!-- Subtle App Refresh Trigger -->
           <div style="margin-top: 14px; text-align: center;">
             <button id="btn-force-update-app" class="tool-btn" onclick="window.forceUpdateApp && window.forceUpdateApp()" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
-              <span>🔄 تحديث التطبيق ومسح الكاش (v6.1)</span>
+              <span>🔄 تحديث التطبيق ومسح الكاش (v6.2)</span>
             </button>
           </div>
 
@@ -1338,11 +1338,13 @@
       </div>
     </div>
 
-    <!-- Transparent Pro Watermark at Bottom (Clean & Minimal) -->
-    <footer class="app-watermark-footer" aria-hidden="true">
-      <span class="wm-bolt">⚡</span>
-      <span class="wm-text">BY — ENG — GEORGE</span>
-      <span class="wm-bolt">⚡</span>
+    <!-- Fixed Glassmorphic Developer Bottom Bar (Slim, Fixed & Transparent) -->
+    <footer class="app-bottom-bar" aria-label="شريط المطور المعتمد">
+      <div class="bottom-bar-content">
+        <span class="bb-bolt">⚡</span>
+        <span class="bb-label">BY — ENG — GEORGE</span>
+        <span class="bb-bolt">⚡</span>
+      </div>
     </footer>
 
     <!-- Toast Notification Container -->
@@ -1353,19 +1355,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=6.1"></script>
+  <script src="./js/firebase-app.js?v=6.2"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=6.1"></script>
-  <script src="./libs/html5-qrcode.min.js?v=6.1"></script>
-  <script src="./libs/xlsx.full.min.js?v=6.1"></script>
+  <script src="./libs/qrcode.js?v=6.2"></script>
+  <script src="./libs/html5-qrcode.min.js?v=6.2"></script>
+  <script src="./libs/xlsx.full.min.js?v=6.2"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=6.1"></script>
-  <script src="./js/sync.js?v=6.1"></script>
-  <script src="./js/qr-scanner.js?v=6.1"></script>
-  <script src="./js/excel.js?v=6.1"></script>
-  <script src="./js/app.js?v=6.1"></script>
+  <script src="./js/db.js?v=6.2"></script>
+  <script src="./js/sync.js?v=6.2"></script>
+  <script src="./js/qr-scanner.js?v=6.2"></script>
+  <script src="./js/excel.js?v=6.2"></script>
+  <script src="./js/app.js?v=6.2"></script>
 
 </body>
 </html>
