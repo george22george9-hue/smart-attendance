@@ -58,6 +58,57 @@ function validateNationalId(nid) {
   return { valid: true, nid: clean };
 }
 
+// ===================================================================
+// Dual Theme System (Agricultural Engineer Light & Emerald Night Dark)
+// ===================================================================
+function initThemeManager() {
+  const savedTheme = localStorage.getItem('app_theme') || 'light';
+  applyTheme(savedTheme, false);
+
+  const toggleBtn = document.getElementById('btn-theme-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme, true);
+    });
+  }
+}
+
+function applyTheme(theme, notify = false) {
+  document.documentElement.setAttribute('data-theme', theme);
+  try {
+    localStorage.setItem('app_theme', theme);
+  } catch(e){}
+
+  const iconEl = document.getElementById('theme-toggle-icon');
+  const textEl = document.getElementById('theme-toggle-text');
+  const toggleBtn = document.getElementById('btn-theme-toggle');
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+  if (theme === 'dark') {
+    if (iconEl) iconEl.textContent = '☀️';
+    if (textEl) textEl.textContent = 'ليلي';
+    if (toggleBtn) toggleBtn.setAttribute('title', 'التبديل إلى الوضع النهاري ☀️');
+    if (metaTheme) metaTheme.setAttribute('content', '#070f14');
+    if (notify) {
+      showToast('تم تفعيل الوضع الليلي 🌙', 'info', 1800);
+    }
+  } else {
+    if (iconEl) iconEl.textContent = '🌙';
+    if (textEl) textEl.textContent = 'نهاري';
+    if (toggleBtn) toggleBtn.setAttribute('title', 'التبديل إلى الوضع الليلي 🌙');
+    if (metaTheme) metaTheme.setAttribute('content', '#f0fdf4');
+    if (notify) {
+      showToast('تم تفعيل الوضع النهاري ☀️', 'info', 1800);
+    }
+  }
+}
+
+window.initThemeManager = initThemeManager;
+window.applyTheme = applyTheme;
+
 // UI Toasts (Luxurious Floating Glass Pill - Single Instance)
 let currentActiveToast = null;
 
@@ -1169,7 +1220,7 @@ async function loadDeveloperInstructors() {
         </div>
         <div style="flex: 1;">
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
-            <h4 style="color:#064e3b; font-size:1.15rem; margin:0; font-weight:800;">${doc.name}</h4>
+            <h4 style="color:var(--text-main); font-size:1.15rem; margin:0; font-weight:800;">${doc.name}</h4>
             <span class="doctor-role-badge ${isProf ? 'prof' : 'assistant'}">${doc.role} - قسم ${doc.department}</span>
           </div>
           <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 8px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 8px;">
@@ -1315,14 +1366,14 @@ function renderDeveloperStudents(students) {
         </div>
         <div style="flex: 1;">
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
-            <h4 style="color:#064e3b; font-size:1.05rem; margin:0; font-weight:700;">${student.full_name}</h4>
+            <h4 style="color:var(--text-main); font-size:1.05rem; margin:0; font-weight:700;">${student.full_name}</h4>
             <span class="doctor-role-badge" style="background: rgba(139,92,246,0.18); color: var(--purple-light); font-size: 0.72rem; border: 1px solid rgba(139,92,246,0.3);">${student.academic_year || 'الفرقة الأولى'}</span>
             <span class="doctor-role-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light); font-size: 0.72rem;">${(student.department && (student.department.startsWith('سكشن') || student.department.startsWith('قسم'))) ? student.department : ('قسم ' + (student.department || 'عام'))}</span>
             <span class="dept-badge" style="background: rgba(6,182,212,0.15); color: var(--cyan-light); font-size: 0.72rem;">حضر ${attendedCount} محاضرة</span>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
             <span style="font-size:0.78rem; color:var(--text-muted);">الرقم القومي:</span>
-            <code style="color:#0f172a; font-size:0.88rem; font-family:monospace; letter-spacing:1px; font-weight:700;">${student.national_id}</code>
+            <code style="color:var(--text-dark); font-size:0.88rem; font-family:monospace; letter-spacing:1px; font-weight:700;">${student.national_id}</code>
           </div>
         </div>
       </div>
@@ -1479,7 +1530,7 @@ async function openOwnerStudentProfile(student) {
           <div>
             <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
               <span class="doctor-role-badge ${isLab ? 'assistant' : 'prof'}" style="font-size:0.7rem; padding:2px 6px;">${r.session_type || 'محاضرة'}</span>
-              <strong style="color:#064e3b; font-size:0.88rem;">${r.lecture_title || 'محاضرة'}</strong>
+              <strong style="color:var(--text-main); font-size:0.88rem;">${r.lecture_title || 'محاضرة'}</strong>
             </div>
             <div style="font-size:0.75rem; color:var(--text-dim);">
               ${r.instructor_name ? `👨‍🏫 ${r.instructor_name} | ` : ''}⏰ وقت الرصد: ${r.scan_time || ''}
@@ -1599,7 +1650,7 @@ async function openOwnerInstructorProfile(instructor) {
         item.className = 'owner-history-item';
         item.innerHTML = `
           <div>
-            <div style="color:#064e3b; font-size:0.88rem; font-weight:700; margin-bottom:2px;">${l.title}</div>
+            <div style="color:var(--text-main); font-size:0.88rem; font-weight:700; margin-bottom:2px;">${l.title}</div>
             <div style="font-size:0.75rem; color:var(--text-dim);">
               <span>📅 ${l.lecture_date || ''}</span> | <span>🏛️ ${l.target_dept || 'الكل'}</span>
             </div>
@@ -2805,6 +2856,7 @@ function registerServiceWorker() {
 // Robust Initialization (handles loading or already-interactive DOM)
 function initApp() {
   try {
+    initThemeManager();
     setupSyncUI();
     setupStudentFormEvents();
     setupInstructorFlow();
@@ -2812,7 +2864,7 @@ function initApp() {
     setupInstructorPortalTabs();
     setupGlobalEvents();
     registerServiceWorker();
-    console.log('Agricultural engineer PWA v5.9 initialized successfully.');
+    console.log('Agricultural engineer PWA v7.1 initialized successfully.');
   } catch (e) {
     console.error('Error during initApp:', e);
   }
@@ -2983,7 +3035,7 @@ async function loadStudentAttendanceHistory(nationalId) {
       <div style="flex:1;">
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
           <span class="doctor-role-badge ${isLab ? 'assistant' : 'prof'}">${typeBadge}</span>
-          <h5 style="color:#064e3b; font-size:1.05rem; font-weight:700; margin:0;">${titleText}</h5>
+          <h5 style="color:var(--text-main); font-size:1.05rem; font-weight:700; margin:0;">${titleText}</h5>
         </div>
         <div style="font-size:0.8rem; color:var(--text-muted); display:flex; flex-wrap:wrap; gap:12px; margin-top:4px;">
           <span>🕒 وقت الحضور: ${rec.scan_time || ''}</span>
@@ -3120,7 +3172,7 @@ function renderStudentsDirectoryRows(students) {
 
     tr.innerHTML = `
       <td>${idx + 1}</td>
-      <td style="font-weight:700; color:#064e3b;">${st.full_name}</td>
+      <td style="font-weight:700; color:var(--text-main);">${st.full_name}</td>
       <td style="font-family:monospace; color:#cbd5e1;">${st.national_id}</td>
       <td><span class="table-dept-badge ${badgeClass}">${st.department}</span></td>
       <td style="color:var(--text-muted); font-size:0.82rem;">${dateStr}</td>
