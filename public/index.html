@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#f0fdf4">
   <meta name="description" content="نظام الحضور والغياب الذكي - يعمل بدون إنترنت مع مسح QR وتصدير إكسيل فوري">
 
   <title>Agricultural engineer</title>
 
   <!-- PWA Manifest & App Home Screen Icons (Agricultural Engineer) -->
-  <link rel="manifest" href="./manifest.json?v=6.4">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=6.4">
-  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=6.4">
-  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=6.4">
-  <link rel="shortcut icon" href="./icons/icon-192.png?v=6.4">
-  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=6.4">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=6.4">
+  <link rel="manifest" href="./manifest.json?v=7.0">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=7.0">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=7.0">
+  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=7.0">
+  <link rel="shortcut icon" href="./icons/icon-192.png?v=7.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=7.0">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=7.0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,12 +23,12 @@
   <meta name="application-name" content="Agricultural engineer">
 
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=6.4">
+  <link rel="stylesheet" href="./css/style.css?v=7.0">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v6.4) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v7.0) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v6.4-student-auth-grades';
+      const CURRENT_VERSION = 'v7.0-student-auth-grades';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
         // Clear cached assets to ensure fresh JS/CSS files without deleting student profile!
@@ -62,11 +62,11 @@
     <header class="app-header">
       <div class="brand-container btn-back-landing" title="الصفحة الرئيسية">
         <div class="brand-logo">
-          <img src="./icons/icon-192.png?v=6.4" alt="Logo" class="brand-logo-img">
+          <img src="./icons/icon-192.png?v=7.0" alt="Logo" class="brand-logo-img">
         </div>
         <div class="brand-text-wrap">
           <span class="brand-title-text">Agricultural engineer</span>
-          <span class="version-tag">v6.4</span>
+          <span class="version-tag">v7.0</span>
         </div>
       </div>
 
@@ -95,7 +95,7 @@
           <!-- Clean App Header with Agricultural Engineer Emblem -->
           <div class="simple-brand-header">
             <div class="agri-eng-badge" title="Agricultural engineer" style="overflow: hidden; padding: 0;">
-              <img src="./icons/icon-192.png?v=6.4" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
+              <img src="./icons/icon-192.png?v=7.0" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
             </div>
             <h2 class="simple-app-title">Agricultural engineer</h2>
             <p class="simple-app-sub">منظومة الحضور والغياب الذكي بالـ QR Code</p>
@@ -133,7 +133,7 @@
           <!-- Subtle App Refresh Trigger -->
           <div style="margin-top: 14px; text-align: center;">
             <button id="btn-force-update-app" class="tool-btn" onclick="window.forceUpdateApp && window.forceUpdateApp()" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
-              <span>🔄 تحديث التطبيق ومسح الكاش (v6.4)</span>
+              <span>🔄 تحديث التطبيق ومسح الكاش (v7.0)</span>
             </button>
           </div>
 
@@ -326,12 +326,12 @@
           <div style="display: flex; align-items: center; gap: 14px;">
             <div class="student-avatar-box">🎓</div>
             <div>
-              <h2 id="card-student-name" style="font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 4px;">اسم الطالب</h2>
+              <h2 id="card-student-name" style="font-size: 1.35rem; font-weight: 800; color: #064e3b; margin-bottom: 4px;">اسم الطالب</h2>
               <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                 <span id="card-student-year" class="table-dept-badge badge-alat" style="font-size: 0.82rem; background: rgba(139,92,246,0.2); color: var(--purple-light); border: 1px solid rgba(139,92,246,0.35);">الفرقة الأولى</span>
                 <span id="card-student-dept" class="table-dept-badge badge-alat" style="font-size: 0.82rem;">القسم</span>
                 <span style="font-size: 0.82rem; color: var(--text-dim);">|</span>
-                <span style="font-family: monospace; font-size: 0.85rem; color: #cbd5e1;">الرقم القومي: <span id="card-student-nid">00000000000000</span></span>
+                <span style="font-family: monospace; font-size: 0.85rem; color: #475569;">الرقم القومي: <span id="card-student-nid" style="color: #064e3b; font-weight: 700;">00000000000000</span></span>
               </div>
             </div>
           </div>
@@ -406,7 +406,7 @@
         <div id="panel-student-inbox" class="student-subpanel" style="display: none;">
           <div class="glass-panel" style="padding: 22px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <h4 style="font-size: 1.1rem; color: #fff;">رسائل وتنبيهات الدكتور / المحاضر</h4>
+              <h4 style="font-size: 1.1rem; color: #064e3b;">رسائل وتنبيهات الدكتور / المحاضر</h4>
               <span style="font-size: 0.8rem; color: var(--cyan-light);">تصلك فورياً</span>
             </div>
             <div id="student-messages-list" class="messages-list">
@@ -419,7 +419,7 @@
         <div id="panel-student-history" class="student-subpanel" style="display: none;">
           <div class="glass-panel" style="padding: 22px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <h4 style="font-size: 1.1rem; color: #fff;">سجل المحاضرات التي تم تسجيل حضورك بها</h4>
+              <h4 style="font-size: 1.1rem; color: #064e3b;">سجل المحاضرات التي تم تسجيل حضورك بها</h4>
               <span style="font-size: 0.85rem; color: var(--emerald-light);">إجمالي الحضور: <strong id="student-total-attended">0</strong> محاضرة</span>
             </div>
             <div id="student-attendance-history-list">
@@ -443,7 +443,7 @@
           <!-- Doctor Selector Dropdown -->
           <div class="form-group" style="text-align: right;">
             <label class="form-label" for="instructor-select">اختر اسم الدكتور / المعيد:</label>
-            <select id="instructor-select" class="form-input" style="font-size: 1.05rem; padding: 12px 14px; background: #111827;">
+            <select id="instructor-select" class="form-input" style="font-size: 1.05rem; padding: 12px 14px; ">
               <!-- Dynamically populated from registered instructors -->
             </select>
           </div>
@@ -522,7 +522,7 @@
           <div id="dev-panel-instructors" class="dev-subpanel active">
             <!-- Add New Instructor Card -->
             <div class="glass-panel" style="padding: 22px; margin-bottom: 20px;">
-              <h4 style="font-size: 1.15rem; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+              <h4 style="font-size: 1.15rem; color: #064e3b; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
                 <span class="icon-sq-badge">➕</span>
                 <span>إضافة دكتور أو معيد جديد للنظام</span>
               </h4>
@@ -539,7 +539,7 @@
                     <label class="form-label" for="new-doc-role">الصفة / الرتبة:</label>
                     <div class="input-with-icon">
                       <span class="input-icon">🎓</span>
-                      <select id="new-doc-role" class="form-input" style="background: #111827;">
+                      <select id="new-doc-role" class="form-input" style="">
                         <option value="دكتور">دكتور (محاضرات نظري)</option>
                         <option value="معيد">معيد (سكاشن عملي)</option>
                       </select>
@@ -549,7 +549,7 @@
                     <label class="form-label" for="new-doc-dept">القسم التابع له:</label>
                     <div class="input-with-icon">
                       <span class="input-icon">🏛️</span>
-                      <select id="new-doc-dept" class="form-input" style="background: #111827;">
+                      <select id="new-doc-dept" class="form-input" style="">
                         <option value="الكل">جميع الأقسام</option>
                         <option value="آلات">آلات</option>
                         <option value="نظم">نظم</option>
@@ -578,7 +578,7 @@
             <!-- Instructors Directory & Password Manager -->
             <div class="glass-panel" style="padding: 22px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h4 style="font-size: 1.15rem; color: #fff;">قائمة الدكاترة المسجلين وكلمات السر</h4>
+                <h4 style="font-size: 1.15rem; color: #064e3b;">قائمة الدكاترة المسجلين وكلمات السر</h4>
                 <span id="instructors-count-badge" class="dept-badge" style="background: rgba(6,182,212,0.15); color: var(--cyan-light);">● 0 محاضر</span>
               </div>
               <div id="instructors-list-container">
@@ -593,7 +593,7 @@
           <div id="dev-panel-students" class="dev-subpanel" style="display: none;">
             <!-- Developer Add Student Form -->
             <div class="glass-panel" style="padding: 22px; margin-bottom: 20px;">
-              <h4 style="font-size: 1.15rem; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+              <h4 style="font-size: 1.15rem; color: #064e3b; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
                 <span class="icon-sq-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light);">➕</span>
                 <span>إضافة طالب جديد للنظام بواسطة المطور</span>
               </h4>
@@ -617,7 +617,7 @@
                     <label class="form-label" for="dev-student-year"><span class="req">*</span> الفرقة الدراسية:</label>
                     <div class="input-with-icon">
                       <span class="input-icon">🎓</span>
-                      <select id="dev-student-year" class="form-input" style="background: #111827;">
+                      <select id="dev-student-year" class="form-input" style="">
                         <option value="الفرقة الأولى">الفرقة الأولى</option>
                         <option value="الفرقة الثانية">الفرقة الثانية</option>
                         <option value="الفرقة الثالثة">الفرقة الثالثة</option>
@@ -629,7 +629,7 @@
                     <label class="form-label" for="dev-student-dept"><span class="req">*</span> القسم التابع له:</label>
                     <div class="input-with-icon">
                       <span class="input-icon">🏛️</span>
-                      <select id="dev-student-dept" class="form-input" style="background: #111827;">
+                      <select id="dev-student-dept" class="form-input" style="">
                         <option value="آلات">آلات</option>
                         <option value="نظم">نظم</option>
                         <option value="ري">ري</option>
@@ -654,12 +654,12 @@
             <!-- Students Directory & Search -->
             <div class="glass-panel" style="padding: 22px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-                <h4 style="font-size: 1.15rem; color: #fff; margin: 0;">دليل الطلاب والتحكم الكامل</h4>
+                <h4 style="font-size: 1.15rem; color: #064e3b; margin: 0;">دليل الطلاب والتحكم الكامل</h4>
                 <span id="dev-students-count-badge" class="dept-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light);">● 0 طالب</span>
               </div>
               <!-- Search Bar -->
               <div style="margin-bottom: 16px;">
-                <input type="text" id="dev-student-search-input" class="form-input" placeholder="🔍 ابحث بالاسم أو الرقم القومي أو القسم..." style="background: rgba(15,23,42,0.7);">
+                <input type="text" id="dev-student-search-input" class="form-input" placeholder="🔍 ابحث بالاسم أو الرقم القومي أو القسم..." style="background: #f8fafc;">
               </div>
               <div id="dev-students-list-container">
                 <!-- Injected via JavaScript -->
@@ -673,12 +673,12 @@
           <div id="dev-panel-lectures" class="dev-subpanel" style="display: none;">
             <div class="glass-panel" style="padding: 22px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-                <h4 style="font-size: 1.15rem; color: #fff; margin: 0;">جميع المحاضرات والسكاشن المسجلة</h4>
+                <h4 style="font-size: 1.15rem; color: #064e3b; margin: 0;">جميع المحاضرات والسكاشن المسجلة</h4>
                 <span id="dev-lectures-count-badge" class="dept-badge" style="background: rgba(139,92,246,0.15); color: var(--purple-light);">● 0 محاضرة</span>
               </div>
               <!-- Search Bar -->
               <div style="margin-bottom: 16px;">
-                <input type="text" id="dev-lecture-search-input" class="form-input" placeholder="🔍 ابحث باسم المحاضرة أو اسم المحاضر أو القسم..." style="background: rgba(15,23,42,0.7);">
+                <input type="text" id="dev-lecture-search-input" class="form-input" placeholder="🔍 ابحث باسم المحاضرة أو اسم المحاضر أو القسم..." style="background: #f8fafc;">
               </div>
               <div id="dev-lectures-list-container">
                 <!-- Injected via JavaScript -->
@@ -726,7 +726,7 @@
             <div class="glass-panel" style="padding: 22px; margin-bottom: 20px;">
               <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
                 <div>
-                  <h4 style="font-size:1.1rem; color:#fff; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+                  <h4 style="font-size:1.1rem; color: #064e3b; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
                     <span>🔐</span>
                     <span>كلمة سر المطور الرئيسية (Master PIN)</span>
                   </h4>
@@ -744,7 +744,7 @@
             <div class="glass-panel" style="padding: 22px; margin-bottom: 20px;">
               <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
                 <div>
-                  <h4 style="font-size:1.1rem; color:#fff; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+                  <h4 style="font-size:1.1rem; color: #064e3b; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
                     <span>📊</span>
                     <span>تصدير نسخة احتياطية كاملة للنظام (Excel)</span>
                   </h4>
@@ -788,7 +788,7 @@
           <div style="display:flex; align-items:center; gap:10px;">
             <div class="doctor-avatar-box" style="border-radius:12px; width:44px; height:44px; background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3); font-size:1.3rem;">👨‍🏫</div>
             <div>
-              <h3 id="inst-dashboard-header-title" class="panel-title" style="margin:0; font-size:1.15rem; font-weight:800; color:#fff;">لوحة تحكم المحاضر</h3>
+              <h3 id="inst-dashboard-header-title" class="panel-title" style="margin:0; font-size:1.15rem; font-weight:800; color: #064e3b;">لوحة تحكم المحاضر</h3>
               <div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
                 <span id="inst-dashboard-header-dept" class="dept-badge" style="background:rgba(6,182,212,0.15); color:var(--cyan-light); font-size:0.75rem;">عضو هيئة تدريس</span>
               </div>
@@ -842,7 +842,7 @@
 
           <div class="glass-panel" style="padding: 20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
-              <h4 style="font-size:1.1rem; color:#fff;">سجل المحاضرات والجلسات</h4>
+              <h4 style="font-size:1.1rem; color: #064e3b;">سجل المحاضرات والجلسات</h4>
               <button id="btn-open-new-lecture-modal" class="tool-btn" style="background:linear-gradient(135deg, var(--cyan-primary), #2563eb); color:#fff; padding:10px 18px; font-size:0.95rem;">
                 <span>+ بدء محاضرة جديدة</span>
               </button>
@@ -859,7 +859,7 @@
           <div class="glass-panel" style="padding: 20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
               <div>
-                <h4 style="font-size:1.1rem; color:#fff;">دليل وبيانات جميع الطلاب المسجلين</h4>
+                <h4 style="font-size:1.1rem; color: #064e3b;">دليل وبيانات جميع الطلاب المسجلين</h4>
                 <p style="font-size:0.8rem; color:var(--text-muted);">يمكنك استعراض بيانات كل طالب وإرسال رسالة مباشرة إليه</p>
               </div>
               <div class="search-input-box" style="max-width: 300px;">
@@ -903,7 +903,7 @@
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
               <span style="font-size:1.6rem;">📢</span>
               <div>
-                <h4 style="font-size:1.15rem; color:#fff;">إرسال رسالة أو تنبيه للطلاب</h4>
+                <h4 style="font-size:1.15rem; color: #064e3b;">إرسال رسالة أو تنبيه للطلاب</h4>
                 <p style="font-size:0.8rem; color:var(--text-muted);">تصل الرسائل فوراً داخل بروفايل الطلاب على هواتفهم</p>
               </div>
             </div>
@@ -912,7 +912,7 @@
               <!-- Target Type Selector -->
               <div class="form-group">
                 <label class="form-label" for="msg-target-type">تحديد المستهدفين بالرسالة:</label>
-                <select id="msg-target-type" class="form-input" style="background:#111827;">
+                <select id="msg-target-type" class="form-input" style="">
                   <option value="all">📢 إرسال لجميع الطلاب (عام لكل الأقسام)</option>
                   <option value="dept:آلات">🏛️ لطلاب قسم آلات فقط</option>
                   <option value="dept:نظم">🏛️ لطلاب قسم نظم فقط</option>
@@ -949,7 +949,7 @@
 
           <!-- History of Sent Messages -->
           <div class="glass-panel" style="padding: 22px;">
-            <h4 style="font-size:1.05rem; color:#fff; margin-bottom:14px;">سجل الرسائل والتنبيهات المرسلة سابقاً</h4>
+            <h4 style="font-size:1.05rem; color: #064e3b; margin-bottom:14px;">سجل الرسائل والتنبيهات المرسلة سابقاً</h4>
             <div id="sent-messages-list" class="messages-list">
               <!-- Sent messages injected here -->
             </div>
@@ -959,7 +959,7 @@
         <!-- Subpanel 4: Settings -->
         <div id="panel-inst-settings" class="instructor-subpanel" style="display: none;">
           <div class="glass-panel" style="padding: 22px; max-width: 500px; margin: 0 auto;">
-            <h4 style="font-size:1.1rem; color:#fff; margin-bottom:16px;">إعدادات لوحة التحكم</h4>
+            <h4 style="font-size:1.1rem; color: #064e3b; margin-bottom:16px;">إعدادات لوحة التحكم</h4>
 
             <div style="display: flex; flex-direction: column; gap: 14px;">
               <button id="btn-open-share-modal" class="tool-btn" style="background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.35); color:var(--cyan-light); padding:12px 16px; justify-content:center;">
@@ -1063,7 +1063,7 @@
         <!-- Live Attendance List / Table -->
         <div class="glass-panel" style="padding: 20px;">
           <div class="table-header-tools">
-            <h4 style="font-size:1.05rem; color:#fff;">كشف حضور المحاضرة اللحظي</h4>
+            <h4 style="font-size:1.05rem; color: #064e3b;">كشف حضور المحاضرة اللحظي</h4>
             <div class="search-input-box">
               <input type="text" id="attendance-search-input" placeholder="بحث بالاسم أو الرقم القومي...">
               <span class="search-icon">🔍</span>
@@ -1100,7 +1100,7 @@
     <div id="modal-new-lecture" class="modal-backdrop">
       <div class="modal-dialog">
         <button class="modal-close-btn">&times;</button>
-        <h3 style="font-size:1.25rem; margin-bottom:14px; color:#fff;">بدء جلسة حضور جديدة</h3>
+        <h3 style="font-size:1.25rem; margin-bottom:14px; color: #064e3b;">بدء جلسة حضور جديدة</h3>
         
         <form id="create-lecture-form">
           <!-- Session Type Selector: نظري / عملي -->
@@ -1136,7 +1136,7 @@
 
           <div class="form-group">
             <label class="form-label" for="new-lec-dept">القسم المستهدف:</label>
-            <select id="new-lec-dept" class="form-input" style="background:#111827;">
+            <select id="new-lec-dept" class="form-input" style="">
               <option value="الكل">جميع الأقسام (متاح للكل)</option>
               <option value="آلات">آلات فقط</option>
               <option value="نظم">نظم فقط</option>
@@ -1157,7 +1157,7 @@
     <div id="modal-manual-add" class="modal-backdrop">
       <div class="modal-dialog">
         <button class="modal-close-btn">&times;</button>
-        <h3 style="font-size:1.2rem; margin-bottom:8px; color:#fff;">إضافة حضور طالب يدوياً</h3>
+        <h3 style="font-size:1.2rem; margin-bottom:8px; color: #064e3b;">إضافة حضور طالب يدوياً</h3>
         <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:18px;">
           في حال نفاذ شحن بطارية هاتف الطالب داخل المدرج
         </p>
@@ -1175,7 +1175,7 @@
 
           <div class="form-group">
             <label class="form-label" for="manual-dept">القسم:</label>
-            <select id="manual-dept" class="form-input" style="background:#111827;">
+            <select id="manual-dept" class="form-input" style="">
               <option value="آلات">آلات</option>
               <option value="نظم">نظم</option>
               <option value="ري">ري</option>
@@ -1196,7 +1196,7 @@
       <div class="modal-dialog" style="text-align: center;">
         <button class="modal-close-btn">&times;</button>
         <div style="font-size: 2.2rem; margin-bottom: 8px;">📲</div>
-        <h3 style="font-size:1.25rem; margin-bottom:6px; color:#fff;">مشاركة التطبيق مع الطلاب</h3>
+        <h3 style="font-size:1.25rem; margin-bottom:6px; color: #064e3b;">مشاركة التطبيق مع الطلاب</h3>
         <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">
           اطلب من الطلاب في المدرج توجيه كاميرا هواتفهم نحو هذا الكود لفتح التطبيق وتسجيل بياناتهم فوراً
         </p>
@@ -1221,7 +1221,7 @@
     <div id="modal-change-pin" class="modal-backdrop">
       <div class="modal-dialog">
         <button class="modal-close-btn">&times;</button>
-        <h3 style="font-size:1.25rem; margin-bottom:6px; color:#fff;">تغيير الرمز السري للمحاضر</h3>
+        <h3 style="font-size:1.25rem; margin-bottom:6px; color: #064e3b;">تغيير الرمز السري للمحاضر</h3>
         <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:18px;">
           الرمز السري يمنع الطلاب من فتح لوحة التحكم أو التلاعب بالغياب
         </p>
@@ -1250,7 +1250,7 @@
       <div class="modal-dialog" style="max-width: 380px; text-align: center;">
         <button class="modal-close-btn">&times;</button>
         <div style="font-size: 2rem; margin-bottom: 8px;">🔐</div>
-        <h3 style="font-size:1.15rem; margin-bottom:6px; color:#fff;">دخول مسؤول النظام والمطور</h3>
+        <h3 style="font-size:1.15rem; margin-bottom:6px; color: #064e3b;">دخول مسؤول النظام والمطور</h3>
         <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:16px;">
           يرجى إدخال كلمة سر المطور للمتابعة
         </p>
@@ -1278,7 +1278,7 @@
     <div id="modal-edit-doc-pin" class="modal-backdrop">
       <div class="modal-dialog" style="max-width: 440px;">
         <button class="modal-close-btn">&times;</button>
-        <h3 style="font-size:1.2rem; margin-bottom:6px; color:#fff;">تغيير كلمة سر الدكتور</h3>
+        <h3 style="font-size:1.2rem; margin-bottom:6px; color: #064e3b;">تغيير كلمة سر الدكتور</h3>
         <p id="edit-doc-pin-subtitle" style="font-size:0.85rem; color:var(--cyan-light); margin-bottom:16px;">
           د. جورج سليمان
         </p>
@@ -1303,7 +1303,7 @@
         <button class="modal-close-btn">&times;</button>
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
           <span style="font-size:1.3rem;">⚙️</span>
-          <h3 style="font-size:1.15rem; color:#fff; margin:0;">تغيير كلمة سر المطور</h3>
+          <h3 style="font-size:1.15rem; color: #064e3b; margin:0;">تغيير كلمة سر المطور</h3>
         </div>
         <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:16px;">
           قم بتعيين كلمة سر جديدة لحماية لوحة إدارة النظام
@@ -1339,7 +1339,7 @@
             🎓
           </div>
           <div>
-            <h3 id="owner-student-prof-name" style="font-size:1.25rem; color:#fff; margin:0 0 4px 0; font-weight:800;">اسم الطالب</h3>
+            <h3 id="owner-student-prof-name" style="font-size:1.25rem; color: #064e3b; margin:0 0 4px 0; font-weight:800;">اسم الطالب</h3>
             <div style="display:flex; gap:8px; align-items:center;">
               <span id="owner-student-prof-dept" class="dept-badge" style="background:rgba(16,185,129,0.2); color:var(--emerald-light); font-size:0.75rem;">قسم</span>
               <span id="owner-student-prof-date" style="font-size:0.75rem; color:var(--text-dim);">مسجل: 2026/11/9</span>
@@ -1348,7 +1348,7 @@
         </div>
 
         <!-- National ID Info Card -->
-        <div style="background:rgba(15,23,42,0.7); border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="background: #f8fafc; border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
           <div>
             <span style="font-size:0.75rem; color:var(--text-muted); display:block;">الرقم القومي (14 رقم):</span>
             <code id="owner-student-prof-nid" style="font-size:1.05rem; color:var(--cyan-light); font-family:monospace; font-weight:700; letter-spacing:1px;">00000000000000</code>
@@ -1359,7 +1359,7 @@
         </div>
 
         <!-- Password Info Card -->
-        <div style="background:rgba(15,23,42,0.7); border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="background: #f8fafc; border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
           <div>
             <span style="font-size:0.75rem; color:var(--text-muted); display:block;">كلمة المرور المسجلة:</span>
             <code id="owner-student-prof-pass" style="font-size:1.05rem; color:var(--purple-light); font-family:monospace; font-weight:700;">******</code>
@@ -1370,7 +1370,7 @@
         </div>
 
         <!-- Student Smart QR Code Container -->
-        <div style="background:rgba(11,15,25,0.7); border:1px solid var(--glass-border); border-radius:14px; padding:14px; text-align:center; margin-bottom:16px;">
+        <div style="background: #f0fdf4; border:1px solid var(--glass-border); border-radius:14px; padding:14px; text-align:center; margin-bottom:16px;">
           <div style="font-size:0.82rem; color:#cbd5e1; font-weight:700; margin-bottom:10px;">كود الحضور الذكي للطالب (QR Code)</div>
           <div class="qr-frame-box" style="margin: 0 auto 10px auto; width: 170px; height: 170px;">
             <div id="owner-student-qr-container"></div>
@@ -1383,7 +1383,7 @@
         <!-- Student Attendance History -->
         <div style="margin-bottom:18px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <h4 style="font-size:0.95rem; color:#fff; margin:0;">سجل حضور المحاضرات والسكاشن</h4>
+            <h4 style="font-size:0.95rem; color: #064e3b; margin:0;">سجل حضور المحاضرات والسكاشن</h4>
             <span id="owner-student-att-count" class="dept-badge" style="background:rgba(6,182,212,0.15); color:var(--cyan-light); font-size:0.75rem;">0 حضور</span>
           </div>
           <div id="owner-student-att-list" style="max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
@@ -1410,7 +1410,7 @@
             👨‍🏫
           </div>
           <div>
-            <h3 id="owner-inst-prof-name" style="font-size:1.25rem; color:#fff; margin:0 0 4px 0; font-weight:800;">اسم المحاضر</h3>
+            <h3 id="owner-inst-prof-name" style="font-size:1.25rem; color: #064e3b; margin:0 0 4px 0; font-weight:800;">اسم المحاضر</h3>
             <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
               <span id="owner-inst-prof-role" class="doctor-role-badge prof">دكتور</span>
               <span id="owner-inst-prof-dept" class="dept-badge" style="background:rgba(255,255,255,0.08); color:var(--text-muted); font-size:0.75rem;">قسم الكل</span>
@@ -1419,7 +1419,7 @@
         </div>
 
         <!-- Password Card with Reveal Toggle & Quick Edit -->
-        <div style="background:rgba(15,23,42,0.7); border:1px solid var(--glass-border); border-radius:12px; padding:12px 14px; margin-bottom:16px;">
+        <div style="background: #f8fafc; border:1px solid var(--glass-border); border-radius:12px; padding:12px 14px; margin-bottom:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div>
               <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">كلمة السر / الرمز السري الحالي:</span>
@@ -1454,7 +1454,7 @@
 
         <!-- Lectures List by This Instructor -->
         <div style="margin-bottom:18px;">
-          <h4 style="font-size:0.95rem; color:#fff; margin-bottom:8px;">سجل المحاضرات التي ألقاها</h4>
+          <h4 style="font-size:0.95rem; color: #064e3b; margin-bottom:8px;">سجل المحاضرات التي ألقاها</h4>
           <div id="owner-inst-lectures-list" style="max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
             <!-- Lectures injected here -->
           </div>
@@ -1487,19 +1487,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=6.4"></script>
+  <script src="./js/firebase-app.js?v=7.0"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=6.4"></script>
-  <script src="./libs/html5-qrcode.min.js?v=6.4"></script>
-  <script src="./libs/xlsx.full.min.js?v=6.4"></script>
+  <script src="./libs/qrcode.js?v=7.0"></script>
+  <script src="./libs/html5-qrcode.min.js?v=7.0"></script>
+  <script src="./libs/xlsx.full.min.js?v=7.0"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=6.4"></script>
-  <script src="./js/sync.js?v=6.4"></script>
-  <script src="./js/qr-scanner.js?v=6.4"></script>
-  <script src="./js/excel.js?v=6.4"></script>
-  <script src="./js/app.js?v=6.4"></script>
+  <script src="./js/db.js?v=7.0"></script>
+  <script src="./js/sync.js?v=7.0"></script>
+  <script src="./js/qr-scanner.js?v=7.0"></script>
+  <script src="./js/excel.js?v=7.0"></script>
+  <script src="./js/app.js?v=7.0"></script>
 
 </body>
 </html>

@@ -719,21 +719,21 @@ function downloadQrAsImage() {
   const ctx = canvas.getContext('2d');
 
   // Card background
-  ctx.fillStyle = '#0f172a';
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Top header bar
-  ctx.fillStyle = '#06b6d4';
+  ctx.fillStyle = '#059669';
   ctx.fillRect(0, 0, canvas.width, 16);
 
   // Title
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = '#064e3b';
   ctx.font = 'bold 34px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('بطاقة الحضور والغياب الذكية', 300, 70);
 
   // Student Name
-  ctx.fillStyle = '#38bdf8';
+  ctx.fillStyle = '#047857';
   ctx.font = 'bold 36px sans-serif';
   ctx.fillText(state.currentStudent.full_name, 300, 130);
 
@@ -754,7 +754,7 @@ function downloadQrAsImage() {
     ctx.drawImage(img, 120, 230, 360, 360);
 
     // National ID
-    ctx.fillStyle = '#cbd5e1';
+    ctx.fillStyle = '#334155';
     ctx.font = '24px monospace';
     ctx.fillText('الرقم القومي: ' + state.currentStudent.national_id, 300, 650);
 
@@ -1165,11 +1165,11 @@ async function loadDeveloperInstructors() {
           <div class="doctor-avatar-box" style="border-radius: 16px; width: 52px; height: 52px; background: ${isProf ? 'rgba(6,182,212,0.15)' : 'rgba(168,85,247,0.15)'}; border: 1px solid ${isProf ? 'rgba(6,182,212,0.3)' : 'rgba(168,85,247,0.3)'};">
             ${isProf ? '👨‍🏫' : '🔬'}
           </div>
-          <span style="position: absolute; bottom: -2px; left: -2px; width: 10px; height: 10px; border-radius: 50%; background: #10b981; border: 2px solid #0f172a;"></span>
+          <span style="position: absolute; bottom: -2px; left: -2px; width: 10px; height: 10px; border-radius: 50%; background: #10b981; border: 2px solid #ffffff;"></span>
         </div>
         <div style="flex: 1;">
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
-            <h4 style="color:#fff; font-size:1.15rem; margin:0; font-weight:800;">${doc.name}</h4>
+            <h4 style="color:#064e3b; font-size:1.15rem; margin:0; font-weight:800;">${doc.name}</h4>
             <span class="doctor-role-badge ${isProf ? 'prof' : 'assistant'}">${doc.role} - قسم ${doc.department}</span>
           </div>
           <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 8px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 8px;">
@@ -1305,8 +1305,8 @@ function renderDeveloperStudents(students) {
     const attendedCount = attendanceCounts[nid] || 0;
     const card = document.createElement('div');
     card.className = 'doctor-item-card';
-    card.style.background = 'rgba(15, 23, 42, 0.65)';
-    card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+    card.style.background = '#ffffff';
+    card.style.borderColor = '#e2e8f0';
 
     card.innerHTML = `
       <div class="doctor-info-box" style="flex: 1;">
@@ -1315,14 +1315,14 @@ function renderDeveloperStudents(students) {
         </div>
         <div style="flex: 1;">
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
-            <h4 style="color:#fff; font-size:1.05rem; margin:0; font-weight:700;">${student.full_name}</h4>
+            <h4 style="color:#064e3b; font-size:1.05rem; margin:0; font-weight:700;">${student.full_name}</h4>
             <span class="doctor-role-badge" style="background: rgba(139,92,246,0.18); color: var(--purple-light); font-size: 0.72rem; border: 1px solid rgba(139,92,246,0.3);">${student.academic_year || 'الفرقة الأولى'}</span>
             <span class="doctor-role-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light); font-size: 0.72rem;">${(student.department && (student.department.startsWith('سكشن') || student.department.startsWith('قسم'))) ? student.department : ('قسم ' + (student.department || 'عام'))}</span>
             <span class="dept-badge" style="background: rgba(6,182,212,0.15); color: var(--cyan-light); font-size: 0.72rem;">حضر ${attendedCount} محاضرة</span>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
             <span style="font-size:0.78rem; color:var(--text-muted);">الرقم القومي:</span>
-            <code style="color:#fff; font-size:0.88rem; font-family:monospace; letter-spacing:1px;">${student.national_id}</code>
+            <code style="color:#0f172a; font-size:0.88rem; font-family:monospace; letter-spacing:1px; font-weight:700;">${student.national_id}</code>
           </div>
         </div>
       </div>
@@ -1479,7 +1479,7 @@ async function openOwnerStudentProfile(student) {
           <div>
             <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
               <span class="doctor-role-badge ${isLab ? 'assistant' : 'prof'}" style="font-size:0.7rem; padding:2px 6px;">${r.session_type || 'محاضرة'}</span>
-              <strong style="color:#fff; font-size:0.88rem;">${r.lecture_title || 'محاضرة'}</strong>
+              <strong style="color:#064e3b; font-size:0.88rem;">${r.lecture_title || 'محاضرة'}</strong>
             </div>
             <div style="font-size:0.75rem; color:var(--text-dim);">
               ${r.instructor_name ? `👨‍🏫 ${r.instructor_name} | ` : ''}⏰ وقت الرصد: ${r.scan_time || ''}
@@ -1599,7 +1599,7 @@ async function openOwnerInstructorProfile(instructor) {
         item.className = 'owner-history-item';
         item.innerHTML = `
           <div>
-            <div style="color:#fff; font-size:0.88rem; font-weight:700; margin-bottom:2px;">${l.title}</div>
+            <div style="color:#064e3b; font-size:0.88rem; font-weight:700; margin-bottom:2px;">${l.title}</div>
             <div style="font-size:0.75rem; color:var(--text-dim);">
               <span>📅 ${l.lecture_date || ''}</span> | <span>🏛️ ${l.target_dept || 'الكل'}</span>
             </div>
@@ -2983,7 +2983,7 @@ async function loadStudentAttendanceHistory(nationalId) {
       <div style="flex:1;">
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
           <span class="doctor-role-badge ${isLab ? 'assistant' : 'prof'}">${typeBadge}</span>
-          <h5 style="color:#fff; font-size:1.05rem; font-weight:700; margin:0;">${titleText}</h5>
+          <h5 style="color:#064e3b; font-size:1.05rem; font-weight:700; margin:0;">${titleText}</h5>
         </div>
         <div style="font-size:0.8rem; color:var(--text-muted); display:flex; flex-wrap:wrap; gap:12px; margin-top:4px;">
           <span>🕒 وقت الحضور: ${rec.scan_time || ''}</span>
@@ -3120,7 +3120,7 @@ function renderStudentsDirectoryRows(students) {
 
     tr.innerHTML = `
       <td>${idx + 1}</td>
-      <td style="font-weight:700; color:#fff;">${st.full_name}</td>
+      <td style="font-weight:700; color:#064e3b;">${st.full_name}</td>
       <td style="font-family:monospace; color:#cbd5e1;">${st.national_id}</td>
       <td><span class="table-dept-badge ${badgeClass}">${st.department}</span></td>
       <td style="color:var(--text-muted); font-size:0.82rem;">${dateStr}</td>
