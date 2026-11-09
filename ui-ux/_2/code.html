@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>لوحة المحاضر - Agricultural Engineer</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&amp;family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Readex Pro"', 'Cairo', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              dark: '#070d17',
+              navy: '#0b1322',
+              card: '#121d2f',
+              cardHover: '#17253b',
+              border: '#1e2e48',
+              emerald: '#10b981',
+              cyan: '#06b6d4',
+              accent: '#059669',
+              danger: '#f43f5e',
+            }
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 25px -5px rgba(6, 182, 212, 0.25)',
+            'glow-emerald': '0 0 25px -5px rgba(16, 185, 129, 0.25)',
+            'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-scroll-and-glass">
+    body {
+      background-color: #070d17;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 20%, rgba(16, 185, 129, 0.07) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.05) 0px, transparent 50%);
+      min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Custom subtle glass morphism styling */
+    .glass-panel {
+      background: linear-gradient(135deg, rgba(18, 29, 47, 0.75) 0%, rgba(11, 19, 34, 0.85) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .glass-card {
+      background: linear-gradient(145deg, rgba(20, 33, 53, 0.6) 0%, rgba(13, 22, 38, 0.8) 100%);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(56, 189, 248, 0.1);
+    }
+    
+    .nav-tab-active {
+      background: linear-gradient(135deg, #0ea5e9 0%, #059669 100%);
+      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.35);
+    }
+
+    /* Hide scrollbar for clean horizontal list scrolling */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="font-sans text-slate-100 antialiased selection:bg-emerald-500 selection:text-white flex justify-center min-h-screen">
+<!-- Mobile Viewport Container -->
+<div class="w-full max-w-[440px] flex flex-col min-h-screen border-x border-slate-800/40 relative shadow-2xl pb-8">
+<!-- BEGIN: TopHeader -->
+<header class="px-5 pt-5 pb-3 flex items-center justify-between sticky top-0 z-30 bg-[#070d17]/85 backdrop-blur-md border-b border-slate-800/60" data-purpose="top-navigation-bar">
+<!-- App Identity / Logo & Title -->
+<div class="flex items-center gap-2.5">
+<div class="relative w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-400 p-[1.5px] shadow-sm">
+<div class="w-full h-full bg-[#0a1424] rounded-[10px] flex items-center justify-center text-lg overflow-hidden">
+            👨‍🌾
+          </div>
+<span class="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-sm tracking-tight text-white flex items-center gap-1.5">
+            Agricultural engineer
+          </span>
+<span class="text-[10px] text-emerald-400/90 font-medium">نظام إدارة المحاضرات الذكي</span>
+</div>
+</div>
+<!-- Offline Status Pill -->
+<div class="flex items-center gap-2">
+<button aria-label="Dark mode toggler" class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-800/70 border border-slate-700/60 text-amber-300 hover:bg-slate-700/60 transition-colors" type="button">
+<svg class="w-4 h-4 fill-amber-300" viewbox="0 0 24 24">
+<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+</svg>
+</button>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/80 border border-emerald-500/30 text-emerald-400 shadow-inner" data-purpose="offline-indicator">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+<span class="text-[11px] font-semibold tracking-wide">أوفلاين</span>
+</div>
+</div>
+</header>
+<!-- END: TopHeader -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 px-4 pt-4 space-y-4">
+<!-- BEGIN: LecturerProfileCard -->
+<section class="glass-panel rounded-2xl p-4 shadow-lg border border-slate-800 relative overflow-hidden" data-purpose="lecturer-identity">
+<!-- Glow highlight background -->
+<div class="absolute -top-12 -left-12 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex items-center justify-between relative z-10">
+<!-- Lecturer Details & Avatar -->
+<div class="flex items-center gap-3">
+<div class="relative w-13 h-13 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 p-1 border border-emerald-500/30">
+<div class="w-11 h-11 rounded-xl bg-slate-900 flex items-center justify-center text-2xl shadow-inner">
+                👨‍🏫
+              </div>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<h1 class="text-base font-bold text-white tracking-wide">لوحة المحاضر</h1>
+<span class="text-slate-400 font-semibold text-sm">: د. محمد صبري</span>
+</div>
+<div class="mt-1 flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-emerald-950/70 border border-emerald-500/30 text-emerald-300">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  معيد • قسم الكل
+                </span>
+</div>
+</div>
+</div>
+<!-- Logout Button -->
+<button class="group flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 hover:text-rose-200 transition-all text-xs font-semibold" data-purpose="logout-button" type="button">
+<span>خروج</span>
+<svg class="w-3.5 h-3.5 text-rose-400 rotate-180 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</section>
+<!-- END: LecturerProfileCard -->
+<!-- BEGIN: NavigationTabs -->
+<nav class="glass-panel p-1.5 rounded-2xl flex items-center justify-between gap-1 shadow-md border border-slate-800" data-purpose="dashboard-navigation-tabs">
+<!-- Tab: المحاضرات (Active) -->
+<button class="flex-1 py-2 px-1 rounded-xl nav-tab-active text-white flex flex-col items-center justify-center gap-1 transition-all" type="button">
+<span class="text-base">📚</span>
+<span class="text-[11px] font-bold tracking-tight">المحاضرات</span>
+</button>
+<!-- Tab: دليل الطلاب -->
+<button class="flex-1 py-2 px-1 rounded-xl hover:bg-slate-800/60 text-slate-300 hover:text-white flex flex-col items-center justify-center gap-1 transition-colors" type="button">
+<span class="text-base text-slate-400">👥</span>
+<span class="text-[11px] font-medium tracking-tight">دليل الطلاب</span>
+</button>
+<!-- Tab: الرسائل -->
+<button class="flex-1 py-2 px-1 rounded-xl hover:bg-slate-800/60 text-slate-300 hover:text-white flex flex-col items-center justify-center gap-1 transition-colors" type="button">
+<span class="text-base text-slate-400">📢</span>
+<span class="text-[11px] font-medium tracking-tight">الرسائل</span>
+</button>
+<!-- Tab: الإعدادات -->
+<button class="flex-1 py-2 px-1 rounded-xl hover:bg-slate-800/60 text-slate-300 hover:text-white flex flex-col items-center justify-center gap-1 transition-colors" type="button">
+<span class="text-base text-slate-400">⚙️</span>
+<span class="text-[11px] font-medium tracking-tight">الإعدادات</span>
+</button>
+</nav>
+<!-- END: NavigationTabs -->
+<!-- BEGIN: StatsCounters -->
+<section class="grid grid-cols-2 gap-3" data-purpose="overview-statistics">
+<!-- Stat Card 1: إجمالي المحاضرات -->
+<div class="glass-card rounded-2xl p-4 flex items-center justify-between border border-slate-800 shadow-md hover:border-emerald-500/30 transition-all">
+<div class="flex flex-col">
+<span class="text-2xl font-black text-white font-mono leading-none">1</span>
+<span class="text-xs text-slate-400 font-medium mt-1.5">إجمالي المحاضرات</span>
+</div>
+<div class="w-11 h-11 rounded-xl bg-cyan-950/40 border border-cyan-500/20 flex items-center justify-center text-xl shadow-inner">
+            📚
+          </div>
+</div>
+<!-- Stat Card 2: الطلاب المسجلين -->
+<div class="glass-card rounded-2xl p-4 flex items-center justify-between border border-slate-800 shadow-md hover:border-emerald-500/30 transition-all">
+<div class="flex flex-col">
+<span class="text-2xl font-black text-white font-mono leading-none">2</span>
+<span class="text-xs text-slate-400 font-medium mt-1.5">الطلاب المسجلين</span>
+</div>
+<div class="w-11 h-11 rounded-xl bg-purple-950/40 border border-purple-500/20 flex items-center justify-center text-xl shadow-inner">
+            👥
+          </div>
+</div>
+</section>
+<!-- END: StatsCounters -->
+<!-- BEGIN: LectureSessionsSection -->
+<section class="glass-panel rounded-2xl p-4 pt-5 shadow-xl border border-slate-800 space-y-4" data-purpose="lecture-sessions-container">
+<!-- Section Header -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400"></span>
+<h2 class="text-base font-bold text-white tracking-wide">سجل المحاضرات والجلسات</h2>
+</div>
+<span class="text-xs text-slate-400 bg-slate-800/60 px-2 py-0.5 rounded-full border border-slate-700/50">جلسة نشطة</span>
+</div>
+<!-- Primary Action: Start New Lecture -->
+<button class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-500 active:scale-[0.99] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 border border-emerald-400/30 transition-all" data-purpose="create-lecture-button" type="button">
+<span class="text-lg leading-none font-normal">+</span>
+<span>بدء محاضرة جديدة</span>
+</button>
+<!-- Lecture Session Card Item -->
+<article class="bg-[#0b1424] rounded-2xl p-4 border border-slate-800 hover:border-slate-700 transition-all relative shadow-md" data-purpose="lecture-item">
+<!-- Card Header: Title & Subject -->
+<div class="flex items-start justify-between pb-3 border-b border-slate-800/80">
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-xl bg-cyan-950/40 border border-cyan-500/30 flex items-center justify-center text-lg text-cyan-400 shadow-inner">
+                🔬
+              </div>
+<div>
+<h3 class="font-bold text-white text-sm">سكشن عملي ميكانيكا تربة</h3>
+<span class="text-[11px] text-slate-400">الجلسة العملية الأسبوعية</span>
+</div>
+</div>
+<!-- Date Badge -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 text-[11px] font-mono">
+<span>📅</span>
+<span dir="ltr">2026/11/9</span>
+</div>
+</div>
+<!-- Metadata Rows Grid -->
+<div class="grid grid-cols-2 gap-2.5 my-3.5 text-xs">
+<!-- Department Info -->
+<div class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-800/60">
+<span class="text-sm">🏛️</span>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400">القسم:</span>
+<span class="font-semibold text-slate-200">قسم الكل</span>
+</div>
+</div>
+<!-- Instructor Info -->
+<div class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-800/60">
+<span class="text-sm">👨‍🏫</span>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400">المحاضر:</span>
+<span class="font-semibold text-slate-200">د. محمد صبري</span>
+</div>
+</div>
+</div>
+<!-- Attendance Status & Actions Bar -->
+<div class="flex items-center justify-between pt-2">
+<!-- Attendance Metric Pill -->
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-500/25 text-emerald-300 text-xs">
+<span>👥</span>
+<span>الحضور: <strong class="font-bold text-white">0</strong> طالب</span>
+</div>
+<!-- Controls: Action Button & Delete Button -->
+<div class="flex items-center gap-2">
+<!-- Open & Record Lecture Button -->
+<button class="group flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-600/20 to-blue-600/20 hover:from-cyan-600/30 hover:to-blue-600/30 border border-cyan-500/40 text-cyan-300 text-xs font-semibold transition-all" data-purpose="open-record-lecture" type="button">
+<span>فتح ورصد المحاضرة</span>
+<svg class="w-3.5 h-3.5 fill-current transform group-hover:-translate-x-0.5 transition-transform" viewbox="0 0 24 24">
+<path d="M15.5 5.5l-7.5 6.5 7.5 6.5v-13z"></path>
+</svg>
+</button>
+<!-- Delete/Trash Action -->
+<button aria-label="حذف المحاضرة" class="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 hover:text-rose-300 transition-colors" data-purpose="delete-lecture" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+</article>
+</section>
+<!-- END: LectureSessionsSection -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: PageFooter -->
+<footer class="mt-8 pt-4 pb-2 text-center text-xs tracking-widest text-slate-400 font-mono flex items-center justify-center gap-2 select-none border-t border-slate-900/60" data-purpose="developer-credit-footer">
+<span class="text-amber-400">⚡</span>
+<span>BY — ENG — GEORGE</span>
+<span class="text-amber-400">⚡</span>
+</footer>
+<!-- END: PageFooter -->
+</div>
+</body></html>

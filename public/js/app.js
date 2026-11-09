@@ -2598,7 +2598,7 @@ function renderAttendanceRows(records) {
     tr.innerHTML = `
       <td>${records.length - idx}</td>
       <td style="font-weight:600;">${rec.student_name}</td>
-      <td style="font-family:monospace; color:#cbd5e1;">${rec.national_id}</td>
+      <td style="font-family:monospace; font-weight:700; color:var(--text-dark);">${rec.national_id}</td>
       <td><span class="table-dept-badge ${badgeClass}">${rec.department}</span></td>
       <td style="color:var(--text-muted);">${rec.scan_time}</td>
       <td>
@@ -2864,7 +2864,7 @@ function initApp() {
     setupInstructorPortalTabs();
     setupGlobalEvents();
     registerServiceWorker();
-    console.log('Agricultural engineer PWA v7.2 initialized successfully.');
+    console.log('Agricultural engineer PWA v7.3 initialized successfully.');
   } catch (e) {
     console.error('Error during initApp:', e);
   }
@@ -3126,7 +3126,10 @@ async function loadStudentsDirectory() {
   const tbody = document.getElementById('students-directory-tbody');
   if (!tbody) return;
 
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:25px; color:var(--text-dim);">جاري جلب بيانات الطلاب...</td></tr>';
+  const container = document.getElementById('students-directory-list') || document.getElementById('students-directory-tbody');
+  if (container) {
+    container.innerHTML = '<div style="text-align:center; padding:28px; color:var(--text-dim); font-weight:700;">⏳ جاري جلب بيانات الطلاب...</div>';
+  }
 
   let students = [];
   if (window.CloudDB && window.CloudDB.getAllStudents) {
@@ -3157,37 +3160,67 @@ function updateDirectoryCounts(students) {
 }
 
 function renderStudentsDirectoryRows(students) {
-  const tbody = document.getElementById('students-directory-tbody');
-  tbody.innerHTML = '';
+  const container = document.getElementById('students-directory-list') || document.getElementById('students-directory-tbody');
+  if (!container) return;
+  container.innerHTML = '';
 
-  if (students.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-dim);">لا يوجد طلاب مسجلين في هذا القسم حتى الآن.</td></tr>';
+  if (!students || students.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding: 36px 16px;">
+        <div class="empty-state-icon">👥</div>
+        <p style="font-weight:700; color:var(--text-dim); font-size:1rem;">لا يوجد طلاب مسجلين في هذا القسم حتى الآن.</p>
+      </div>
+    `;
     return;
   }
 
   students.forEach((st, idx) => {
-    const tr = document.createElement('tr');
+    const card = document.createElement('div');
+    card.className = 'student-card-box';
     const badgeClass = getDeptBadgeClass(st.department);
-    const dateStr = st.registered_at ? new Date(st.registered_at).toLocaleDateString('ar-EG') : '';
+    const dateStr = st.registered_at ? new Date(st.registered_at).toLocaleDateString('ar-EG') : '—';
+    const yearOrSection = st.academic_year || (st.department ? `قسم ${st.department}` : 'طالب');
 
-    tr.innerHTML = `
-      <td style="text-align:center; font-weight:700; color:var(--text-dim);">${idx + 1}</td>
-      <td style="font-weight:800; color:var(--text-main); font-size:0.95rem;">${st.full_name}</td>
-      <td style="font-family:monospace; font-weight:700; letter-spacing:0.5px; color:var(--text-dark);">${st.national_id}</td>
-      <td><span class="table-dept-badge ${badgeClass}">${st.department}</span></td>
-      <td style="color:var(--text-muted); font-size:0.84rem;">${dateStr}</td>
-      <td style="text-align:center;">
-        <button class="tool-btn btn-direct-msg-student" data-nid="${st.national_id}" data-name="${st.full_name}" style="background:var(--bg-secondary); border-color:var(--card-border); color:var(--emerald-light); padding:6px 14px; font-size:0.82rem; border-radius:var(--radius-full); font-weight:700;">
-          ✉️ مراسلة
-        </button>
-      </td>
+    card.innerHTML = `
+      <!-- السطر الأول: الترقيم + الاسم ثلاثي + شارة القسم + زر المراسلة -->
+      <div class="student-card-line-1">
+        <div class="student-card-main-meta">
+          <span class="student-card-idx">#${idx + 1}</span>
+          <h4 class="student-card-name" title="${st.full_name}">${st.full_name}</h4>
+          <span class="table-dept-badge ${badgeClass}">${st.department || 'عام'}</span>
+        </div>
+        <div class="student-card-actions">
+          <button type="button" class="btn-card-msg btn-direct-msg-student" data-nid="${st.national_id}" data-name="${st.full_name}">
+            <span>✉️</span>
+            <span>مراسلة</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- السطر الثاني: الرقم القومي + الفرقة/السكشن + تاريخ التسجيل -->
+      <div class="student-card-line-2">
+        <div class="student-meta-item">
+          <span class="meta-icon">🪪</span>
+          <span class="meta-label">الرقم القومي:</span>
+          <strong class="meta-val nid-text">${st.national_id}</strong>
+        </div>
+        <div class="student-meta-item">
+          <span class="meta-icon">🏛️</span>
+          <span class="meta-label">الفرقة:</span>
+          <strong class="meta-val">${yearOrSection}</strong>
+        </div>
+        <div class="student-meta-item meta-date">
+          <span class="meta-icon">📅</span>
+          <span class="meta-val">${dateStr}</span>
+        </div>
+      </div>
     `;
 
-    tr.querySelector('.btn-direct-msg-student').addEventListener('click', () => {
+    card.querySelector('.btn-direct-msg-student').addEventListener('click', () => {
       openDirectMessageToStudent(st);
     });
 
-    tbody.appendChild(tr);
+    container.appendChild(card);
   });
 }
 
