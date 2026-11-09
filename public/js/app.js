@@ -1356,8 +1356,6 @@ function renderDeveloperStudents(students) {
     const attendedCount = attendanceCounts[nid] || 0;
     const card = document.createElement('div');
     card.className = 'doctor-item-card';
-    card.style.background = '#ffffff';
-    card.style.borderColor = '#e2e8f0';
 
     card.innerHTML = `
       <div class="doctor-info-box" style="flex: 1;">
@@ -1373,11 +1371,11 @@ function renderDeveloperStudents(students) {
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
             <span style="font-size:0.78rem; color:var(--text-muted);">الرقم القومي:</span>
-            <code style="color:var(--text-dark); font-size:0.88rem; font-family:monospace; letter-spacing:1px; font-weight:700;">${student.national_id}</code>
+            <code style="color:var(--text-main); font-size:0.88rem; font-family:'JetBrains Mono', monospace; letter-spacing:0.5px; font-weight:700; background:var(--bg-surface-elevated); padding:2px 8px; border-radius:6px; border:1px solid var(--card-border-subtle);">${student.national_id}</code>
           </div>
         </div>
       </div>
-      <div class="doctor-actions" style="margin-top: 6px; display:flex; gap:8px; flex-wrap:wrap;">
+      <div class="doctor-actions" style="margin-top: 8px; display:flex; gap:8px; flex-wrap:wrap;">
         <button class="btn-view-student-profile" data-nid="${student.national_id}" style="border: 1px solid rgba(6, 182, 212, 0.4); background: rgba(6, 182, 212, 0.12); color: var(--cyan-light); padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">
           👤 الملف الكامل
         </button>
@@ -2154,11 +2152,12 @@ async function loadInstructorDashboard() {
     // Update Header with active doctor info
     const headerTitle = document.getElementById('inst-dashboard-header-title');
     if (headerTitle) {
-      headerTitle.innerText = currentDocName ? `لوحة المحاضر: ${currentDocName}` : 'لوحة تحكم المحاضر';
+      headerTitle.innerText = currentDocName || 'المحاضر';
     }
     const headerDept = document.getElementById('inst-dashboard-header-dept');
     if (headerDept && currentDoc) {
-      headerDept.innerText = `${currentDoc.role || 'عضو هيئة تدريس'} • قسم ${currentDoc.department || 'عام'}`;
+      const deptTxt = (currentDoc.department && currentDoc.department !== 'الكل') ? `قسم ${currentDoc.department}` : 'جميع الأقسام';
+      headerDept.innerText = `${currentDoc.role || 'عضو هيئة تدريس'} • ${deptTxt}`;
     }
 
     let lectures = [];
@@ -2895,17 +2894,39 @@ function setupDeveloperSecretTriggers() {
   }
 }
 
-// Register PWA Service Worker
+// Register PWA Service Worker with Auto-Update Support
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
         .then((reg) => {
           console.log('[PWA] Service Worker registered with scope:', reg.scope);
+          // Force check for updates every time app opens
+          try { reg.update(); } catch (_) {}
+
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('[PWA] New update available, activating immediately...');
+                  newWorker.postMessage({ action: 'skipWaiting' });
+                }
+              });
+            }
+          });
         })
         .catch((err) => {
           console.warn('[PWA] Service Worker registration failed:', err);
         });
+
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
     });
   }
 

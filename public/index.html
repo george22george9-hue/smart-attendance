@@ -27,13 +27,29 @@
   <meta name="application-name" content="Agricultural engineer">
 
   <!-- Main Stylesheet (Glassmorphism Dark & Light Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=1.3">
-  <!-- Instant FOUC Prevention for Theme -->
+  <link rel="stylesheet" href="./css/style.css?v=1.3.1">
+  <!-- Instant FOUC Prevention for Theme & Cache Refresh -->
   <script>
     (function() {
       try {
         var t = localStorage.getItem('app_theme') || 'light';
         document.documentElement.setAttribute('data-theme', t);
+        var CURRENT_APP_VERSION = '1.3.1';
+        var lastSeenVer = localStorage.getItem('smart_attendance_app_ver');
+        if (lastSeenVer && lastSeenVer !== CURRENT_APP_VERSION) {
+          localStorage.setItem('smart_attendance_app_ver', CURRENT_APP_VERSION);
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              names.forEach(function(name) {
+                if (name.indexOf(CURRENT_APP_VERSION) === -1) {
+                  caches.delete(name);
+                }
+              });
+            });
+          }
+        } else if (!lastSeenVer) {
+          localStorage.setItem('smart_attendance_app_ver', CURRENT_APP_VERSION);
+        }
       } catch(e) {}
     })();
   </script>
@@ -337,9 +353,11 @@
             <span class="nav-tab-label">كود الحضور</span>
           </button>
           <button id="tab-btn-student-inbox" class="nav-tab-btn" data-target="panel-student-inbox">
-            <span class="nav-tab-icon">📬</span>
+            <span class="nav-tab-icon-wrapper">
+              <span class="nav-tab-icon">📬</span>
+              <span id="student-msg-badge" class="tab-badge" style="display:none;">0</span>
+            </span>
             <span class="nav-tab-label">صندوق الرسائل</span>
-            <span id="student-msg-badge" class="tab-badge" style="display:none;">0</span>
           </button>
           <button id="tab-btn-student-history" class="nav-tab-btn" data-target="panel-student-history">
             <span class="nav-tab-icon">📊</span>
@@ -457,24 +475,28 @@
       <section id="view-developer-admin" class="view-section">
         <div class="developer-panel" style="max-width: 960px; margin: 0 auto;">
 
-          <!-- Top Navigation & Master Identity -->
-          <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <button id="btn-open-dev-settings" class="icon-circle-btn" title="تغيير كلمة سر المطور">
-                ⚙️
-              </button>
-              <div>
-                <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+          <!-- Master Developer Header (Balanced, Symmetrical & Fully Responsive) -->
+          <div class="dev-portal-master-header">
+            <div class="dev-header-brand-side">
+              <div class="dev-header-badge-icon">🛠️</div>
+              <div class="dev-header-text-group">
+                <div class="dev-header-top-status">
                   <span class="sync-status-dot" style="background:#10b981; box-shadow: 0 0 8px #10b981;"></span>
-                  <span style="font-size:0.75rem; color:var(--emerald-light); font-weight:700;">لوحة تحكم وإدارة المطور الشاملة</span>
+                  <span class="dev-header-subtitle">لوحة تحكم وإدارة النظام الشاملة</span>
                 </div>
-                <h3 class="panel-title" style="margin:0; font-size:1.25rem;">Agricultural Engineer — Master Dev Portal</h3>
+                <h2 class="dev-header-main-title">بوابة المطور — م. جورج</h2>
               </div>
             </div>
-            <button class="back-btn btn-back-landing">
-              <span>الرئيسية</span>
-              <span>◀</span>
-            </button>
+            <div class="dev-header-actions-group">
+              <button id="btn-open-dev-settings" class="dev-header-btn dev-settings-action-btn" title="تغيير كلمة سر المطور" type="button">
+                <span>⚙️</span>
+                <span>الإعدادات</span>
+              </button>
+              <button class="dev-header-btn dev-back-action-btn btn-back-landing" title="العودة للصفحة الرئيسية" type="button">
+                <span>الرئيسية</span>
+                <span>◀</span>
+              </button>
+            </div>
           </div>
 
           <!-- Developer Section Navigation Tabs -->
@@ -774,14 +796,11 @@
                 <div class="lecturer-avatar-emoji">👨‍🏫</div>
               </div>
               <div class="lecturer-details">
-                <div class="lecturer-title-row">
-                  <h1 class="lecturer-title-heading">لوحة المحاضر</h1>
-                  <span class="lecturer-name-label">: <span id="inst-dashboard-header-title">د. محمد صبري</span></span>
-                </div>
+                <h2 id="inst-dashboard-header-title" class="lecturer-name-heading">د. محمد صبري</h2>
                 <div class="lecturer-meta-row">
                   <span class="lecturer-dept-badge">
                     <span class="badge-pulse-dot"></span>
-                    <span id="inst-dashboard-header-dept">معيد • قسم الكل</span>
+                    <span id="inst-dashboard-header-dept">معيد • قسم الآلات الزراعية</span>
                   </span>
                 </div>
               </div>
@@ -1543,19 +1562,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=1.3"></script>
+  <script src="./js/firebase-app.js?v=1.3.1"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=1.3"></script>
-  <script src="./libs/html5-qrcode.min.js?v=1.3"></script>
-  <script src="./libs/xlsx.full.min.js?v=1.3"></script>
+  <script src="./libs/qrcode.js?v=1.3.1"></script>
+  <script src="./libs/html5-qrcode.min.js?v=1.3.1"></script>
+  <script src="./libs/xlsx.full.min.js?v=1.3.1"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=1.3"></script>
-  <script src="./js/sync.js?v=1.3"></script>
-  <script src="./js/qr-scanner.js?v=1.3"></script>
-  <script src="./js/excel.js?v=1.3"></script>
-  <script src="./js/app.js?v=1.3"></script>
+  <script src="./js/db.js?v=1.3.1"></script>
+  <script src="./js/sync.js?v=1.3.1"></script>
+  <script src="./js/qr-scanner.js?v=1.3.1"></script>
+  <script src="./js/excel.js?v=1.3.1"></script>
+  <script src="./js/app.js?v=1.3.1"></script>
 
 </body>
 </html>
