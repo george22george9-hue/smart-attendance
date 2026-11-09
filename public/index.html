@@ -9,13 +9,13 @@
   <title>Agricultural engineer</title>
 
   <!-- PWA Manifest & App Home Screen Icons (Agricultural Engineer) -->
-  <link rel="manifest" href="./manifest.json?v=5.9">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=5.9">
-  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=5.9">
-  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=5.9">
-  <link rel="shortcut icon" href="./icons/icon-192.png?v=5.9">
-  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=5.9">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=5.9">
+  <link rel="manifest" href="./manifest.json?v=6.0">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=6.0">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=6.0">
+  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=6.0">
+  <link rel="shortcut icon" href="./icons/icon-192.png?v=6.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=6.0">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=6.0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,12 +23,12 @@
   <meta name="application-name" content="Agricultural engineer">
 
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=5.9">
+  <link rel="stylesheet" href="./css/style.css?v=6.0">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v5.9) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation & Clean Slate (v6.0) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v5.9-agri-engineer';
+      const CURRENT_VERSION = 'v6.0-agri-engineer';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
         // Clear local test session & test profiles
@@ -75,10 +75,10 @@
     <header class="app-header">
       <div class="brand-container btn-back-landing">
         <div class="brand-logo" title="Agricultural engineer">
-          <img src="./icons/icon-192.png?v=5.9" alt="Agricultural engineer" style="width: 24px; height: 24px; object-fit: cover; border-radius: 6px; display: block;">
+          <img src="./icons/icon-192.png?v=6.0" alt="Agricultural engineer" style="width: 24px; height: 24px; object-fit: cover; border-radius: 6px; display: block;">
         </div>
         <div>
-          <h1 class="brand-title">Agricultural engineer <span style="font-size:0.65rem; background:rgba(16,185,129,0.2); color:var(--emerald-light); border:1px solid rgba(16,185,129,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.9</span></h1>
+          <h1 class="brand-title">Agricultural engineer <span style="font-size:0.65rem; background:rgba(16,185,129,0.2); color:var(--emerald-light); border:1px solid rgba(16,185,129,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v6.0</span></h1>
         </div>
       </div>
 
@@ -107,7 +107,7 @@
           <!-- Clean App Header with Agricultural Engineer Emblem -->
           <div class="simple-brand-header">
             <div class="agri-eng-badge" title="Agricultural engineer" style="overflow: hidden; padding: 0;">
-              <img src="./icons/icon-192.png?v=5.9" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
+              <img src="./icons/icon-192.png?v=6.0" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
             </div>
             <h2 class="simple-app-title">Agricultural engineer</h2>
             <p class="simple-app-sub">منظومة الحضور والغياب الذكي بالـ QR Code</p>
@@ -145,7 +145,7 @@
           <!-- Subtle App Refresh Trigger -->
           <div style="margin-top: 14px; text-align: center;">
             <button id="btn-force-update-app" class="tool-btn" onclick="window.forceUpdateApp && window.forceUpdateApp()" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
-              <span>🔄 تحديث التطبيق ومسح الكاش (v5.9)</span>
+              <span>🔄 تحديث التطبيق ومسح الكاش (v6.0)</span>
             </button>
           </div>
 
@@ -249,16 +249,19 @@
         </div>
 
         <!-- Student Profile Navigation Tabs -->
-        <div class="nav-tabs-bar">
+        <div class="nav-tabs-bar tabs-3">
           <button id="tab-btn-student-qr" class="nav-tab-btn active" data-target="panel-student-qr">
-            <span>📇 كود الحضور الذكي</span>
+            <span class="nav-tab-icon">📇</span>
+            <span class="nav-tab-label">كود الحضور</span>
           </button>
           <button id="tab-btn-student-inbox" class="nav-tab-btn" data-target="panel-student-inbox">
-            <span>📬 صندوق الرسائل</span>
+            <span class="nav-tab-icon">📬</span>
+            <span class="nav-tab-label">صندوق الرسائل</span>
             <span id="student-msg-badge" class="tab-badge" style="display:none;">0</span>
           </button>
           <button id="tab-btn-student-history" class="nav-tab-btn" data-target="panel-student-history">
-            <span>📊 سجل حضوري</span>
+            <span class="nav-tab-icon">📊</span>
+            <span class="nav-tab-label">سجل حضوري</span>
           </button>
         </div>
 
@@ -396,18 +399,22 @@
           </div>
 
           <!-- Developer Section Navigation Tabs -->
-          <div class="nav-tabs-bar" style="margin-bottom: 20px;">
+          <div class="nav-tabs-bar">
             <button id="tab-btn-dev-instructors" class="nav-tab-btn active" data-target="dev-panel-instructors">
-              <span>👨‍🏫 الدكاترة والمحاضرين</span>
+              <span class="nav-tab-icon">👨‍🏫</span>
+              <span class="nav-tab-label">الدكاترة</span>
             </button>
             <button id="tab-btn-dev-students" class="nav-tab-btn" data-target="dev-panel-students">
-              <span>🎓 إدارة الطلاب</span>
+              <span class="nav-tab-icon">🎓</span>
+              <span class="nav-tab-label">الطلاب</span>
             </button>
             <button id="tab-btn-dev-lectures" class="nav-tab-btn" data-target="dev-panel-lectures">
-              <span>📚 إدارة المحاضرات</span>
+              <span class="nav-tab-icon">📚</span>
+              <span class="nav-tab-label">المحاضرات</span>
             </button>
             <button id="tab-btn-dev-control" class="nav-tab-btn" data-target="dev-panel-control">
-              <span>⚙️ التحكم بالنظام والإحصائيات</span>
+              <span class="nav-tab-icon">⚙️</span>
+              <span class="nav-tab-label">التحكم</span>
             </button>
           </div>
 
@@ -674,16 +681,20 @@
         <!-- Instructor Navigation Tabs -->
         <div class="nav-tabs-bar">
           <button id="tab-btn-inst-lectures" class="nav-tab-btn active" data-target="panel-inst-lectures">
-            <span>📚 المحاضرات والغياب</span>
+            <span class="nav-tab-icon">📚</span>
+            <span class="nav-tab-label">المحاضرات</span>
           </button>
           <button id="tab-btn-inst-students" class="nav-tab-btn" data-target="panel-inst-students">
-            <span>👥 دليل الطلاب</span>
+            <span class="nav-tab-icon">👥</span>
+            <span class="nav-tab-label">دليل الطلاب</span>
           </button>
           <button id="tab-btn-inst-broadcast" class="nav-tab-btn" data-target="panel-inst-broadcast">
-            <span>📢 إرسال رسائل وتنبيهات</span>
+            <span class="nav-tab-icon">📢</span>
+            <span class="nav-tab-label">الرسائل</span>
           </button>
           <button id="tab-btn-inst-settings" class="nav-tab-btn" data-target="panel-inst-settings">
-            <span>⚙️ الإعدادات</span>
+            <span class="nav-tab-icon">⚙️</span>
+            <span class="nav-tab-label">الإعدادات</span>
           </button>
         </div>
 
@@ -1197,6 +1208,135 @@
       </div>
     </div>
 
+    <!-- Modal 8: Owner / Developer - Detailed Student Profile & Attendance History -->
+    <div id="modal-owner-student-profile" class="modal-backdrop">
+      <div class="modal-dialog" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
+        <button class="modal-close-btn">&times;</button>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+          <div class="doctor-avatar-box" style="border-radius:14px; width:52px; height:52px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); font-size:1.4rem;">
+            🎓
+          </div>
+          <div>
+            <h3 id="owner-student-prof-name" style="font-size:1.25rem; color:#fff; margin:0 0 4px 0; font-weight:800;">اسم الطالب</h3>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span id="owner-student-prof-dept" class="dept-badge" style="background:rgba(16,185,129,0.2); color:var(--emerald-light); font-size:0.75rem;">قسم</span>
+              <span id="owner-student-prof-date" style="font-size:0.75rem; color:var(--text-dim);">مسجل: 2026/11/9</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- National ID Info Card -->
+        <div style="background:rgba(15,23,42,0.7); border:1px solid var(--glass-border); border-radius:12px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span style="font-size:0.75rem; color:var(--text-muted); display:block;">الرقم القومي (14 رقم):</span>
+            <code id="owner-student-prof-nid" style="font-size:1.05rem; color:var(--cyan-light); font-family:monospace; font-weight:700; letter-spacing:1px;">00000000000000</code>
+          </div>
+          <button type="button" id="btn-copy-student-nid" class="tool-btn" style="padding:6px 12px; font-size:0.78rem;" title="نسخ الرقم">
+            📋 نسخ
+          </button>
+        </div>
+
+        <!-- Student Smart QR Code Container -->
+        <div style="background:rgba(11,15,25,0.7); border:1px solid var(--glass-border); border-radius:14px; padding:14px; text-align:center; margin-bottom:16px;">
+          <div style="font-size:0.82rem; color:#cbd5e1; font-weight:700; margin-bottom:10px;">كود الحضور الذكي للطالب (QR Code)</div>
+          <div class="qr-frame-box" style="margin: 0 auto 10px auto; width: 170px; height: 170px;">
+            <div id="owner-student-qr-container"></div>
+          </div>
+          <button type="button" id="btn-download-owner-student-qr" class="tool-btn" style="background:rgba(6,182,212,0.15); color:var(--cyan-light); border:1px solid rgba(6,182,212,0.3); padding:8px 16px; font-size:0.82rem; border-radius:8px;">
+            📥 تحميل الكود كصورة
+          </button>
+        </div>
+
+        <!-- Student Attendance History -->
+        <div style="margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h4 style="font-size:0.95rem; color:#fff; margin:0;">سجل حضور المحاضرات والسكاشن</h4>
+            <span id="owner-student-att-count" class="dept-badge" style="background:rgba(6,182,212,0.15); color:var(--cyan-light); font-size:0.75rem;">0 حضور</span>
+          </div>
+          <div id="owner-student-att-list" style="max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
+            <!-- Attendance items injected here -->
+          </div>
+        </div>
+
+        <!-- Action Footer -->
+        <div style="display:flex; gap:10px; flex-wrap:wrap; border-top:1px solid var(--glass-border); padding-top:14px;">
+          <button type="button" id="btn-owner-delete-student" class="submit-btn" style="flex:1; background:linear-gradient(135deg, #ef4444, #dc2626); font-size:0.9rem;">
+            🗑️ حذف الطالب من النظام
+          </button>
+          <button type="button" class="back-btn btn-cancel-modal" style="min-width:80px;">إغلاق</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 9: Owner / Developer - Detailed Instructor Profile -->
+    <div id="modal-owner-instructor-profile" class="modal-backdrop">
+      <div class="modal-dialog" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
+        <button class="modal-close-btn">&times;</button>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+          <div id="owner-inst-prof-avatar" class="doctor-avatar-box" style="border-radius:14px; width:52px; height:52px; background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3); font-size:1.4rem;">
+            👨‍🏫
+          </div>
+          <div>
+            <h3 id="owner-inst-prof-name" style="font-size:1.25rem; color:#fff; margin:0 0 4px 0; font-weight:800;">اسم المحاضر</h3>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <span id="owner-inst-prof-role" class="doctor-role-badge prof">دكتور</span>
+              <span id="owner-inst-prof-dept" class="dept-badge" style="background:rgba(255,255,255,0.08); color:var(--text-muted); font-size:0.75rem;">قسم الكل</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Password Card with Reveal Toggle & Quick Edit -->
+        <div style="background:rgba(15,23,42,0.7); border:1px solid var(--glass-border); border-radius:12px; padding:12px 14px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">كلمة السر / الرمز السري الحالي:</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <code id="owner-inst-prof-pin" style="font-size:1.2rem; color:var(--cyan-light); font-family:monospace; font-weight:800; letter-spacing:2px;">••••</code>
+                <button type="button" id="btn-toggle-owner-inst-pin" style="background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1.1rem;" title="إظهار / إخفاء">👁️</button>
+              </div>
+            </div>
+            <button type="button" id="btn-owner-edit-inst-pin-cta" class="tool-btn" style="background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3); color:#fbbf24; padding:8px 14px; font-size:0.82rem; border-radius:8px; font-weight:700;">
+              🔑 تعديل كلمة السر
+            </button>
+          </div>
+        </div>
+
+        <!-- Instructor KPIs Summary -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+          <div class="stat-card" style="padding:12px; text-align:center; display:flex; flex-direction:column; align-items:center;">
+            <div class="stat-icon" style="background:rgba(139,92,246,0.15); color:var(--purple-light); width:40px; height:40px; font-size:1.2rem; margin:0 auto 6px auto;">📚</div>
+            <div class="stat-info" style="text-align:center;">
+              <span class="stat-label" style="font-size:0.75rem;">المحاضرات</span>
+              <h4 id="owner-inst-total-lectures" class="stat-value" style="font-size:1.35rem; color:var(--purple-light);">0</h4>
+            </div>
+          </div>
+          <div class="stat-card" style="padding:12px; text-align:center; display:flex; flex-direction:column; align-items:center;">
+            <div class="stat-icon" style="background:rgba(16,185,129,0.15); color:var(--emerald-light); width:40px; height:40px; font-size:1.2rem; margin:0 auto 6px auto;">👥</div>
+            <div class="stat-info" style="text-align:center;">
+              <span class="stat-label" style="font-size:0.75rem;">إجمالي الحضور</span>
+              <h4 id="owner-inst-total-attendance" class="stat-value" style="font-size:1.35rem; color:var(--emerald-light);">0</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lectures List by This Instructor -->
+        <div style="margin-bottom:18px;">
+          <h4 style="font-size:0.95rem; color:#fff; margin-bottom:8px;">سجل المحاضرات التي ألقاها</h4>
+          <div id="owner-inst-lectures-list" style="max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
+            <!-- Lectures injected here -->
+          </div>
+        </div>
+
+        <!-- Action Footer -->
+        <div style="display:flex; gap:10px; flex-wrap:wrap; border-top:1px solid var(--glass-border); padding-top:14px;">
+          <button type="button" id="btn-owner-delete-instructor" class="submit-btn" style="flex:1; background:linear-gradient(135deg, #ef4444, #dc2626); font-size:0.9rem;">
+            🗑️ حذف حساب المحاضر
+          </button>
+          <button type="button" class="back-btn btn-cancel-modal" style="min-width:80px;">إغلاق</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Transparent Pro Watermark at Bottom (Clean & Minimal) -->
     <footer class="app-watermark-footer" aria-hidden="true">
       <span class="wm-bolt">⚡</span>
@@ -1212,19 +1352,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=5.9"></script>
+  <script src="./js/firebase-app.js?v=6.0"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=5.9"></script>
-  <script src="./libs/html5-qrcode.min.js?v=5.9"></script>
-  <script src="./libs/xlsx.full.min.js?v=5.9"></script>
+  <script src="./libs/qrcode.js?v=6.0"></script>
+  <script src="./libs/html5-qrcode.min.js?v=6.0"></script>
+  <script src="./libs/xlsx.full.min.js?v=6.0"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=5.9"></script>
-  <script src="./js/sync.js?v=5.9"></script>
-  <script src="./js/qr-scanner.js?v=5.9"></script>
-  <script src="./js/excel.js?v=5.9"></script>
-  <script src="./js/app.js?v=5.9"></script>
+  <script src="./js/db.js?v=6.0"></script>
+  <script src="./js/sync.js?v=6.0"></script>
+  <script src="./js/qr-scanner.js?v=6.0"></script>
+  <script src="./js/excel.js?v=6.0"></script>
+  <script src="./js/app.js?v=6.0"></script>
 
 </body>
 </html>

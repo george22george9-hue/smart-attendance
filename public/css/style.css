@@ -717,44 +717,69 @@ body::after {
   font-family: monospace;
 }
 
-/* Instructor Dashboard Top Stats */
+/* Instructor Dashboard Top Stats - Two Symmetrical Squares Side-by-Side */
 .dashboard-metrics {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 14px;
-  margin-bottom: 24px;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+  margin-bottom: 20px !important;
 }
 
 .metric-card {
-  background: var(--glass-card);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  background: linear-gradient(145deg, rgba(18, 25, 43, 0.85), rgba(15, 23, 42, 0.95)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 18px !important;
+  padding: 16px 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  gap: 10px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+  position: relative !important;
+  min-height: 120px !important;
+}
+
+.metric-card:hover {
+  border-color: rgba(6, 182, 212, 0.4) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4) !important;
 }
 
 .metric-icon-box {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.05);
+}
+
+.metric-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
 
 .metric-info .val {
-  font-size: 1.6rem;
+  font-size: 1.85rem;
   font-weight: 800;
   color: #fff;
-  line-height: 1.1;
+  line-height: 1;
+  letter-spacing: -0.5px;
 }
 
 .metric-info .label {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 2px;
+  white-space: nowrap;
 }
 
 /* Active Lecture / Scanner Screen */
@@ -1150,35 +1175,150 @@ body::after {
   margin-top: 14px;
 }
 
+/* Redesigned Lecture Item Card & Metadata Chips */
 .lecture-item-card {
-  background: rgba(11, 15, 25, 0.6);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, rgba(18, 25, 43, 0.85), rgba(11, 15, 25, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
   padding: 16px 18px;
+  margin-bottom: 14px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  transition: var(--transition-normal);
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  position: relative;
 }
 
 .lecture-item-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.18);
-  transform: translateX(-4px);
+  background: linear-gradient(145deg, rgba(24, 33, 56, 0.9), rgba(15, 20, 34, 0.98));
+  border-color: rgba(6, 182, 212, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
-.lecture-item-info h4 {
-  font-size: 1.05rem;
-  color: #fff;
-  margin-bottom: 4px;
-}
-
-.lecture-item-meta {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+.lecture-card-header {
   display: flex;
-  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.lecture-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.lecture-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.lecture-type-badge.theory {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--cyan-light);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.lecture-type-badge.lab {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--purple-light);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.lecture-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.lecture-btn-delete-quick {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.lecture-btn-delete-quick:hover {
+  background: rgba(239, 68, 68, 0.28);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: scale(1.08);
+}
+
+.lecture-chips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.lecture-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
+.lecture-chip.highlight-chip {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: var(--emerald-light);
+  font-weight: 700;
+}
+
+.lecture-card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.btn-open-lecture-cta {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(37, 99, 235, 0.3));
+  border: 1px solid rgba(6, 182, 212, 0.45);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-open-lecture-cta:hover {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.38), rgba(37, 99, 235, 0.5));
+  border-color: var(--cyan-light);
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
 }
 
 /* Toast Notifications (Modern Floating Glass Pill) */
@@ -1314,46 +1454,80 @@ body::after {
    Profile Tabs, Messaging Center & Students Directory
    ========================================================================== */
 
+/* Highly Segmented & Modern Responsive Navigation Tab Bar */
 .nav-tabs-bar {
-  display: flex;
-  gap: 8px;
-  background: rgba(11, 15, 25, 0.75);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: 6px;
-  margin-bottom: 20px;
-  overflow-x: auto;
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 6px !important;
+  background: rgba(11, 15, 25, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  padding: 5px !important;
+  margin-bottom: 20px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+.nav-tabs-bar.tabs-3 {
+  grid-template-columns: repeat(3, 1fr) !important;
 }
 
 .nav-tab-btn {
-  flex: 1;
-  min-width: 120px;
-  padding: 10px 14px;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-md);
-  color: var(--text-muted);
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  white-space: nowrap;
-  transition: var(--transition-fast);
+  min-width: 0 !important;
+  width: 100% !important;
+  padding: 8px 4px !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 12px !important;
+  color: var(--text-muted) !important;
+  font-weight: 700 !important;
+  font-size: 0.78rem !important;
+  cursor: pointer !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  text-align: center !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+}
+
+.nav-tab-btn .nav-tab-icon {
+  font-size: 1.25rem !important;
+  line-height: 1 !important;
+}
+
+.nav-tab-btn .nav-tab-label {
+  font-size: 0.75rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
 }
 
 .nav-tab-btn:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 .nav-tab-btn.active {
-  background: rgba(6, 182, 212, 0.18);
-  color: var(--cyan-light);
-  border: 1px solid rgba(6, 182, 212, 0.35);
-  box-shadow: 0 0 15px var(--cyan-glow);
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.22), rgba(37, 99, 235, 0.25)) !important;
+  color: #fff !important;
+  border: 1px solid rgba(6, 182, 212, 0.45) !important;
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+@media (min-width: 640px) {
+  .nav-tab-btn {
+    flex-direction: row !important;
+    gap: 8px !important;
+    padding: 10px 14px !important;
+  }
+  .nav-tab-btn .nav-tab-label {
+    font-size: 0.88rem !important;
+  }
 }
 
 .tab-badge {
@@ -1363,6 +1537,23 @@ body::after {
   font-weight: 700;
   padding: 2px 7px;
   border-radius: var(--radius-full);
+}
+
+/* Owner Profile Modal Items */
+.owner-history-item {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  transition: background 0.2s ease;
+}
+
+.owner-history-item:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* Student Profile Header Card */

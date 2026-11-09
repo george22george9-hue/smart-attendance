@@ -920,11 +920,14 @@ async function loadDeveloperInstructors() {
           </div>
         </div>
       </div>
-      <div class="doctor-actions" style="margin-top: 8px;">
-        <button class="btn-change-doc-pin" data-id="${doc.id}" data-name="${doc.name}" data-pin="${doc.pin}" style="border: 1px solid rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.08); color: #fbbf24;">
-          🔑 تغيير كلمة السر
+      <div class="doctor-actions" style="margin-top: 8px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn-view-doc-profile" data-id="${doc.id}" style="border: 1px solid rgba(6, 182, 212, 0.4); background: rgba(6, 182, 212, 0.12); color: var(--cyan-light); padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 700;">
+          👤 الملف الكامل
         </button>
-        <button class="btn-delete-doc" data-id="${doc.id}" data-name="${doc.name}" style="border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); color: #f87171;">
+        <button class="btn-change-doc-pin" data-id="${doc.id}" data-name="${doc.name}" data-pin="${doc.pin}" style="border: 1px solid rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.08); color: #fbbf24; padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 600;">
+          🔑 تعديل السر
+        </button>
+        <button class="btn-delete-doc" data-id="${doc.id}" data-name="${doc.name}" style="border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); color: #f87171; padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 600;">
           🗑️ حذف
         </button>
       </div>
@@ -933,6 +936,14 @@ async function loadDeveloperInstructors() {
   });
 
   // Attach button events
+  container.querySelectorAll('.btn-view-doc-profile').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const docId = btn.getAttribute('data-id');
+      const doc = state.instructors.find(i => String(i.id) === String(docId));
+      if (doc) openOwnerInstructorProfile(doc);
+    });
+  });
+
   container.querySelectorAll('.btn-change-doc-pin').forEach(btn => {
     btn.addEventListener('click', () => {
       const docId = btn.getAttribute('data-id');
@@ -1056,7 +1067,10 @@ function renderDeveloperStudents(students) {
           </div>
         </div>
       </div>
-      <div class="doctor-actions" style="margin-top: 6px;">
+      <div class="doctor-actions" style="margin-top: 6px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn-view-student-profile" data-nid="${student.national_id}" style="border: 1px solid rgba(6, 182, 212, 0.4); background: rgba(6, 182, 212, 0.12); color: var(--cyan-light); padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">
+          👤 الملف الكامل
+        </button>
         <button class="btn-delete-student" data-nid="${student.national_id}" data-name="${student.full_name}" style="border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); color: #f87171; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
           🗑️ حذف الطالب
         </button>
@@ -1064,6 +1078,15 @@ function renderDeveloperStudents(students) {
     `;
 
     container.appendChild(card);
+  });
+
+  // Attach profile view buttons
+  container.querySelectorAll('.btn-view-student-profile').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const nid = btn.getAttribute('data-nid');
+      const st = students.find(s => String(s.national_id).trim() === String(nid).trim());
+      if (st) openOwnerStudentProfile(st);
+    });
   });
 
   // Attach delete buttons
@@ -1082,10 +1105,258 @@ async function handleDevDeleteStudent(nid, name) {
     if (window.CloudDB && window.CloudDB.deleteStudent) {
       await window.CloudDB.deleteStudent(nid);
     }
+    if (typeof deleteLocalStudent === 'function') {
+      try { await deleteLocalStudent(nid); } catch (e) {}
+    }
     showToast(`تم حذف الطالب ${name} بنجاح`, 'info');
     await loadDeveloperStudents();
     await loadDeveloperKPIs();
   }
+}
+
+// ==========================================================================
+// Owner Detailed Profiles (Student & Instructor Modals)
+// ==========================================================================
+let currentViewingStudent = null;
+
+async function openOwnerStudentProfile(student) {
+  currentViewingStudent = student;
+  const modal = document.getElementById('modal-owner-student-profile');
+  if (!modal) return;
+
+  const nidStr = String(student.national_id || '').trim();
+  document.getElementById('owner-student-prof-name').innerText = student.full_name || 'طالب';
+  document.getElementById('owner-student-prof-dept').innerText = `قسم ${student.department || 'عام'}`;
+
+  const regDate = student.registered_at ? new Date(student.registered_at).toLocaleDateString('ar-EG') : 'غير محدد';
+  document.getElementById('owner-student-prof-date').innerText = `انضم: ${regDate}`;
+  document.getElementById('owner-student-prof-nid').innerText = nidStr;
+
+  // Generate QR Code
+  const qrContainer = document.getElementById('owner-student-qr-container');
+  qrContainer.innerHTML = '';
+  if (typeof QRCode !== 'undefined') {
+    new QRCode(qrContainer, {
+      text: nidStr,
+      width: 160,
+      height: 160,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  // Copy NID
+  const copyBtn = document.getElementById('btn-copy-student-nid');
+  if (copyBtn) {
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(nidStr);
+      showToast('تم نسخ الرقم القومي بنجاح 📋', 'info');
+    };
+  }
+
+  // Download QR Code image
+  const downloadBtn = document.getElementById('btn-download-owner-student-qr');
+  if (downloadBtn) {
+    downloadBtn.onclick = () => {
+      const img = qrContainer.querySelector('img');
+      const canvas = qrContainer.querySelector('canvas');
+      const src = img ? img.src : (canvas ? canvas.toDataURL('image/png') : null);
+      if (src) {
+        const a = document.createElement('a');
+        a.href = src;
+        a.download = `QR_${student.full_name || 'student'}_${nidStr}.png`;
+        a.click();
+        showToast('تم تحميل كود الطالب بنجاح 📥', 'success');
+      } else {
+        showToast('تعذر تحميل الكود حالياً', 'error');
+      }
+    };
+  }
+
+  // Load Attendance History
+  const attList = document.getElementById('owner-student-att-list');
+  const attCountBadge = document.getElementById('owner-student-att-count');
+  attList.innerHTML = '<p style="text-align:center; color:var(--text-dim); font-size:0.82rem; padding:10px;">جاري تحميل سجل الحضور...</p>';
+
+  try {
+    let records = [];
+    if (window.CloudDB && window.CloudDB.getStudentAttendanceHistory) {
+      records = await window.CloudDB.getStudentAttendanceHistory(nidStr);
+    }
+    if (records.length === 0 && allDevAttendanceCache && allDevAttendanceCache.length > 0) {
+      records = allDevAttendanceCache.filter(a => String(a.national_id).trim() === nidStr);
+    }
+
+    if (attCountBadge) attCountBadge.innerText = `${records.length} حضور`;
+    attList.innerHTML = '';
+
+    if (records.length === 0) {
+      attList.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:0.82rem; padding:12px;">لم يسجل هذا الطالب أي حضور حتى الآن.</p>';
+    } else {
+      records.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      records.forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'owner-history-item';
+        const isLab = (r.session_type || '').includes('عملي');
+        item.innerHTML = `
+          <div>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+              <span class="doctor-role-badge ${isLab ? 'assistant' : 'prof'}" style="font-size:0.7rem; padding:2px 6px;">${r.session_type || 'محاضرة'}</span>
+              <strong style="color:#fff; font-size:0.88rem;">${r.lecture_title || 'محاضرة'}</strong>
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-dim);">
+              ${r.instructor_name ? `👨‍🏫 ${r.instructor_name} | ` : ''}⏰ وقت الرصد: ${r.scan_time || ''}
+            </div>
+          </div>
+          <span style="font-size:0.75rem; color:var(--emerald-light); font-weight:700;">✅ حاضر</span>
+        `;
+        attList.appendChild(item);
+      });
+    }
+  } catch (err) {
+    console.error('Error fetching student history:', err);
+    attList.innerHTML = '<p style="text-align:center; color:red; font-size:0.82rem;">تعذر جلب سجل الحضور</p>';
+  }
+
+  // Delete Student action in modal
+  const delBtn = document.getElementById('btn-owner-delete-student');
+  if (delBtn) {
+    delBtn.onclick = async () => {
+      closeModals();
+      await handleDevDeleteStudent(nidStr, student.full_name);
+    };
+  }
+
+  modal.classList.add('open');
+}
+
+let currentViewingInstructor = null;
+let ownerInstPinVisible = false;
+
+async function openOwnerInstructorProfile(instructor) {
+  currentViewingInstructor = instructor;
+  ownerInstPinVisible = false;
+  const modal = document.getElementById('modal-owner-instructor-profile');
+  if (!modal) return;
+
+  const isProf = instructor.role === 'دكتور';
+  const avatarBox = document.getElementById('owner-inst-prof-avatar');
+  if (avatarBox) {
+    avatarBox.innerText = isProf ? '👨‍🏫' : '🔬';
+    avatarBox.style.background = isProf ? 'rgba(6,182,212,0.15)' : 'rgba(168,85,247,0.15)';
+    avatarBox.style.borderColor = isProf ? 'rgba(6,182,212,0.3)' : 'rgba(168,85,247,0.3)';
+  }
+
+  document.getElementById('owner-inst-prof-name').innerText = instructor.name || 'محاضر';
+
+  const roleBadge = document.getElementById('owner-inst-prof-role');
+  if (roleBadge) {
+    roleBadge.className = `doctor-role-badge ${isProf ? 'prof' : 'assistant'}`;
+    roleBadge.innerText = instructor.role || 'دكتور';
+  }
+
+  document.getElementById('owner-inst-prof-dept').innerText = `قسم ${instructor.department || 'الكل'}`;
+
+  // PIN display & reveal toggle
+  const pinElem = document.getElementById('owner-inst-prof-pin');
+  const toggleBtn = document.getElementById('btn-toggle-owner-inst-pin');
+  const updatePinText = () => {
+    if (ownerInstPinVisible) {
+      pinElem.innerText = instructor.pin || '----';
+      if (toggleBtn) toggleBtn.innerText = '🔒';
+    } else {
+      pinElem.innerText = '••••';
+      if (toggleBtn) toggleBtn.innerText = '👁️';
+    }
+  };
+  updatePinText();
+
+  if (toggleBtn) {
+    toggleBtn.onclick = () => {
+      ownerInstPinVisible = !ownerInstPinVisible;
+      updatePinText();
+    };
+  }
+
+  // Edit PIN CTA
+  const editPinCta = document.getElementById('btn-owner-edit-inst-pin-cta');
+  if (editPinCta) {
+    editPinCta.onclick = () => {
+      closeModals();
+      openEditDoctorPinModal(instructor.id, instructor.name, instructor.pin);
+    };
+  }
+
+  // Load instructor lectures & attendance stats
+  const listContainer = document.getElementById('owner-inst-lectures-list');
+  listContainer.innerHTML = '<p style="text-align:center; color:var(--text-dim); font-size:0.82rem; padding:10px;">جاري تحميل سجل المحاضرات...</p>';
+
+  try {
+    let allLectures = allDevLecturesCache;
+    if (allLectures.length === 0 && window.CloudDB && window.CloudDB.getAllLectures) {
+      allLectures = await window.CloudDB.getAllLectures();
+    }
+    let allAtt = allDevAttendanceCache;
+    if (allAtt.length === 0 && window.CloudDB && window.CloudDB.getAllAttendance) {
+      allAtt = await window.CloudDB.getAllAttendance();
+    }
+
+    const instLectures = allLectures.filter(l => {
+      return (l.instructor_name && instructor.name && l.instructor_name.trim() === instructor.name.trim()) ||
+             (l.instructor_id && l.instructor_id === instructor.id);
+    });
+
+    const lecIds = new Set(instLectures.map(l => l.lecture_id));
+    const totalAttCount = allAtt.filter(a => lecIds.has(a.lecture_id)).length;
+
+    document.getElementById('owner-inst-total-lectures').innerText = instLectures.length;
+    document.getElementById('owner-inst-total-attendance').innerText = totalAttCount;
+
+    listContainer.innerHTML = '';
+    if (instLectures.length === 0) {
+      listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:0.82rem; padding:12px;">لم يقم هذا المحاضر بإنشاء أي محاضرات بعد.</p>';
+    } else {
+      instLectures.forEach(l => {
+        const lecAtt = allAtt.filter(a => a.lecture_id === l.lecture_id).length;
+        const item = document.createElement('div');
+        item.className = 'owner-history-item';
+        item.innerHTML = `
+          <div>
+            <div style="color:#fff; font-size:0.88rem; font-weight:700; margin-bottom:2px;">${l.title}</div>
+            <div style="font-size:0.75rem; color:var(--text-dim);">
+              <span>📅 ${l.lecture_date || ''}</span> | <span>🏛️ ${l.target_dept || 'الكل'}</span>
+            </div>
+          </div>
+          <span class="dept-badge" style="background:rgba(16,185,129,0.15); color:var(--emerald-light); font-size:0.72rem;">
+            👥 ${lecAtt} طالب
+          </span>
+        `;
+        listContainer.appendChild(item);
+      });
+    }
+  } catch (err) {
+    console.error('Error fetching instructor stats:', err);
+    listContainer.innerHTML = '<p style="text-align:center; color:red; font-size:0.82rem;">تعذر تحميل السجل</p>';
+  }
+
+  // Delete Instructor CTA
+  const delBtn = document.getElementById('btn-owner-delete-instructor');
+  if (delBtn) {
+    delBtn.onclick = async () => {
+      if (confirm(`هل أنت متأكد من حذف حساب ${instructor.name}؟`)) {
+        closeModals();
+        if (window.CloudDB && window.CloudDB.deleteInstructor) {
+          await window.CloudDB.deleteInstructor(instructor.id);
+        }
+        showToast('تم حذف المحاضر بنجاح', 'info');
+        await loadDeveloperInstructors();
+        await loadDeveloperKPIs();
+      }
+    };
+  }
+
+  modal.classList.add('open');
 }
 
 let devAddStudentFormBound = false;
@@ -1227,32 +1498,37 @@ function renderDeveloperLectures(lectures) {
     const isLab = (lecture.session_type || '').includes('عملي');
 
     const card = document.createElement('div');
-    card.className = 'doctor-item-card';
-    card.style.background = 'rgba(15, 23, 42, 0.65)';
-    card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+    card.className = 'lecture-item-card';
 
     card.innerHTML = `
-      <div class="doctor-info-box" style="flex: 1;">
-        <div class="doctor-avatar-box" style="border-radius: 14px; width: 48px; height: 48px; background: ${isLab ? 'rgba(168,85,247,0.15)' : 'rgba(6,182,212,0.15)'}; border: 1px solid ${isLab ? 'rgba(168,85,247,0.3)' : 'rgba(6,182,212,0.3)'}; font-size: 1.25rem;">
-          ${isLab ? '🔬' : '📚'}
+      <div class="lecture-card-header">
+        <div class="lecture-title-wrap">
+          <span class="lecture-type-badge ${isLab ? 'lab' : 'theory'}">${isLab ? '🔬 سكشن عملي' : '📚 محاضرة نظري'}</span>
+          <h4 class="lecture-card-title">${lecture.title}</h4>
         </div>
-        <div style="flex: 1;">
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
-            <h4 style="color:#fff; font-size:1.05rem; margin:0; font-weight:700;">${lecture.title}</h4>
-            <span class="doctor-role-badge ${isLab ? 'assistant' : 'prof'}" style="font-size:0.75rem;">${lecture.session_type || 'محاضرة نظري'}</span>
-            <span class="dept-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light); font-size: 0.72rem;">حضر ${attendedCount} طالب</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:0.8rem; color:var(--text-muted);">
-            <span>👨‍🏫 المحاضر: <strong>${lecture.instructor_name || 'غير محدد'}</strong></span>
-            <span>🏛️ القسم: <strong>${lecture.target_dept || 'الكل'}</strong></span>
-            <span>📅 التاريخ: <strong>${lecture.lecture_date || ''}</strong></span>
-          </div>
-        </div>
-      </div>
-      <div class="doctor-actions" style="margin-top: 6px;">
-        <button class="btn-delete-lecture" data-id="${lecture.lecture_id}" data-title="${lecture.title}" style="border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); color: #f87171; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-          🗑️ حذف المحاضرة
+        <button class="lecture-btn-delete-quick btn-delete-lecture" data-id="${lecture.lecture_id}" data-title="${lecture.title}" title="حذف المحاضرة">
+          🗑️
         </button>
+      </div>
+
+      <div class="lecture-chips-grid">
+        <div class="lecture-chip">
+          <span>📅</span>
+          <span>${lecture.lecture_date || ''}</span>
+        </div>
+        <div class="lecture-chip">
+          <span>🏛️</span>
+          <span>قسم ${lecture.target_dept || 'الكل'}</span>
+        </div>
+        ${lecture.instructor_name ? `
+        <div class="lecture-chip">
+          <span>👨‍🏫</span>
+          <span>${lecture.instructor_name}</span>
+        </div>` : ''}
+        <div class="lecture-chip highlight-chip">
+          <span>👥</span>
+          <span>حضر: <strong>${attendedCount}</strong> طالب</span>
+        </div>
       </div>
     `;
 
@@ -1538,16 +1814,44 @@ async function handleChangeDevMasterPinSubmit() {
 // Load Instructor Dashboard & Lectures
 async function loadInstructorDashboard() {
   try {
-    const localLectures = await getAllLocalLectures();
-    const students = await getAllLocalStudents();
+    let lectures = [];
+    if (window.CloudDB && window.CloudDB.getAllLectures) {
+      try {
+        lectures = await window.CloudDB.getAllLectures();
+      } catch (e) {
+        console.warn('Error fetching cloud lectures:', e);
+      }
+    }
+    if (!lectures || lectures.length === 0) {
+      lectures = await getAllLocalLectures();
+    }
 
-    document.getElementById('metric-total-lectures').innerText = localLectures.length;
+    let students = [];
+    if (window.CloudDB && window.CloudDB.getAllStudents) {
+      try {
+        students = await window.CloudDB.getAllStudents();
+      } catch (e) {
+        console.warn('Error fetching cloud students:', e);
+      }
+    }
+    if (!students || students.length === 0) {
+      students = await getAllLocalStudents();
+    }
+
+    let allAtt = [];
+    if (window.CloudDB && window.CloudDB.getAllAttendance) {
+      try {
+        allAtt = await window.CloudDB.getAllAttendance();
+      } catch (e) {}
+    }
+
+    document.getElementById('metric-total-lectures').innerText = lectures.length;
     document.getElementById('metric-total-students').innerText = students.length;
 
     const listContainer = document.getElementById('instructor-lectures-list');
     listContainer.innerHTML = '';
 
-    if (localLectures.length === 0) {
+    if (lectures.length === 0) {
       listContainer.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">📋</div>
@@ -1558,31 +1862,90 @@ async function loadInstructorDashboard() {
       return;
     }
 
-    for (const lec of localLectures) {
-      const attendance = await getLectureAttendance(lec.lecture_id);
+    for (const lec of lectures) {
+      let attCount = 0;
+      if (allAtt && allAtt.length > 0) {
+        attCount = allAtt.filter(a => a.lecture_id === lec.lecture_id).length;
+      } else {
+        const localAtt = await getLectureAttendance(lec.lecture_id);
+        attCount = localAtt ? localAtt.length : 0;
+      }
+
       const card = document.createElement('div');
       card.className = 'lecture-item-card';
 
-      const isLab = lec.session_type === 'سكشن عملي';
+      const isLab = (lec.session_type || '').includes('عملي');
       card.innerHTML = `
-        <div class="lecture-item-info">
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
-            <span class="doctor-role-badge ${isLab ? 'assistant' : 'prof'}">${lec.session_type || 'محاضرة نظري'}</span>
-            <h4 style="margin:0; font-size:1.1rem; color:#fff; font-weight:700;">${lec.title}</h4>
+        <div class="lecture-card-header">
+          <div class="lecture-title-wrap">
+            <span class="lecture-type-badge ${isLab ? 'lab' : 'theory'}">${isLab ? '🔬 سكشن عملي' : '📚 محاضرة نظري'}</span>
+            <h4 class="lecture-card-title">${lec.title}</h4>
           </div>
-          <div class="lecture-item-meta" style="margin-top:6px;">
-            <span>📅 ${lec.lecture_date}</span>
-            <span>🏛️ القسم: ${lec.target_dept}</span>
-            ${lec.instructor_name ? `<span>👨‍🏫 ${lec.instructor_name}</span>` : ''}
-            <span>👥 الحضور: <strong>${attendance.length}</strong> طالب</span>
+          <button class="lecture-btn-delete-quick btn-del-inst-lecture" data-id="${lec.lecture_id}" data-title="${lec.title}" title="حذف المحاضرة">
+            🗑️
+          </button>
+        </div>
+
+        <div class="lecture-chips-grid">
+          <div class="lecture-chip">
+            <span>📅</span>
+            <span>${lec.lecture_date || ''}</span>
+          </div>
+          <div class="lecture-chip">
+            <span>🏛️</span>
+            <span>قسم ${lec.target_dept || 'الكل'}</span>
+          </div>
+          ${lec.instructor_name ? `
+          <div class="lecture-chip">
+            <span>👨‍🏫</span>
+            <span>${lec.instructor_name}</span>
+          </div>` : ''}
+          <div class="lecture-chip highlight-chip">
+            <span>👥</span>
+            <span>الحضور: <strong>${attCount}</strong> طالب</span>
           </div>
         </div>
-        <button class="tool-btn" style="background:rgba(255,255,255,0.08); color:#fff;">
-          فتح المحاضرة ◀
-        </button>
+
+        <div class="lecture-card-actions">
+          <button class="btn-open-lecture-cta btn-open-inst-lecture" data-id="${lec.lecture_id}">
+            <span>فتح ورصد المحاضرة</span>
+            <span>◀</span>
+          </button>
+        </div>
       `;
 
-      card.addEventListener('click', () => {
+      // Delete lecture
+      const delBtn = card.querySelector('.btn-del-inst-lecture');
+      if (delBtn) {
+        delBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const lid = delBtn.getAttribute('data-id');
+          const title = delBtn.getAttribute('data-title');
+          if (confirm(`هل أنت متأكد من حذف محاضرة "${title}"؟\nسيتم حذف سجلات الحضور الخاصة بها.`)) {
+            showToast('جاري حذف المحاضرة...', 'info', 1000);
+            if (window.CloudDB && window.CloudDB.deleteLecture) {
+              await window.CloudDB.deleteLecture(lid);
+            }
+            if (typeof deleteLocalLecture === 'function') {
+              try { await deleteLocalLecture(lid); } catch (err) {}
+            }
+            showToast(`تم حذف محاضرة "${title}" بنجاح`, 'info');
+            await loadInstructorDashboard();
+          }
+        });
+      }
+
+      // Open lecture
+      const openBtn = card.querySelector('.btn-open-inst-lecture');
+      if (openBtn) {
+        openBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          loadLectureSession(lec.lecture_id);
+        });
+      }
+
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-del-inst-lecture')) return;
         loadLectureSession(lec.lecture_id);
       });
 

@@ -147,6 +147,29 @@ async function getLocalLecture(lectureId) {
 }
 
 // Attendance Operations
+async function deleteLocalLecture(lectureId) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(['lectures'], 'readwrite');
+    const store = tx.objectStore('lectures');
+    const req = store.delete(lectureId);
+    req.onsuccess = () => resolve(true);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function deleteLocalStudent(nationalId) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(['students'], 'readwrite');
+    const store = tx.objectStore('students');
+    const req = store.delete(String(nationalId).trim());
+    req.onsuccess = () => resolve(true);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Attendance Operations
 async function recordLocalAttendance(record) {
   const db = await openDb();
   return new Promise((resolve, reject) => {
