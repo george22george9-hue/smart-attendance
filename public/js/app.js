@@ -1615,7 +1615,7 @@ function initApp() {
     setupInstructorPortalTabs();
     setupGlobalEvents();
     registerServiceWorker();
-    console.log('Smart Attendance PWA v5.6 initialized successfully.');
+    console.log('Smart Attendance PWA v5.7 initialized successfully.');
   } catch (e) {
     console.error('Error during initApp:', e);
   }

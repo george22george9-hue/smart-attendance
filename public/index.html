@@ -8,18 +8,27 @@
 
   <title>نظام الحضور والغياب الذكي</title>
 
-  <!-- PWA Manifest & Favicon -->
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" type="image/png" href="./icons/icon-192.png">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <!-- PWA Manifest & App Home Screen Icons (Agricultural Engineer) -->
+  <link rel="manifest" href="./manifest.json?v=5.7">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=5.7">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png?v=5.7">
+  <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon.png?v=5.7">
+  <link rel="shortcut icon" href="./icons/icon-192.png?v=5.7">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=5.7">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=5.7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="حضور وغياب">
+  <meta name="application-name" content="حضور وغياب">
 
   <!-- Main Stylesheet (Glassmorphism Dark Mode) -->
-  <link rel="stylesheet" href="./css/style.css?v=5.6">
+  <link rel="stylesheet" href="./css/style.css?v=5.7">
 
-  <!-- Auto Cache Buster & Instant Version Invalidation (v5.6) -->
+  <!-- Auto Cache Buster & Instant Version Invalidation (v5.7) -->
   <script>
     (function() {
-      const CURRENT_VERSION = 'v5.6-instant-action';
+      const CURRENT_VERSION = 'v5.7-agri-outer-icon';
       const storedVersion = localStorage.getItem('smart_attendance_build');
       if (storedVersion !== CURRENT_VERSION) {
         if ('caches' in window) {
@@ -55,7 +64,7 @@
           <img src="./icons/icon-192.png?v=5.6" alt="مهندس زراعي" style="width: 24px; height: 24px; object-fit: cover; border-radius: 6px; display: block;">
         </div>
         <div>
-          <h1 class="brand-title">حضور وغياب <span style="font-size:0.65rem; background:rgba(16,185,129,0.2); color:var(--emerald-light); border:1px solid rgba(16,185,129,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.6</span></h1>
+          <h1 class="brand-title">حضور وغياب <span style="font-size:0.65rem; background:rgba(16,185,129,0.2); color:var(--emerald-light); border:1px solid rgba(16,185,129,0.4); padding:2px 8px; border-radius:999px; margin-right:6px; font-weight:normal;">v5.7</span></h1>
         </div>
       </div>
 
@@ -84,7 +93,7 @@
           <!-- Clean App Header with Agricultural Engineer Emblem -->
           <div class="simple-brand-header">
             <div class="agri-eng-badge" title="مهندس زراعي" style="overflow: hidden; padding: 0;">
-              <img src="./icons/icon-192.png?v=5.6" alt="مهندس زراعي" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
+              <img src="./icons/icon-192.png?v=5.7" alt="مهندس زراعي" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
             </div>
             <h2 class="simple-app-title">نظام الحضور والغياب</h2>
             <p class="simple-app-sub">منظومة الحضور الذكي بالـ QR Code</p>
@@ -122,7 +131,7 @@
           <!-- Subtle App Refresh Trigger -->
           <div style="margin-top: 14px; text-align: center;">
             <button id="btn-force-update-app" class="tool-btn" onclick="window.forceUpdateApp && window.forceUpdateApp()" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
-              <span>🔄 تحديث التطبيق ومسح الكاش (v5.6)</span>
+              <span>🔄 تحديث التطبيق ومسح الكاش (v5.7)</span>
             </button>
           </div>
 
@@ -994,19 +1003,19 @@
   <!-- Firebase Cloud SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="./js/firebase-app.js?v=5.6"></script>
+  <script src="./js/firebase-app.js?v=5.7"></script>
 
   <!-- Local Bundled Libraries (100% Offline Capable) -->
-  <script src="./libs/qrcode.js?v=5.6"></script>
-  <script src="./libs/html5-qrcode.min.js?v=5.6"></script>
-  <script src="./libs/xlsx.full.min.js?v=5.6"></script>
+  <script src="./libs/qrcode.js?v=5.7"></script>
+  <script src="./libs/html5-qrcode.min.js?v=5.7"></script>
+  <script src="./libs/xlsx.full.min.js?v=5.7"></script>
 
   <!-- Application Modules -->
-  <script src="./js/db.js?v=5.6"></script>
-  <script src="./js/sync.js?v=5.6"></script>
-  <script src="./js/qr-scanner.js?v=5.6"></script>
-  <script src="./js/excel.js?v=5.6"></script>
-  <script src="./js/app.js?v=5.6"></script>
+  <script src="./js/db.js?v=5.7"></script>
+  <script src="./js/sync.js?v=5.7"></script>
+  <script src="./js/qr-scanner.js?v=5.7"></script>
+  <script src="./js/excel.js?v=5.7"></script>
+  <script src="./js/app.js?v=5.7"></script>
 
 </body>
 </html>
