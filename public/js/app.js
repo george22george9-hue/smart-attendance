@@ -221,6 +221,7 @@ window.addEventListener('popstate', (event) => {
 function setupSyncUI() {
   const syncPill = document.getElementById('sync-status-indicator');
   const syncText = document.getElementById('sync-status-text');
+  if (!syncPill || !syncText) return;
 
   window.syncManager.onStatusChange((status) => {
     syncPill.className = 'sync-status-pill';
@@ -231,8 +232,8 @@ function setupSyncUI() {
       syncPill.title = 'جاري مزامنة البيانات مع السحابة...';
     } else if (status.isOnline) {
       syncPill.classList.add('synced');
-      syncText.innerText = 'متصل';
-      syncPill.title = 'البيانات متزامنة ومأمنة في السحابة';
+      syncText.innerText = 'أونلاين';
+      syncPill.title = 'متصل بالسحابة: النظام يعمل أونلاين والبيانات متزامنة 🟢';
     } else {
       syncPill.classList.add('offline');
       syncText.innerText = 'أوفلاين';
@@ -298,17 +299,23 @@ function switchStudentAuthTab(mode) {
   const regBtn = document.getElementById('tab-btn-student-register');
   const loginForm = document.getElementById('student-login-form');
   const regForm = document.getElementById('student-reg-form');
+  const submitText = document.getElementById('btn-student-submit-text');
 
   if (mode === 'register') {
     if (regBtn) regBtn.classList.add('active');
     if (loginBtn) loginBtn.classList.remove('active');
     if (regForm) regForm.style.display = 'block';
     if (loginForm) loginForm.style.display = 'none';
+    if (!state.isEditingStudent && submitText) {
+      submitText.innerText = 'إنشاء الحساب وتوليد الكود';
+    }
   } else {
+    state.isEditingStudent = false;
     if (loginBtn) loginBtn.classList.add('active');
     if (regBtn) regBtn.classList.remove('active');
     if (loginForm) loginForm.style.display = 'block';
     if (regForm) regForm.style.display = 'none';
+    if (submitText) submitText.innerText = 'إنشاء الحساب وتوليد الكود';
   }
 }
 window.switchStudentAuthTab = switchStudentAuthTab;
@@ -374,8 +381,12 @@ function setupStudentFormEvents() {
   const switchToLoginBtn = document.getElementById('btn-switch-to-login');
 
   if (tabLoginBtn) tabLoginBtn.addEventListener('click', () => switchStudentAuthTab('login'));
-  if (tabRegBtn) tabRegBtn.addEventListener('click', () => switchStudentAuthTab('register'));
-  if (switchToRegBtn) switchToRegBtn.addEventListener('click', () => switchStudentAuthTab('register'));
+  if (tabRegBtn) tabRegBtn.addEventListener('click', () => {
+    switchStudentAuthTab('register');
+  });
+  if (switchToRegBtn) switchToRegBtn.addEventListener('click', () => {
+    switchStudentAuthTab('register');
+  });
   if (switchToLoginBtn) switchToLoginBtn.addEventListener('click', () => switchStudentAuthTab('login'));
 
   // 2. Password Visibility Toggles
@@ -576,8 +587,12 @@ function setupStudentFormEvents() {
           existing = await getLocalStudent(nidVal);
         }
 
-        if (existing) {
-          showToast('هذا الرقم القومي مسجل بالفعل مسبقاً! يرجى تسجيل الدخول مباشرة 🔑', 'warning', 3500);
+        const isEditingCurrent = (state.currentStudent && String(state.currentStudent.national_id).trim() === nidVal);
+        const isPasswordMatch = (existing && existing.password && String(existing.password).trim() === passVal);
+        const canUpdateExisting = existing && (state.isEditingStudent || isEditingCurrent || isPasswordMatch || !existing.password);
+
+        if (existing && !canUpdateExisting) {
+          showToast('هذا الرقم القومي مسجل مسبقاً! يرجى إدخال كلمة المرور الصحيحة لتعديل البيانات 🔑', 'warning', 3500);
           switchStudentAuthTab('login');
           if (loginNidInput) loginNidInput.value = nidVal;
           if (loginPassInput) loginPassInput.focus();
@@ -590,13 +605,17 @@ function setupStudentFormEvents() {
           academic_year: selectedYear,
           department: deptVal,
           password: passVal,
-          registered_at: new Date().toISOString()
+          registered_at: existing && existing.registered_at ? existing.registered_at : new Date().toISOString()
         };
 
         // Dual Save:
         // 1. Save in LocalStorage (Permanent offline session)
         localStorage.setItem('student_profile', JSON.stringify(studentData));
         state.currentStudent = studentData;
+        state.isEditingStudent = false;
+
+        const submitText = document.getElementById('btn-student-submit-text');
+        if (submitText) submitText.innerText = 'إنشاء الحساب وتوليد الكود';
 
         // 2. Save in IndexedDB
         try {
@@ -618,7 +637,7 @@ function setupStudentFormEvents() {
         // 5. Generate and show Smart QR Card
         renderStudentQrCard(studentData);
         initStudentInboxListener(studentData);
-        showToast('تم إنشاء حسابك وتوليد بطاقة الحضور بنجاح ✨', 'success');
+        showToast(existing ? `تم تحديث بيانات حسابك بنجاح ✨ (${selectedYear} - قسم ${deptVal})` : 'تم إنشاء حسابك وتوليد بطاقة الحضور بنجاح ✨', 'success');
         showView('view-student-card');
       } catch (err) {
         console.error('Error saving student:', err);
@@ -672,7 +691,12 @@ function setupStudentFormEvents() {
     editBtn.addEventListener('click', () => {
       if (!state.currentStudent) return;
       if (confirm('هل ترغب في تعديل بيانات حسابك المسجلة؟')) {
+        state.isEditingStudent = true;
         switchStudentAuthTab('register');
+
+        const submitText = document.getElementById('btn-student-submit-text');
+        if (submitText) submitText.innerText = 'حفظ التعديلات وتحديث الكود';
+
         if (nameInput) nameInput.value = state.currentStudent.full_name || '';
         if (regNidInput) regNidInput.value = state.currentStudent.national_id || '';
         if (regPassInput) regPassInput.value = state.currentStudent.password || '';

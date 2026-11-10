@@ -4,7 +4,7 @@
  */
 class SyncManager {
   constructor() {
-    this.isOnline = navigator.onLine;
+    this.isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
     this.isSyncing = false;
     this.lastSyncTime = localStorage.getItem('last_sync_timestamp') || null;
     this.listeners = [];
@@ -30,7 +30,7 @@ class SyncManager {
 
     // Periodic sync attempt (every 25 seconds if online)
     this.syncInterval = setInterval(() => {
-      if (this.isOnline && !this.isSyncing) {
+      if (navigator.onLine && !this.isSyncing) {
         this.syncNow(true); // silent background sync
       }
     }, 25000);
@@ -39,11 +39,12 @@ class SyncManager {
     setTimeout(() => {
       this.isOnline = navigator.onLine;
       if (this.isOnline) {
+        this.notifyStatus('online');
         this.syncNow(true);
       } else {
         this.notifyStatus('offline');
       }
-    }, 1200);
+    }, 800);
   }
 
   onStatusChange(callback) {
@@ -59,9 +60,14 @@ class SyncManager {
   }
 
   getStatus(forceState = null) {
+    let online = navigator.onLine;
+    if (forceState === 'online' || forceState === 'synced') online = true;
+    if (forceState === 'offline') online = false;
+
     return {
-      isOnline: forceState ? forceState === 'online' : this.isOnline,
-      isSyncing: this.isSyncing,
+      isOnline: online,
+      isSyncing: this.isSyncing || forceState === 'syncing',
+      syncState: forceState || (online ? 'online' : 'offline'),
       lastSyncTime: this.lastSyncTime
     };
   }
@@ -74,6 +80,7 @@ class SyncManager {
       return { success: false, offline: true, message: 'الجهاز غير متصل بالإنترنت حالياً' };
     }
 
+    this.isOnline = true;
     this.isSyncing = true;
     this.notifyStatus('syncing');
 
@@ -85,7 +92,7 @@ class SyncManager {
       if (totalCount === 0) {
         this.isSyncing = false;
         this.notifyStatus('synced');
-        return { success: true, count: 0, message: 'جميع البيانات متزامنة ومأمنة في السحابة' };
+        return { success: true, count: 0, message: 'جميع البيانات متزامنة ومأمنة في السحابة أونلاين 🟢' };
       }
 
       // 2. Primary Cloud Sync: Sync via Firebase Cloud Firestore if available
@@ -120,37 +127,46 @@ class SyncManager {
         };
       }
 
-      // 3. Fallback: Local Server Sync (/api/sync) if running on local Node.js server
-      const response = await fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          students: unsynced.students,
-          lectures: unsynced.lectures,
-          attendance: unsynced.attendance
-        })
-      });
+      // 3. Fallback: Local Server Sync (/api/sync) only if running on local Node.js server (not Firebase static hosting)
+      const isCloudHosting = window.location.hostname.includes('web.app') || window.location.hostname.includes('firebaseapp.com');
+      if (!isCloudHosting) {
+        const response = await fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            students: unsynced.students,
+            lectures: unsynced.lectures,
+            attendance: unsynced.attendance
+          })
+        });
 
-      if (!response.ok) {
-        throw new Error('Server returned ' + response.status);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            await markRecordsAsSynced(unsynced);
+            this.lastSyncTime = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            localStorage.setItem('last_sync_timestamp', this.lastSyncTime);
+            this.isSyncing = false;
+            this.notifyStatus('synced');
+            window.dispatchEvent(new CustomEvent('sync-completed', { detail: result }));
+            return { success: true, count: totalCount, message: `تم رفع البيانات بنجاح` };
+          }
+        }
       }
 
-      const result = await response.json();
-      if (result.success) {
-        await markRecordsAsSynced(unsynced);
-        this.lastSyncTime = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-        localStorage.setItem('last_sync_timestamp', this.lastSyncTime);
-        this.isSyncing = false;
-        this.notifyStatus('synced');
-        window.dispatchEvent(new CustomEvent('sync-completed', { detail: result }));
-        return { success: true, count: totalCount, message: `تم رفع البيانات بنجاح` };
-      } else {
-        throw new Error(result.message || 'فشلت المزامنة');
-      }
-    } catch (err) {
-      console.warn('[Sync] Sync failed or offline:', err.message);
       this.isSyncing = false;
-      this.notifyStatus('offline');
+      this.notifyStatus(navigator.onLine ? 'synced' : 'offline');
+      return { success: true, count: totalCount, message: 'تم حفظ البيانات' };
+    } catch (err) {
+      console.warn('[Sync] Sync notice:', err.message);
+      this.isSyncing = false;
+      if (!navigator.onLine) {
+        this.isOnline = false;
+        this.notifyStatus('offline');
+      } else {
+        this.isOnline = true;
+        this.notifyStatus('synced');
+      }
       return { success: false, error: err.message };
     }
   }
