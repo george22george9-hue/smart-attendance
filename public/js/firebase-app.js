@@ -64,7 +64,7 @@ const CloudDB = {
   // 1.5 Get single student by National ID (For login and profile retrieval)
   async getStudent(nationalId) {
     const nid = String(nationalId).trim();
-    if (cloudDb) {
+    if (cloudDb && navigator.onLine) {
       try {
         const doc = await cloudDb.collection('students').doc(nid).get();
         if (doc.exists) {
@@ -74,7 +74,7 @@ const CloudDB = {
         console.warn('[Firebase] Get student error:', err);
       }
     }
-    // Fallback to local
+    // Instant Fallback to local IndexedDB (100% offline capable)
     if (typeof getLocalStudent === 'function') {
       try {
         const localSt = await getLocalStudent(nid);
@@ -86,17 +86,24 @@ const CloudDB = {
 
   // 2. Fetch all registered students
   async getAllStudents() {
-    if (!cloudDb) return [];
-    try {
-      const snap = await cloudDb.collection('students').get();
-      const list = [];
-      snap.forEach(doc => list.push(doc.data()));
-      list.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '', 'ar'));
-      return list;
-    } catch (err) {
-      console.warn('[Firebase] Get students error:', err);
-      return [];
+    if (cloudDb && navigator.onLine) {
+      try {
+        const snap = await cloudDb.collection('students').get();
+        const list = [];
+        snap.forEach(doc => list.push(doc.data()));
+        list.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '', 'ar'));
+        if (list.length > 0) return list;
+      } catch (err) {
+        console.warn('[Firebase] Get students error:', err);
+      }
     }
+    // Instant Fallback to local IndexedDB (100% offline capable)
+    if (typeof getAllLocalStudents === 'function') {
+      try {
+        return await getAllLocalStudents();
+      } catch (e) {}
+    }
+    return [];
   },
 
   // 2.5 Delete Student and their associated attendance
@@ -152,7 +159,7 @@ const CloudDB = {
   // 3.5 Get all lectures from Cloud & Local
   async getAllLectures() {
     let list = [];
-    if (cloudDb) {
+    if (cloudDb && navigator.onLine) {
       try {
         const snap = await cloudDb.collection('lectures').get();
         snap.forEach(doc => list.push(doc.data()));
@@ -162,10 +169,17 @@ const CloudDB = {
       }
     }
     if (list.length === 0) {
-      try {
-        const local = localStorage.getItem('app_lectures');
-        if (local) list = JSON.parse(local);
-      } catch (e) {}
+      if (typeof getAllLocalLectures === 'function') {
+        try {
+          list = await getAllLocalLectures();
+        } catch (e) {}
+      }
+      if (list.length === 0) {
+        try {
+          const local = localStorage.getItem('app_lectures');
+          if (local) list = JSON.parse(local);
+        } catch (e) {}
+      }
     }
     return list;
   },
@@ -197,7 +211,7 @@ const CloudDB = {
   // 3.7 Get all attendance records for stats
   async getAllAttendance() {
     let list = [];
-    if (cloudDb) {
+    if (cloudDb && navigator.onLine) {
       try {
         const snap = await cloudDb.collection('attendance').get();
         snap.forEach(doc => list.push(doc.data()));
@@ -206,10 +220,17 @@ const CloudDB = {
       }
     }
     if (list.length === 0) {
-      try {
-        const local = localStorage.getItem('app_attendance');
-        if (local) list = JSON.parse(local);
-      } catch (e) {}
+      if (typeof getAllLocalAttendance === 'function') {
+        try {
+          list = await getAllLocalAttendance();
+        } catch (e) {}
+      }
+      if (list.length === 0) {
+        try {
+          const local = localStorage.getItem('app_attendance');
+          if (local) list = JSON.parse(local);
+        } catch (e) {}
+      }
     }
     return list;
   },
@@ -263,19 +284,26 @@ const CloudDB = {
 
   // 6. Get attendance history for a specific student
   async getStudentAttendanceHistory(nationalId) {
-    if (!cloudDb) return [];
-    try {
-      const nid = String(nationalId).trim();
-      const snap = await cloudDb.collection('attendance')
-        .where('national_id', '==', nid)
-        .get();
-      const records = [];
-      snap.forEach(doc => records.push(doc.data()));
-      return records;
-    } catch (err) {
-      console.warn('[Firebase] Get student attendance error:', err);
-      return [];
+    let records = [];
+    if (cloudDb && navigator.onLine) {
+      try {
+        const nid = String(nationalId).trim();
+        const snap = await cloudDb.collection('attendance')
+          .where('national_id', '==', nid)
+          .get();
+        snap.forEach(doc => records.push(doc.data()));
+        if (records.length > 0) return records;
+      } catch (err) {
+        console.warn('[Firebase] Get student attendance error:', err);
+      }
     }
+    // Instant Fallback to local IndexedDB (100% offline capable)
+    if (typeof getLocalAttendanceByStudent === 'function') {
+      try {
+        records = await getLocalAttendanceByStudent(nationalId);
+      } catch (e) {}
+    }
+    return records;
   },
 
   // 7. Send Announcement/Message from Instructor

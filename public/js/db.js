@@ -255,6 +255,33 @@ async function deleteLocalAttendance(id) {
   });
 }
 
+// 100% Offline Attendance Helpers
+async function getAllLocalAttendance() {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(['attendance'], 'readonly');
+    const store = tx.objectStore('attendance');
+    const req = store.getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function getLocalAttendanceByStudent(nationalId) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(['attendance'], 'readonly');
+    const store = tx.objectStore('attendance');
+    const req = store.getAll();
+    req.onsuccess = () => {
+      const nid = String(nationalId).trim();
+      const list = (req.result || []).filter(item => String(item.national_id).trim() === nid);
+      resolve(list);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
 // Sync Helpers: Get all records with is_synced === 0
 async function getUnsyncedRecords() {
   const db = await openDb();
