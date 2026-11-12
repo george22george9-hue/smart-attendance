@@ -15,6 +15,7 @@ const CORE_ASSETS = [
   './js/qr-scanner.js?v=1.3.2',
   './js/excel.js',
   './js/excel.js?v=1.3.2',
+  './js/env.js',
   './js/firebase-app.js',
   './js/firebase-app.js?v=1.3.2',
   './libs/firebase-app-compat.js',

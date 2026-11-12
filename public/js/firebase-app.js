@@ -2,14 +2,16 @@
  * Firebase Initialization & Cloud Firestore Integration
  * Enables real-time cloud sync, messaging, and offline persistence
  */
+const env = (typeof window !== 'undefined' && window.ENV) ? window.ENV : {};
+
 const firebaseConfig = {
-  apiKey: "AIzaSyBsV_WcXz4JG9PSJRX8VCUO5fmAcIX9dNE",
-  authDomain: "smart-attendance-7019f.firebaseapp.com",
-  projectId: "smart-attendance-7019f",
-  storageBucket: "smart-attendance-7019f.firebasestorage.app",
-  messagingSenderId: "45270123562",
-  appId: "1:45270123562:web:3fcb2df5853af2848eef53",
-  measurementId: "G-KLV9R8JMYF"
+  apiKey: env.apiKey || env.FIREBASE_API_KEY || "AIzaSyBsV_WcXz4JG9PSJRX8VCUO5fmAcIX9dNE",
+  authDomain: env.authDomain || env.FIREBASE_AUTH_DOMAIN || "smart-attendance-7019f.firebaseapp.com",
+  projectId: env.projectId || env.FIREBASE_PROJECT_ID || "smart-attendance-7019f",
+  storageBucket: env.storageBucket || env.FIREBASE_STORAGE_BUCKET || "smart-attendance-7019f.firebasestorage.app",
+  messagingSenderId: env.messagingSenderId || env.FIREBASE_MESSAGING_SENDER_ID || "45270123562",
+  appId: env.appId || env.FIREBASE_APP_ID || "1:45270123562:web:3fcb2df5853af2848eef53",
+  measurementId: env.measurementId || env.FIREBASE_MEASUREMENT_ID || "G-KLV9R8JMYF"
 };
 
 let cloudDb = null;

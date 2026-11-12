@@ -4,8 +4,9 @@
   "description": "Smart Attendance PWA System - Agricultural Engineer Edition with Real-Time QR, Offline SQLite/IndexedDB, SheetJS Export, and Modern Dark/Light Glassmorphism UI",
   "main": "server/index.js",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "node --watch server/index.js"
+    "start": "node scripts/generate-env.js && node server/index.js",
+    "dev": "node scripts/generate-env.js && node --watch server/index.js",
+    "generate:env": "node scripts/generate-env.js"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -21,6 +22,7 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.6",
+    "dotenv": "^18.0.10",
     "express": "^5.3.0",
     "localtunnel": "^2.0.2",
     "sqlite3": "^6.0.1"

@@ -4,3 +4,12 @@ cloudflared.exe
 *.log
 npm-debug.log*
 
+# Environment Variables & Secrets (NEVER commit to GitHub)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+public/js/env.js
+
+

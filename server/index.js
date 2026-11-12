@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -5,6 +6,7 @@ const { initDb, run, get, all } = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const DEFAULT_INSTRUCTOR_PIN = process.env.DEFAULT_INSTRUCTOR_PIN || '1234';
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -53,7 +55,7 @@ app.post('/api/instructor/verify-pin', async (req, res) => {
     }
     const cleanPin = String(pin).trim();
     const row = await get(`SELECT value FROM config WHERE key = 'instructor_pin'`);
-    const currentPin = row ? row.value : '1234';
+    const currentPin = row ? row.value : DEFAULT_INSTRUCTOR_PIN;
 
     if (cleanPin === String(currentPin).trim()) {
       resetFailedAttempts(clientIp);
@@ -78,7 +80,7 @@ app.post('/api/instructor/change-pin', async (req, res) => {
     const cleanNewPin = String(newPin).trim();
 
     const row = await get(`SELECT value FROM config WHERE key = 'instructor_pin'`);
-    const currentPin = row ? row.value : '1234';
+    const currentPin = row ? row.value : DEFAULT_INSTRUCTOR_PIN;
 
     if (cleanOldPin !== String(currentPin).trim()) {
       return res.status(401).json({ success: false, message: 'الرمز السري الحالي غير صحيح' });
