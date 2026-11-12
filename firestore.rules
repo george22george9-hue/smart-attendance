@@ -1,9 +1,92 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Helper functions for strict validation
+    function isValidNationalId(nid) {
+      return nid is string && nid.size() == 14 && nid.matches('^[0-9]{14}$');
+    }
+
+    function isNonEmptyString(val, minLen, maxLen) {
+      return val is string && val.size() >= minLen && val.size() <= maxLen;
+    }
+
+    // 1. Students Collection
+    match /students/{nationalId} {
+      allow read: if true;
+
+      allow create: if nationalId == request.resource.data.national_id &&
+                       isValidNationalId(request.resource.data.national_id) &&
+                       isNonEmptyString(request.resource.data.full_name, 3, 100) &&
+                       request.resource.data.academic_year in ['الفرقة الأولى', 'الفرقة الثانية', 'الفرقة الثالثة', 'الفرقة الرابعة'] &&
+                       isNonEmptyString(request.resource.data.department, 2, 50);
+
+      allow update: if nationalId == resource.data.national_id &&
+                       request.resource.data.national_id == resource.data.national_id &&
+                       isNonEmptyString(request.resource.data.full_name, 3, 100);
+
+      allow delete: if resource != null;
+    }
+
+    // 2. Lectures Collection
+    match /lectures/{lectureId} {
+      allow read: if true;
+
+      allow create: if lectureId == request.resource.data.lecture_id &&
+                       isNonEmptyString(request.resource.data.title, 2, 120) &&
+                       isNonEmptyString(request.resource.data.instructor_name, 2, 100);
+
+      allow update: if request.resource.data.lecture_id == resource.data.lecture_id &&
+                       isNonEmptyString(request.resource.data.title, 2, 120);
+
+      allow delete: if resource != null;
+    }
+
+    // 3. Attendance Records Collection
+    match /attendance/{attendanceId} {
+      allow read: if true;
+
+      allow create: if isNonEmptyString(request.resource.data.lecture_id, 3, 100) &&
+                       isValidNationalId(request.resource.data.national_id) &&
+                       isNonEmptyString(request.resource.data.student_name, 2, 100) &&
+                       isNonEmptyString(request.resource.data.scan_time, 2, 50);
+
+      // Critical tamper protection: Attendance records cannot be edited once saved!
+      allow update: if false;
+
+      allow delete: if resource != null;
+    }
+
+    // 4. Announcements / Messages Collection
+    match /announcements/{announcementId} {
+      allow read: if true;
+
+      allow create: if isNonEmptyString(request.resource.data.title, 2, 200) &&
+                       isNonEmptyString(request.resource.data.body, 2, 2000);
+
+      allow update: if false;
+
+      allow delete: if resource != null;
+    }
+
+    // 5. Instructors Directory
+    match /instructors/{instructorId} {
+      allow read: if true;
+
+      allow create: if isNonEmptyString(request.resource.data.name, 3, 100) &&
+                       isNonEmptyString(request.resource.data.role, 2, 50) &&
+                       request.resource.data.pin is string &&
+                       request.resource.data.pin.size() >= 4;
+
+      allow update: if request.resource.data.id == resource.data.id &&
+                       isNonEmptyString(request.resource.data.name, 3, 100);
+
+      allow delete: if resource != null;
+    }
+
+    // 6. Deny any access to any other collection or arbitrary path
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }
-
