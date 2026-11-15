@@ -125,10 +125,10 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         })
         .catch(async () => {
-          const cachedIndex = (await caches.match('./index.html')) || 
-                              (await caches.match('./')) || 
-                              (await caches.match('/index.html')) || 
-                              (await caches.match(event.request, { ignoreSearch: true }));
+          const cachedIndex = (await caches.match('./index.html')) ||
+            (await caches.match('./')) ||
+            (await caches.match('/index.html')) ||
+            (await caches.match(event.request, { ignoreSearch: true }));
           if (cachedIndex) return cachedIndex;
           return new Response('Offline - التطبيق غير متصل بالإنترنت حالياً', {
             status: 503,
