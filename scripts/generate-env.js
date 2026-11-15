@@ -22,3 +22,4 @@ window.ENV = ${JSON.stringify(envObject, null, 2)};
 const destPath = path.join(__dirname, '..', 'public', 'js', 'env.js');
 fs.writeFileSync(destPath, outputContent, 'utf8');
 console.log('[ENV] Generated public/js/env.js from .env successfully!');
+
