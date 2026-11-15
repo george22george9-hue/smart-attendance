@@ -60,27 +60,29 @@
 
     <!-- Top Navigation & Sync Status Bar -->
     <header class="app-header">
-      <div class="brand-container btn-back-landing" title="الصفحة الرئيسية">
-        <div class="brand-logo">
-          <img src="./icons/icon-192.png?v=1.3" alt="Logo" class="brand-logo-img">
+      <div class="header-inner">
+        <div class="brand-container btn-back-landing" title="الصفحة الرئيسية">
+          <div class="brand-logo">
+            <img src="./icons/icon-192.png?v=1.3" alt="Logo" class="brand-logo-img">
+          </div>
+          <div class="brand-text-wrap">
+            <span class="brand-title-text">Agricultural engineer</span>
+            <span class="version-tag">v1.3</span>
+          </div>
         </div>
-        <div class="brand-text-wrap">
-          <span class="brand-title-text">Agricultural engineer</span>
-          <span class="version-tag">v1.3</span>
-        </div>
-      </div>
 
-      <!-- Header Actions (Theme Switcher + Sync Indicator) -->
-      <div class="header-actions">
-        <button type="button" id="btn-theme-toggle" class="theme-toggle-btn" title="تبديل المظهر (نهاري / ليلي)" aria-label="تبديل المظهر">
-          <span id="theme-toggle-icon">🌙</span>
-          <span id="theme-toggle-text" class="theme-toggle-label">نهاري</span>
-        </button>
+        <!-- Header Actions (Theme Switcher + Sync Indicator) -->
+        <div class="header-actions">
+          <button type="button" id="btn-theme-toggle" class="theme-toggle-btn" title="تبديل المظهر (نهاري / ليلي)" aria-label="تبديل المظهر">
+            <span id="theme-toggle-icon">🌙</span>
+            <span id="theme-toggle-text" class="theme-toggle-label">نهاري</span>
+          </button>
 
-        <!-- Live Sync Pill -->
-        <div id="sync-status-indicator" class="sync-status-pill synced" title="اضغط للتحقق من المزامنة">
-          <span class="sync-status-dot"></span>
-          <span id="sync-status-text">متصل</span>
+          <!-- Live Sync Pill -->
+          <div id="sync-status-indicator" class="sync-status-pill synced" title="اضغط للتحقق من المزامنة">
+            <span class="sync-status-dot"></span>
+            <span id="sync-status-text">متصل</span>
+          </div>
         </div>
       </div>
     </header>
@@ -88,60 +90,77 @@
     <!-- Main Content Area -->
     <main class="main-content">
 
-      <!-- Optional PWA Install Banner (Positioned cleanly inside content flow below fixed navbar) -->
+      <!-- PWA Install Banner (Compact, Responsive & Positioned Below Fixed Navbar) -->
       <div id="pwa-install-banner">
         <div class="pwa-banner-text">
-          <span style="font-size: 1.3rem;">📱</span>
+          <span class="pwa-banner-icon">📱</span>
           <span>ثبّت التطبيق على شاشتك الرئيسية للتشغيل الفوري بدون إنترنت</span>
         </div>
         <div class="pwa-banner-actions">
-          <button id="btn-install-pwa" type="button" class="tool-btn" aria-label="تثبيت التطبيق">
+          <button id="btn-install-pwa" type="button" class="btn-install-pwa-action" aria-label="تثبيت التطبيق">
             <span>تثبيت الآن</span>
             <span>⬇️</span>
           </button>
-          <button type="button" class="btn-dismiss-pwa" onclick="document.getElementById('pwa-install-banner').style.display='none'" title="إغلاق">&times;</button>
+          <button type="button" class="btn-dismiss-pwa" onclick="document.getElementById('pwa-install-banner').style.display='none'" title="إغلاق" aria-label="إغلاق">&times;</button>
         </div>
       </div>
 
       <!-- ===================================================================
-           1. SIMPLE & CLEAN LANDING VIEW (سيمبل خالص بدون أي تعقيد)
+           1. MODERN ACADEMIC SAAS LANDING VIEW
            =================================================================== -->
       <section id="view-landing" class="view-section active">
-        <div class="landing-simple-box">
+        <div class="landing-hero-container">
 
-          <!-- Clean App Header with Agricultural Engineer Emblem -->
-          <div class="simple-brand-header">
-            <div class="agri-eng-badge" title="Agricultural engineer" style="overflow: hidden; padding: 0;">
-              <img src="./icons/icon-192.png?v=1.3" alt="Agricultural engineer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block;">
+          <!-- Brand Emblem & SaaS Header -->
+          <div class="landing-hero-header">
+            <div class="agri-eng-badge" title="Agricultural engineer">
+              <img src="./icons/icon-192.png?v=1.3" alt="Agricultural engineer" class="agri-eng-img">
             </div>
-            <h2 class="simple-app-title">Agricultural engineer</h2>
-            <p class="simple-app-sub">منظومة الحضور والغياب الذكي بالـ QR Code</p>
+            <h1 class="landing-main-title">Agricultural engineer</h1>
+            <p class="landing-main-subtitle">منظومة الحضور والغياب الذكي الأكاديمية بالـ QR Code</p>
+            <div class="landing-badges-row">
+              <span class="landing-feature-pill">⚡ معتمد للعمل بدون إنترنت (Offline-First)</span>
+            </div>
           </div>
 
-          <!-- The Two Direct Clean Buttons -->
-          <div class="simple-role-actions">
-            <button type="button" id="btn-main-student" class="simple-role-btn student-glow" aria-label="دخول الطالب">
-              <div class="btn-icon-circle">🎓</div>
-              <div class="btn-text-content">
-                <strong class="btn-main-text">دخول الطالب</strong>
-                <span class="btn-sub-text">عرض واستخراج كود الحضور وسجل المحاضرات</span>
+          <!-- Dual SaaS Role Action Cards Grid -->
+          <div class="landing-role-grid">
+            <!-- Student Portal Card -->
+            <button type="button" id="btn-main-student" class="role-action-card student-card" aria-label="دخول بوابة الطالب">
+              <div class="role-card-top">
+                <div class="role-icon-box student-icon-bg">🎓</div>
+                <span class="role-card-tag">للطلاب</span>
               </div>
-              <span class="btn-arrow-icon">◀</span>
+              <div class="role-card-body">
+                <h2 class="role-card-title">بوابة الطالب</h2>
+                <p class="role-card-desc">استخراج وعرض كود الحضور الذكي، سجل المحاضرات والرسائل والتنبيهات</p>
+              </div>
+              <div class="role-card-footer student-footer">
+                <span>الدخول إلى حساب الطالب</span>
+                <span class="role-arrow">←</span>
+              </div>
             </button>
 
-            <button type="button" id="btn-main-instructor" class="simple-role-btn instructor-glow" aria-label="دخول المحاضر">
-              <div class="btn-icon-circle instructor">👨‍🏫</div>
-              <div class="btn-text-content">
-                <strong class="btn-main-text">دخول المحاضر</strong>
-                <span class="btn-sub-text">بدء المحاضرة ورصد الحضور وتصدير Excel</span>
+            <!-- Instructor Portal Card -->
+            <button type="button" id="btn-main-instructor" class="role-action-card instructor-card" aria-label="دخول بوابة المحاضر">
+              <div class="role-card-top">
+                <div class="role-icon-box instructor-icon-bg">👨‍🏫</div>
+                <span class="role-card-tag">للمحاضرين</span>
               </div>
-              <span class="btn-arrow-icon">◀</span>
+              <div class="role-card-body">
+                <h2 class="role-card-title">بوابة المحاضر</h2>
+                <p class="role-card-desc">بدء الجلسة ورصد الحضور عبر الكاميرا، إدارة السكاشن وتصدير كشوف Excel</p>
+              </div>
+              <div class="role-card-footer instructor-footer">
+                <span>الدخول إلى لوحة المحاضر</span>
+                <span class="role-arrow">←</span>
+              </div>
             </button>
           </div>
 
-          <!-- Subtle App Refresh Trigger -->
-          <div style="margin-top: 18px; text-align: center;">
-            <button id="btn-force-update-app" class="tool-btn" aria-label="تحديث التطبيق ومسح الكاش" style="background: none; border: none; color: var(--text-dim); font-size: 0.72rem; cursor: pointer; opacity: 0.7;">
+          <!-- Subtle App Version & Cache Refresh Trigger -->
+          <div class="landing-footer-refresh">
+            <button id="btn-force-update-app" type="button" class="btn-refresh-cache-subtle" aria-label="تحديث التطبيق ومسح الكاش">
               <span>🔄 تحديث التطبيق ومسح الكاش (v1.3)</span>
             </button>
           </div>

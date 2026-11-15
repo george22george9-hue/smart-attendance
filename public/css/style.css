@@ -305,17 +305,28 @@ button {
   top: 0;
   left: 0;
   right: 0;
-  height: 66px;
+  height: 64px;
   background-color: var(--header-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--header-border);
   z-index: 100;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 18px;
+  justify-content: center;
+  padding: 0;
   transition: all 0.2s ease;
+}
+
+.header-inner {
+  max-width: 1140px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
 }
 
 .brand-container {
@@ -527,14 +538,14 @@ button {
   right: 0;
   height: 52px;
   background-color: var(--bottom-bar-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--bottom-bar-border);
   z-index: 90;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 16px;
+  padding: 0;
 }
 
 .bottom-bar-content {
@@ -543,7 +554,10 @@ button {
   justify-content: space-between;
   width: 100%;
   max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 20px;
   gap: 12px;
+  height: 100%;
 }
 
 .bb-watermark-row {
@@ -825,103 +839,260 @@ button {
 }
 
 /* --------------------------------------------------------------------------
-   10. SCREEN 1: LANDING PAGE
+   10. SCREEN 1: LANDING PAGE (MODERN ACADEMIC SAAS HERO & ACTION CARDS)
    -------------------------------------------------------------------------- */
-.landing-simple-box {
-  max-width: 520px;
-  margin: 30px auto;
+.landing-hero-container {
+  max-width: 820px;
+  width: 100%;
+  margin: 18px auto 32px;
   text-align: center;
-  padding: 36px 28px;
 }
 
-.simple-brand-header {
-  margin-bottom: 28px;
+.landing-hero-header {
+  margin-bottom: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .agri-eng-badge {
-  width: 72px;
-  height: 72px;
-  border-radius: 20px;
-  margin: 0 auto 16px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
+  width: 88px;
+  height: 88px;
+  border-radius: 24px;
+  margin-bottom: 16px;
+  border: 2px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 10px 28px rgba(16, 185, 129, 0.22);
   overflow: hidden;
-}
-
-.simple-app-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--text-main);
-  margin-bottom: 4px;
-}
-
-.simple-app-sub {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-.simple-role-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.simple-role-btn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 18px 20px;
-  background-color: var(--bg-surface-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--card-shadow);
-  transition: all 0.2s ease;
-  text-align: right;
-  min-height: 74px;
-}
-
-.simple-role-btn:hover {
-  border-color: var(--primary);
-  transform: translateY(-2px);
-  box-shadow: var(--card-shadow-hover);
-}
-
-.btn-icon-circle {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  background: var(--bg-surface-elevated);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
-  flex-shrink: 0;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.btn-text-content {
+.agri-eng-badge:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(16, 185, 129, 0.3);
+}
+
+.agri-eng-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.landing-main-title {
+  font-size: clamp(1.5rem, 4vw, 2.15rem);
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.4px;
+  margin-bottom: 8px;
+}
+
+.landing-main-subtitle {
+  font-size: clamp(0.92rem, 2.5vw, 1.05rem);
+  color: var(--text-muted);
+  font-weight: 500;
+  max-width: 560px;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.landing-badges-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.landing-feature-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Dual Role Grid */
+.landing-role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 28px;
+  text-align: right;
+}
+
+.role-action-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 26px 22px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--card-shadow);
+  width: 100%;
+}
+
+.role-action-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary);
+  box-shadow: var(--card-shadow-hover), 0 0 24px rgba(16, 185, 129, 0.12);
+}
+
+.role-action-card:active {
+  transform: translateY(-1px);
+}
+
+.role-action-card.instructor-card:hover {
+  border-color: var(--dept-alat);
+  box-shadow: var(--card-shadow-hover), 0 0 24px rgba(2, 132, 199, 0.12);
+}
+
+.role-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.role-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.role-action-card:hover .role-icon-box {
+  transform: scale(1.08);
+}
+
+.student-icon-bg {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1.5px solid rgba(16, 185, 129, 0.28);
+  color: var(--primary);
+}
+
+.instructor-icon-bg {
+  background: rgba(2, 132, 199, 0.12);
+  border: 1.5px solid rgba(2, 132, 199, 0.28);
+  color: var(--dept-alat);
+}
+
+.role-card-tag {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.role-card-body {
   flex: 1;
-  padding: 0 14px;
   display: flex;
   flex-direction: column;
 }
 
-.btn-main-text {
-  font-size: 1.05rem;
+.role-card-title {
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--text-main);
+  margin-bottom: 8px;
 }
 
-.btn-sub-text {
-  font-size: 0.78rem;
+.role-card-desc {
+  font-size: 0.88rem;
   color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 16px;
 }
 
-.btn-arrow-icon {
-  font-size: 0.9rem;
-  color: var(--text-dim);
+.role-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 0.86rem;
+  font-weight: 700;
+  transition: color 0.2s ease;
 }
+
+.student-footer {
+  color: var(--primary);
+}
+
+.instructor-footer {
+  color: var(--dept-alat);
+}
+
+.role-arrow {
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+
+.role-action-card:hover .role-arrow {
+  transform: translateX(-4px);
+}
+
+.landing-footer-refresh {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.btn-refresh-cache-subtle {
+  background: none;
+  border: none;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.btn-refresh-cache-subtle:hover {
+  color: var(--primary);
+  background: var(--bg-secondary);
+}
+
+/* Fallback for old landing markup if cached */
+.landing-simple-box {
+  max-width: 520px;
+  margin: 20px auto;
+  text-align: center;
+  padding: 32px 24px;
+}
+.simple-brand-header { margin-bottom: 24px; }
+.simple-app-title { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
+.simple-app-sub { font-size: 0.9rem; color: var(--text-muted); }
+.simple-role-actions { display: flex; flex-direction: column; gap: 14px; }
+.simple-role-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 18px 20px; background-color: var(--bg-surface-elevated); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--card-shadow); transition: all 0.2s ease; text-align: right; min-height: 74px; }
+.simple-role-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
+.btn-icon-circle { width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--bg-secondary); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+.btn-text-content { flex: 1; padding: 0 14px; display: flex; flex-direction: column; }
+.btn-main-text { font-size: 1.05rem; font-weight: 800; color: var(--text-main); }
+.btn-sub-text { font-size: 0.78rem; color: var(--text-muted); }
+.btn-arrow-icon { font-size: 0.9rem; color: var(--text-dim); }
 
 /* --------------------------------------------------------------------------
    11. SCREEN 2: STUDENT REGISTRATION & LOGIN
@@ -1724,16 +1895,41 @@ button {
 
 @media (max-width: 480px) {
   .app-header {
+    height: 58px;
+    padding: 0;
+  }
+
+  .header-inner {
     padding: 0 12px;
-    height: 60px;
+  }
+
+  .app-bottom-bar {
+    height: 48px;
+    padding: 0;
+  }
+
+  .bottom-bar-content {
+    padding: 0 12px;
   }
 
   .main-content {
-    padding-top: 70px;
+    padding-top: 72px;
+    padding-bottom: 64px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .landing-role-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .role-action-card {
+    padding: 18px 16px;
   }
 
   .brand-title-text {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
   }
 
   .theme-toggle-label {
@@ -1741,7 +1937,14 @@ button {
   }
 
   .theme-toggle-btn {
-    padding: 6px 8px;
+    padding: 6px 10px;
+    min-height: 32px;
+  }
+
+  .sync-status-pill {
+    padding: 6px 10px;
+    min-height: 32px;
+    font-size: 0.74rem;
   }
 
   .year-grid, .dept-grid {
