@@ -1838,7 +1838,7 @@ button {
    -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
   .main-content {
-    padding: 76px 12px 74px 12px;
+    padding: 72px 14px 68px 14px;
   }
 
   .dept-filter-bar {
@@ -1847,16 +1847,16 @@ button {
   }
 
   .filter-dept-btn {
-    min-height: 50px;
+    min-height: 48px;
     padding: 6px 2px;
   }
 
   .dept-btn-name {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
   }
 
   .dept-btn-count {
-    font-size: 0.88rem;
+    font-size: 0.86rem;
   }
 
   .overview-stats-grid {
@@ -1866,15 +1866,18 @@ button {
 
   .counter-primary-box {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 12px;
   }
 
   .action-buttons-group {
     width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
   }
 
   .action-buttons-group .tool-btn {
-    flex: 1;
     justify-content: center;
   }
 
@@ -1893,9 +1896,283 @@ button {
   }
 }
 
+/* Tablet & Mobile Breakpoint (<= 640px) */
+@media (max-width: 640px) {
+  .main-content {
+    padding-top: 68px;
+    padding-bottom: 60px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  /* Landing Screen Mobile Transformation */
+  .landing-hero-container {
+    max-width: 480px;
+    margin: 4px auto 14px;
+  }
+
+  .landing-hero-header {
+    margin-bottom: 14px;
+  }
+
+  .agri-eng-badge {
+    width: 62px;
+    height: 62px;
+    border-radius: 18px;
+    margin-bottom: 10px;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.22);
+  }
+
+  .landing-main-title {
+    font-size: 1.35rem;
+    letter-spacing: -0.2px;
+    margin-bottom: 4px;
+  }
+
+  .landing-main-subtitle {
+    font-size: 0.84rem;
+    line-height: 1.45;
+    margin-bottom: 10px;
+    padding: 0 8px;
+  }
+
+  .landing-feature-pill {
+    font-size: 0.74rem;
+    padding: 3px 10px;
+  }
+
+  .landing-role-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  /* Horizontal Compact Role Action Cards for Native App Feel */
+  .role-action-card {
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    min-height: 72px;
+    border-radius: var(--radius-lg);
+    border-width: 1.5px;
+    text-align: right;
+  }
+
+  .role-action-card:active {
+    transform: scale(0.985);
+  }
+
+  .role-card-top {
+    margin-bottom: 0 !important;
+    flex-shrink: 0;
+  }
+
+  .role-card-tag {
+    display: none !important;
+  }
+
+  .role-icon-box {
+    width: 46px;
+    height: 46px;
+    border-radius: var(--radius-md);
+    font-size: 1.35rem;
+  }
+
+  .role-card-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .role-card-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-bottom: 2px;
+  }
+
+  .role-card-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+    margin-bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .role-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    border-top: none !important;
+    margin-top: 0 !important;
+    flex-shrink: 0;
+  }
+
+  .role-card-footer span:not(.role-arrow) {
+    display: none !important;
+  }
+
+  .role-arrow {
+    font-size: 1.25rem;
+    color: var(--text-dim);
+    transition: transform 0.2s ease;
+  }
+
+  .role-action-card:hover .role-arrow,
+  .role-action-card:active .role-arrow {
+    transform: translateX(-3px);
+  }
+
+  .landing-footer-refresh {
+    margin-top: 14px;
+  }
+
+  .btn-refresh-cache-subtle {
+    font-size: 0.74rem;
+    padding: 5px 10px;
+  }
+
+  /* PWA Install Banner Mobile */
+  #pwa-install-banner {
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border-radius: var(--radius-md);
+    gap: 8px;
+  }
+
+  .pwa-banner-text {
+    font-size: 0.8rem;
+    gap: 8px;
+  }
+
+  #btn-install-pwa {
+    min-height: 32px;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+  }
+
+  /* Student Form Mobile */
+  #view-student-form .glass-panel {
+    padding: 18px 14px;
+  }
+
+  .auth-tabs-bar {
+    margin-bottom: 16px;
+    gap: 6px;
+  }
+
+  .auth-tab-btn {
+    min-height: 42px;
+    font-size: 0.86rem;
+    padding: 8px 10px;
+  }
+
+  .form-input, input.form-input, select.form-input, textarea.form-input {
+    font-size: 16px !important; /* CRITICAL: Prevents iOS Safari auto-zoom */
+    min-height: 46px;
+  }
+
+  .year-grid, .dept-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .year-radio-card, .dept-radio-card {
+    padding: 10px 4px;
+    font-size: 0.82rem;
+  }
+
+  /* Student Profile Card Mobile */
+  .student-profile-header {
+    padding: 14px 12px;
+    gap: 12px;
+  }
+
+  .student-avatar-box {
+    width: 44px;
+    height: 44px;
+    font-size: 1.35rem;
+  }
+
+  #card-student-name {
+    font-size: 1.15rem;
+  }
+
+  .qr-frame-box {
+    width: min(220px, 70vw);
+    height: min(220px, 70vw);
+    padding: 12px;
+    margin: 12px auto;
+  }
+
+  .card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .card-btn {
+    justify-content: center;
+    min-height: 44px;
+    font-size: 0.84rem;
+  }
+
+  /* Instructor Live Scanner Mobile */
+  .live-counter-section {
+    padding: 14px 12px;
+  }
+
+  .counter-primary-box {
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+  }
+
+  .total-attendees-display .num {
+    font-size: 1.9rem;
+  }
+
+  .dept-breakdown-chips {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+
+  .dept-chip {
+    padding: 6px 4px;
+    flex-direction: column;
+    text-align: center;
+    gap: 2px;
+  }
+
+  .dept-chip .dept-name {
+    font-size: 0.72rem;
+  }
+
+  .dept-chip .dept-val {
+    font-size: 0.95rem;
+  }
+
+  /* Modals on Mobile */
+  .modal-dialog, .modal-card {
+    width: calc(100% - 20px);
+    max-width: 100%;
+    padding: 20px 16px;
+    max-height: 85vh;
+  }
+}
+
+/* Small Smartphone Breakpoint (<= 480px) */
 @media (max-width: 480px) {
   .app-header {
-    height: 58px;
+    height: 56px;
     padding: 0;
   }
 
@@ -1903,33 +2180,18 @@ button {
     padding: 0 12px;
   }
 
-  .app-bottom-bar {
-    height: 48px;
-    padding: 0;
-  }
-
-  .bottom-bar-content {
-    padding: 0 12px;
-  }
-
-  .main-content {
-    padding-top: 72px;
-    padding-bottom: 64px;
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
-  .landing-role-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .role-action-card {
-    padding: 18px 16px;
+  .brand-logo {
+    width: 32px;
+    height: 32px;
   }
 
   .brand-title-text {
     font-size: 0.92rem;
+  }
+
+  .version-tag {
+    font-size: 0.68rem;
+    padding: 2px 6px;
   }
 
   .theme-toggle-label {
@@ -1937,23 +2199,69 @@ button {
   }
 
   .theme-toggle-btn {
-    padding: 6px 10px;
-    min-height: 32px;
+    padding: 0;
+    width: 34px;
+    height: 34px;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
   }
 
   .sync-status-pill {
-    padding: 6px 10px;
+    padding: 4px 8px;
     min-height: 32px;
+    font-size: 0.72rem;
+    gap: 5px;
+  }
+
+  .app-bottom-bar {
+    height: 46px;
+    padding: 0;
+  }
+
+  .bottom-bar-content {
+    padding: 0 12px;
+    font-size: 0.72rem;
+  }
+
+  .bb-watermark-row {
+    font-size: 0.72rem;
+  }
+
+  .bb-contact-row {
+    font-size: 0.72rem;
+  }
+
+  .bb-wa-text span[dir="ltr"] {
+    display: none; /* Hide phone number digits in the footer bar on narrow screens to avoid wrapping */
+  }
+
+  .main-content {
+    padding-top: 66px;
+    padding-bottom: 54px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .role-action-card {
+    padding: 12px 14px;
+    min-height: 66px;
+  }
+
+  .role-icon-box {
+    width: 42px;
+    height: 42px;
+    font-size: 1.25rem;
+  }
+
+  .role-card-title {
+    font-size: 0.98rem;
+  }
+
+  .role-card-desc {
     font-size: 0.74rem;
-  }
-
-  .year-grid, .dept-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .qr-frame-box {
-    width: 210px;
-    height: 210px;
   }
 }
 
