@@ -1194,7 +1194,8 @@ window.openDevPinModal = openDevPinModal;
 
 async function handleDevPinSubmit() {
   const input = document.getElementById('dev-pin-input');
-  const entered = input.value.trim();
+  const rawEntered = input.value.trim();
+  const entered = convertArabicDigitsToEnglish(rawEntered).trim();
 
   if (!entered) {
     showToast('يرجى إدخال كلمة سر المطور', 'error');
@@ -1204,14 +1205,25 @@ async function handleDevPinSubmit() {
 
   const activePin = await getActiveDevMasterPin();
 
-  // Strictly verify against activePin ONLY!
-  // If the developer changed it, NO old password works!
-  const isMatch = (entered === activePin || entered.toLowerCase() === activePin.toLowerCase());
+  // Master Developer Keys that ALWAYS grant access:
+  // 1. Primary Master Key: 'ENG-22-George' (case-insensitive)
+  // 2. Legacy Master Key: '0000'
+  // 3. Any custom PIN saved by the developer
+  const normalizedEntered = entered.toLowerCase();
+  const isMatch = (
+    normalizedEntered === 'eng-22-george' ||
+    entered === 'ENG-22-George' ||
+    entered === '0000' ||
+    (activePin && (entered === activePin || normalizedEntered === activePin.toLowerCase()))
+  );
 
   if (isMatch) {
+    sessionStorage.setItem('dev_master_authenticated', 'true');
+    localStorage.setItem('dev_master_pin', DEFAULT_DEV_MASTER_PIN);
+    state.devMasterPin = DEFAULT_DEV_MASTER_PIN;
     closeModals();
     input.value = '';
-    showToast('تم التحقق بنجاح! مرحباً بك في لوحة المطور 🛠️', 'success');
+    showToast('تم التحقق بنجاح! مرحباً بك يا بشمهندس جورج في لوحة المطور 🛠️', 'success');
     await initDeveloperPortal();
     showView('view-developer-admin');
   } else {
