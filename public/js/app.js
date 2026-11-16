@@ -193,7 +193,7 @@ function showToast(message, type = 'info', duration = 3400) {
   }, duration);
 }
 
-// Robust View Navigation with History Stack
+// Robust View Navigation with History Stack & Persistence
 function showView(viewId, pushHistory = true) {
   if (!viewId) return;
 
@@ -206,6 +206,10 @@ function showView(viewId, pushHistory = true) {
     target.classList.add('active');
     state.currentView = viewId;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    try {
+      localStorage.setItem('current_active_view', viewId);
+    } catch (e) {}
 
     if (pushHistory) {
       if (viewHistory[viewHistory.length - 1] !== viewId) {
@@ -378,21 +382,8 @@ function resetStudentForm() {
   }
 }
 
-// Force Update and Clear All Local Data & Test Profiles
+// Safe App Asset Refresh & Cache Update (Preserves database & student sessions)
 async function forceUpdateApp() {
-  try {
-    localStorage.removeItem('student_profile');
-    localStorage.removeItem('app_lectures');
-    localStorage.removeItem('app_attendance');
-    localStorage.removeItem('app_messages');
-  } catch (e) {}
-
-  if ('indexedDB' in window) {
-    try {
-      window.indexedDB.deleteDatabase('SmartAttendanceDB');
-    } catch (e) {}
-  }
-
   if ('caches' in window) {
     try {
       const keys = await caches.keys();
@@ -407,10 +398,10 @@ async function forceUpdateApp() {
       }
     } catch (e) {}
   }
-  localStorage.removeItem('smart_attendance_build');
-  showToast('تم مسح البيانات التجريبية والكاش بنجاح 🧹', 'success');
+  localStorage.setItem('smart_attendance_app_ver', '1.3.7');
+  showToast('تم تحديث ملفات التطبيق ومسح الكاش بنجاح 🔄', 'success');
   setTimeout(() => {
-    window.location.reload(true);
+    window.location.reload();
   }, 400);
 }
 window.forceUpdateApp = forceUpdateApp;
@@ -970,6 +961,9 @@ function setupInstructorFlow() {
   // Instructor Logout button
   document.getElementById('btn-inst-logout')?.addEventListener('click', () => {
     state.currentInstructor = null;
+    localStorage.removeItem('instructor_session');
+    localStorage.removeItem('active_lecture_id');
+    localStorage.setItem('current_active_view', 'view-landing');
     if (instMsgUnsubscribe) {
       instMsgUnsubscribe();
       instMsgUnsubscribe = null;
@@ -1060,10 +1054,22 @@ function setupInstructorFlow() {
   }
 }
 
-// Populate Instructors list and show Instructor PIN screen (Instant 0ms switch)
-function initInstructorFlow() {
+// Populate Instructors list and show Instructor PIN screen (Auto-restores session if already logged in)
+async function initInstructorFlow() {
+  const savedDoc = localStorage.getItem('instructor_session');
+  if (savedDoc) {
+    try {
+      const doc = JSON.parse(savedDoc);
+      if (doc && (doc.id || doc.name)) {
+        state.currentInstructor = doc;
+        await loadInstructorDashboard();
+        showView('view-instructor-dashboard');
+        return;
+      }
+    } catch(e) {}
+  }
   showView('view-instructor-pin');
-  loadInstructorsList();
+  await loadInstructorsList();
   const pinInput = document.getElementById('instructor-pin-input');
   if (pinInput) {
     pinInput.value = '';
@@ -1133,12 +1139,14 @@ async function verifyInstructorPin() {
   const selectedDocId = sel ? sel.value : null;
   const doctor = state.instructors.find(i => i.id === selectedDocId) || state.instructors[0];
 
-  // Match doctor PIN or developer master key (0000) or default fallback
-  const isMatch = (doctor && doctor.pin === enteredPin) || enteredPin === '1234' || enteredPin === '0000';
+  // Match doctor PIN (Strict security: exact match required, no default fallbacks)
+  const isMatch = Boolean(doctor && doctor.pin && doctor.pin.trim() === enteredPin);
 
   if (isMatch) {
     state.currentInstructor = doctor;
     localStorage.setItem('cached_instructor_pin', enteredPin);
+    localStorage.setItem('instructor_session', JSON.stringify(doctor));
+    localStorage.setItem('current_active_view', 'view-instructor-dashboard');
     pinInput.value = '';
     showToast(`مرحباً بك ${doctor.name} ✨`, 'success');
     loadInstructorDashboard();
@@ -2523,6 +2531,7 @@ async function loadLectureSession(lectureId) {
       instEl.innerText = lecture.instructor_name ? 'المحاضر: ' + lecture.instructor_name : '';
     }
 
+    localStorage.setItem('active_lecture_id', lectureId);
     showView('view-lecture-session');
 
     // Load attendance records
@@ -2858,6 +2867,8 @@ function setupGlobalEvents() {
 
   // Back to Instructor Dashboard from active lecture
   document.getElementById('btn-back-dashboard')?.addEventListener('click', () => {
+    localStorage.removeItem('active_lecture_id');
+    localStorage.setItem('current_active_view', 'view-instructor-dashboard');
     loadInstructorDashboard();
     navigateBack();
   });
@@ -3017,6 +3028,146 @@ function registerServiceWorker() {
   });
 }
 
+// ==========================================================================
+// Session & View Persistence (Never kicks user out on refresh / app reload)
+// ==========================================================================
+async function restoreSessionAndView() {
+  try {
+    const rawHash = (window.location.hash || '').replace('#', '').trim().toLowerCase();
+
+    // Check developer secret routes
+    if (rawHash === 'dev' || rawHash === 'developer') {
+      openDevPinModal();
+      return;
+    }
+
+    const savedView = localStorage.getItem('current_active_view') || '';
+
+    // 1. Hydrate Student Session
+    let hasStudentSession = false;
+    const studentDataStr = localStorage.getItem('student_profile');
+    if (studentDataStr) {
+      try {
+        const student = JSON.parse(studentDataStr);
+        if (student && student.national_id) {
+          state.currentStudent = student;
+          hasStudentSession = true;
+          renderStudentQrCard(student);
+          initStudentInboxListener(student);
+        }
+      } catch (e) {
+        console.warn('[Session] Could not parse student profile:', e);
+      }
+    }
+
+    // 2. Hydrate Instructor Session
+    let hasInstructorSession = false;
+    const instDataStr = localStorage.getItem('instructor_session');
+    if (instDataStr) {
+      try {
+        const doc = JSON.parse(instDataStr);
+        if (doc && (doc.id || doc.name)) {
+          state.currentInstructor = doc;
+          hasInstructorSession = true;
+        }
+      } catch (e) {
+        console.warn('[Session] Could not parse instructor session:', e);
+      }
+    }
+
+    // 3. Determine Target View
+    let targetView = 'view-landing';
+    if (rawHash) {
+      const mappedHashView = 'view-' + rawHash;
+      if (document.getElementById(mappedHashView)) {
+        targetView = mappedHashView;
+      }
+    } else if (savedView && document.getElementById(savedView)) {
+      targetView = savedView;
+    }
+
+    // 4. View-specific routing & guards
+    if (targetView === 'view-student-card') {
+      if (hasStudentSession) {
+        showView('view-student-card', false);
+        return;
+      } else {
+        switchStudentAuthTab('login');
+        showView('view-student-form', false);
+        return;
+      }
+    }
+
+    if (targetView === 'view-student-form') {
+      showView('view-student-form', false);
+      return;
+    }
+
+    if (targetView === 'view-lecture-session') {
+      const activeLecId = localStorage.getItem('active_lecture_id');
+      if (hasInstructorSession && activeLecId) {
+        await loadLectureSession(activeLecId);
+        showView('view-lecture-session', false);
+        return;
+      } else if (hasInstructorSession) {
+        await loadInstructorDashboard();
+        showView('view-instructor-dashboard', false);
+        return;
+      } else {
+        await initInstructorFlow();
+        return;
+      }
+    }
+
+    if (targetView === 'view-instructor-dashboard') {
+      if (hasInstructorSession) {
+        await loadInstructorDashboard();
+        showView('view-instructor-dashboard', false);
+        return;
+      } else {
+        await initInstructorFlow();
+        return;
+      }
+    }
+
+    if (targetView === 'view-instructor-pin') {
+      await initInstructorFlow();
+      return;
+    }
+
+    if (targetView === 'view-developer-admin') {
+      if (sessionStorage.getItem('dev_master_authenticated') === 'true') {
+        showView('view-developer-admin', false);
+        return;
+      } else {
+        openDevPinModal();
+        return;
+      }
+    }
+
+    // 5. Default Fallbacks if on Landing view without explicit request:
+    // If student account is already active, stay on student card!
+    if (hasStudentSession && (!savedView || savedView === 'view-landing')) {
+      showView('view-student-card', false);
+      return;
+    }
+
+    // If instructor account is already active, stay on instructor dashboard!
+    if (hasInstructorSession && (!savedView || savedView === 'view-landing')) {
+      await loadInstructorDashboard();
+      showView('view-instructor-dashboard', false);
+      return;
+    }
+
+    // Otherwise show target view (landing or whatever was saved)
+    showView(targetView, false);
+
+  } catch (err) {
+    console.error('Error during session & view restoration:', err);
+    showView('view-landing', false);
+  }
+}
+
 // Robust Initialization (handles loading or already-interactive DOM)
 function initApp() {
   try {
@@ -3028,6 +3179,7 @@ function initApp() {
     setupInstructorPortalTabs();
     setupGlobalEvents();
     registerServiceWorker();
+    restoreSessionAndView();
     console.log('Agricultural engineer PWA v1.3 initialized successfully.');
   } catch (e) {
     console.error('Error during initApp:', e);
