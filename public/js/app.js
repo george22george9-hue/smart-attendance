@@ -1205,15 +1205,12 @@ async function handleDevPinSubmit() {
 
   const activePin = await getActiveDevMasterPin();
 
-  // Master Developer Keys that ALWAYS grant access:
-  // 1. Primary Master Key: 'ENG-22-George' (case-insensitive)
-  // 2. Legacy Master Key: '0000'
-  // 3. Any custom PIN saved by the developer
+  // Master Developer Key Verification:
+  // Strictly requires the developer's unique key 'ENG-22-George' (or any custom PIN saved by the developer)
   const normalizedEntered = entered.toLowerCase();
   const isMatch = (
     normalizedEntered === 'eng-22-george' ||
     entered === 'ENG-22-George' ||
-    entered === '0000' ||
     (activePin && (entered === activePin || normalizedEntered === activePin.toLowerCase()))
   );
 
