@@ -112,7 +112,7 @@ window.applyTheme = applyTheme;
 // UI Toasts (Luxurious Floating Glass Pill - Single Instance)
 let currentActiveToast = null;
 
-function showToast(message, type = 'info', duration = 3200) {
+function showToast(message, type = 'info', duration = 3400) {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
@@ -122,31 +122,73 @@ function showToast(message, type = 'info', duration = 3200) {
     currentActiveToast = null;
   }
 
-  const toast = document.createElement('div');
-  toast.className = `app-toast ${type}`;
+  // Trigger subtle device haptic vibration on mobile if supported
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      if (type === 'error') navigator.vibrate([35, 45, 35]);
+      else if (type === 'success') navigator.vibrate(25);
+    } catch(e) {}
+  }
 
-  let icon = 'ℹ️';
-  if (type === 'success') icon = '✅';
-  else if (type === 'error') icon = '⚠️';
-  else if (type === 'warning') icon = '⚡';
+  const toast = document.createElement('div');
+  toast.className = `app-toast toast-${type}`;
+
+  let iconSvg = '';
+  let typeTitle = 'إشعار';
+  if (type === 'success') {
+    typeTitle = 'تم بنجاح';
+    iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+  } else if (type === 'error') {
+    typeTitle = 'تنبيه';
+    iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+  } else if (type === 'warning') {
+    typeTitle = 'ملاحظة';
+    iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+  } else {
+    typeTitle = 'معلومة';
+    iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+  }
 
   toast.innerHTML = `
-    <span class="toast-icon-chip">${icon}</span>
-    <span class="toast-message-text">${message}</span>
+    <div class="toast-capsule-body">
+      <div class="toast-icon-chip ${type}">
+        ${iconSvg}
+      </div>
+      <div class="toast-content-col">
+        <div class="toast-type-tag">${typeTitle}</div>
+        <div class="toast-message-text">${message}</div>
+      </div>
+      <button type="button" class="toast-dismiss-btn" title="إغلاق" aria-label="إغلاق">&times;</button>
+    </div>
+    <div class="toast-progress-track">
+      <div class="toast-progress-bar ${type}" style="animation-duration: ${duration}ms;"></div>
+    </div>
   `;
+
+  let isDismissed = false;
+  const dismiss = () => {
+    if (isDismissed) return;
+    isDismissed = true;
+    toast.classList.add('hiding');
+    setTimeout(() => {
+      try { toast.remove(); } catch(e){}
+      if (currentActiveToast === toast) currentActiveToast = null;
+    }, 220);
+  };
+
+  const dismissBtn = toast.querySelector('.toast-dismiss-btn');
+  dismissBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dismiss();
+  });
+  toast.addEventListener('click', dismiss);
 
   container.appendChild(toast);
   currentActiveToast = toast;
 
   setTimeout(() => {
     if (toast === currentActiveToast) {
-      toast.classList.add('hiding');
-      setTimeout(() => {
-        if (toast === currentActiveToast) {
-          try { toast.remove(); } catch(e){}
-          currentActiveToast = null;
-        }
-      }, 250);
+      dismiss();
     }
   }, duration);
 }
@@ -3069,9 +3111,13 @@ function renderStudentMessages(messages) {
   container.innerHTML = '';
   if (messages.length === 0) {
     container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">📬</div>
-        <p>لا توجد رسائل أو تنبيهات جديدة من المحاضر حتى الآن</p>
+      <div class="notif-empty-state">
+        <div class="notif-empty-icon-wrap">
+          <span class="notif-empty-icon">🔔</span>
+          <span class="notif-sparkle">✨</span>
+        </div>
+        <h4 class="notif-empty-title">صندوق الإشعارات هادئ تماماً</h4>
+        <p class="notif-empty-desc">جميع التنبيهات والرسائل الرسمية الصادرة من المحاضرين ستصلك هنا فوراً وبأمان</p>
       </div>
     `;
     return;
@@ -3079,26 +3125,35 @@ function renderStudentMessages(messages) {
 
   messages.forEach(msg => {
     const card = document.createElement('div');
-    card.className = 'message-card';
-
-    let targetLabel = '📢 لجميع الطلاب';
+    let targetLabel = '📢 إعلان عام لجميع الطلاب';
     let targetClass = 'all';
+    let cardClassModifier = '';
     if (msg.target_type === 'dept') {
-      targetLabel = '🏛️ لطلاب قسم ' + msg.target_value;
+      targetLabel = '🏛️ إشعار لطلاب قسم ' + msg.target_value;
       targetClass = 'dept';
+      cardClassModifier = 'dept-card';
     } else if (msg.target_type === 'student') {
-      targetLabel = '👤 رسالة خاصة لك';
+      targetLabel = '👤 رسالة شخصية مباشرة لك';
       targetClass = 'student';
+      cardClassModifier = 'student-card';
     }
+
+    card.className = `message-card ${cardClassModifier}`;
 
     const senderInfo = msg.sender_name || msg.sender;
     card.innerHTML = `
       <div class="message-header">
-        <span class="message-target-pill ${targetClass}">${targetLabel}</span>
+        <span class="message-target-pill ${targetClass}">
+          <span class="notif-pulse-dot"></span>
+          <span>${targetLabel}</span>
+        </span>
         <span class="message-date">${senderInfo ? `👨‍🏫 ${senderInfo} • ` : ''}${msg.date_str || ''}</span>
       </div>
       <h5 class="message-title">${msg.title}</h5>
       <p class="message-body">${msg.body}</p>
+      <div class="message-card-footer">
+        <span class="msg-verified-pill">✓ إشعار رسمي معتمد من الكلية</span>
+      </div>
     `;
     container.appendChild(card);
   });
