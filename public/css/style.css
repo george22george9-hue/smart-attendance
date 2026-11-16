@@ -1003,6 +1003,19 @@ input:-webkit-autofill:active {
   font-size: 1.1rem;
 }
 
+.role-card-subhint {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  margin-top: 8px;
+  box-sizing: border-box;
+}
+
 .landing-footer-refresh {
   margin-top: 20px;
   text-align: center;
@@ -1899,68 +1912,113 @@ input:-webkit-autofill:active {
 
   .landing-role-grid {
     grid-template-columns: 1fr;
-    gap: 10px;
-    margin-top: 12px;
+    gap: 14px;
+    margin-top: 14px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  /* Compact Horizontal Mobile Cards (Native Mobile Feel) */
+  /* Well-Proportioned Academic Mobile Cards */
   .role-action-card {
     display: flex;
-    flex-direction: row !important;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 14px;
-    min-height: 66px;
-    border-radius: var(--radius-md);
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 10px;
+    padding: 16px 14px !important;
+    border-radius: var(--radius-lg);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    text-align: right;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
   }
 
   .role-card-top {
-    margin-bottom: 0 !important;
-    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 2px !important;
   }
 
   .role-card-tag {
-    display: none !important;
+    display: inline-block !important;
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background: var(--bg-secondary);
+    color: var(--primary);
+    font-weight: 700;
   }
 
   .role-icon-box {
-    width: 40px;
-    height: 40px;
-    font-size: 1.25rem;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
 
   .role-card-body {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
     text-align: right;
   }
 
   .role-card-title {
-    font-size: 1rem;
-    margin-bottom: 2px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 4px;
   }
 
   .role-card-desc {
-    font-size: 0.76rem;
-    line-height: 1.35;
-    margin-bottom: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
   }
 
   .role-card-footer {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0 !important;
-    border-top: none !important;
-    flex-shrink: 0;
+    justify-content: space-between;
+    width: 100%;
+    padding-top: 10px !important;
+    margin-top: 4px;
+    border-top: 1px solid var(--border-subtle) !important;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary);
   }
 
   .role-card-footer span:not(.role-arrow) {
-    display: none !important;
+    display: inline !important;
+  }
+
+  .role-arrow {
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+  }
+
+  .role-card-subhint {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    margin-top: 6px;
+    box-sizing: border-box;
   }
 
   .form-input, input.form-input, select.form-input, textarea.form-input {
