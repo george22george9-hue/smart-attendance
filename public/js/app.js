@@ -91,17 +91,17 @@ function applyTheme(theme, notify = false) {
     if (iconEl) iconEl.textContent = '☀️';
     if (textEl) textEl.textContent = 'ليلي';
     if (toggleBtn) toggleBtn.setAttribute('title', 'التبديل إلى الوضع النهاري ☀️');
-    if (metaTheme) metaTheme.setAttribute('content', '#070f14');
+    if (metaTheme) metaTheme.setAttribute('content', '#15201A');
     if (notify) {
-      showToast('تم تفعيل الوضع الليلي 🌙', 'info', 1800);
+      showToast('تم تفعيل الوضع الليلي الهادئ 🌙', 'info', 1800);
     }
   } else {
     if (iconEl) iconEl.textContent = '🌙';
     if (textEl) textEl.textContent = 'نهاري';
     if (toggleBtn) toggleBtn.setAttribute('title', 'التبديل إلى الوضع الليلي 🌙');
-    if (metaTheme) metaTheme.setAttribute('content', '#f0fdf4');
+    if (metaTheme) metaTheme.setAttribute('content', '#F7F7F2');
     if (notify) {
-      showToast('تم تفعيل الوضع النهاري ☀️', 'info', 1800);
+      showToast('تم تفعيل الوضع النهاري الأكاديمي ☀️', 'info', 1800);
     }
   }
 }
